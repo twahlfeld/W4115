@@ -1,5 +1,5 @@
 (*
- * Scanner for the TED programming langauge
+ * Scanner for the TED programming language
  *)
 { oper Parser }
 
