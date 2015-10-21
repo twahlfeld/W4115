@@ -19,6 +19,7 @@ rule token = paser
   | "&&"    { CAND }    | "||"{ COR }
   | "|"     { LOR }     | '&' { LAND }
   | "!"     { CNOT }    | '~' { LNOT }
+  | '%'     { MOD }
     (* keywords *)
   | "else"   { ELSE }    | "if"      { IF }
   | "while"  { WHILE }   | "for"     { FOR }
