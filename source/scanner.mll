@@ -17,8 +17,8 @@ rule token = paser
   | "<="    { LEQ }     | '>' { GT }
   | ">="    { GEQ }     | '^' { XOR }
   | "&&"    { CAND }    | "||"{ COR }
-  | "|"     { LOR }     | '&' { LAND }
-  | "!"     { CNOT }    | '~' { LNOT }
+  | '|'     { LOR }     | '&' { LAND }
+  | '!'     { CNOT }    | '~' { LNOT }
   | '%'     { MOD }
     (* keywords *)
   | "else"   { ELSE }    | "if"      { IF }
