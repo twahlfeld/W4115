@@ -1,5 +1,5 @@
 (* 
- * Abstract Synstax Tree for the TED programming language
+ * Abstract Synstax Tree for the TED programming language.
  *)
 
 type op = Add | Sub | Mult | Div | Equal | Neq | Lt | Leq | Gt | Geq
