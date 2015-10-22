@@ -1,9 +1,9 @@
 (*
  * Scanner for the TED programming language
  *)
-{ oper Parser }
+{ open Parser }
 
-rule token = paser
+rule token = parser
   | [' ' '\t' '\r' '\n']    { token lexbuf }    (* whitespace *)
   | "/*"                    { comment lexbuf }  (* comments *)
     (* punctuation *)
