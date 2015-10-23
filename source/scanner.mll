@@ -25,8 +25,7 @@ rule token = parser
   | "while"  { WHILE }   | "for"     { FOR }
   | "int"    { INT }     | "then"    { THEN }
   | "float"  { FLOAT }   | "str"     { STRING }
-  | "list"   { LIST }    | "boolean" { BOOL } (* <- Need Boolean ?*)
-  | "true"   { TRUE }    | "false"   { FALSE }
+  | "list"   { LIST }    
   | "FILE"   { FILE }    | "Page"    { PAGE }
   | "Element"{ ELM }     | "return"  { RETURN }
   | eof      { EOF }
