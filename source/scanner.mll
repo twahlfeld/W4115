@@ -25,8 +25,7 @@ rule token = parse
   | "while"  { WHILE }   | "for"     { FOR }
   | "int"    { INT }     | "then"    { THEN }
   | "float"  { FLOAT }   | "str"     { STRING }
-  | "list"   { LIST }    
-  | "FILE"   { FILE }    | "Page"    { PAGE }
+  | "list"   { LIST }    | "FILE"   { FILE }    | "Page"    { PAGE }
   | "Element"{ ELM }     | "return"  { RETURN }
   | eof      { EOF }
   | ['0'-'9']+ as lit { LITERAL(int_of_string lit) }

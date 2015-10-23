@@ -2,7 +2,7 @@
 default: ted
 
 ted: scanner.ml parser ast parser.cmo scanner.cmo
-	ocamlc -o parser.cmo scanner.cmo ted.cmo
+	ocamlc -o parser.cmo scanner.cmo
 
 parser.cmo: parser.ml
 	ocamlc -c parser.mli
