@@ -2,8 +2,7 @@
  * Abstract Synstax Tree for the TED programming language.
  *)
 
-type op = Add | Sub | Mult | Div | Equal | Neq | Lt | Leq | Gt | Geq
-          | Lor | Land | Xor | Mod
+type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq | Lor | Land | Xor | Mod
 
 type expr = (* Expressions *)
   Literal of int (* 42 *)

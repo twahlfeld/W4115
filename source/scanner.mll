@@ -3,7 +3,7 @@
  *)
 { open Parser }
 
-rule token = parser
+rule token = parse
   | [' ' '\t' '\r' '\n']    { token lexbuf }    (* whitespace *)
   | "/*"                    { comment lexbuf }  (* comments *)
     (* punctuation *)

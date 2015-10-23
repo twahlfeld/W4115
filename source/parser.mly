@@ -1,12 +1,12 @@
 %{ open Ast %}
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE MOD
-%token ASSIGN EQ NEQ LT LEQ GT GEQ RETURN IF ELSE FOR WHILE INT EOF
+%token ASSIGN EQ NEQ LT LEQ GT GEQ RETURN IF ELSE THEN FOR WHILE INT EOF
 %token XOR CAND COR LOR LAND CNOT LNOT
 %token <int> LITERAL
 %token <string> ID
 
-%nonassoc NOELSE (* Precedence and associativity of each operator *)
+%nonassoc NOELSE /* Precedence and associativity of each operator*/
 %nonassoc ELSE
 %right ASSIGN
 %left CAND COR
@@ -17,8 +17,8 @@
 %left TIMES DIVIDE MOD
 %right LNOT
 
-%start program (* Start symbol *)
-%type <Ast.program> program (* Type returned by a program *)
+%start program /* Start symbol */
+%type <Ast.program> program /* Type returned by a program */
 
 %%
 program:
@@ -36,7 +36,7 @@ fdecl:
                                 locals = List.rev $6;
                                 body = List.rev $7 } }
 formals_opt:
-  (* nothing *)             { [] }
+  /* nothing */             { [] }
   | formal_list             { List.rev $1 }
 
 formal_list:
@@ -44,14 +44,14 @@ formal_list:
   | formal_list COMMA ID    { $3 :: $1 }
 
 vdecl_list:
-  (* nothing *) { [] }
+  /* nothing */ { [] }
   | vdecl_list vdecl        { $2 :: $1 }
 
 vdecl:
   INT ID SEMI               { $2 }
 
 stmt_list:
-  (* nothing *)             { [] }
+  /* nothing */             { [] }
   | stmt_list stmt          { $2 :: $1 }
 
 stmt:
@@ -65,7 +65,7 @@ stmt:
   | WHILE LPAREN expr RPAREN stmt             { While($3, $5) }
 
 expr_opt:
-  (* nothing *) { Noexpr }
+  /* nothing */ { Noexpr }
   | expr { $1 }
 
 expr:
@@ -86,7 +86,7 @@ expr:
   | LPAREN expr RPAREN            { $2 }
 
 actuals_opt:
-  (* nothing *)   { [] }
+  /* nothing */   { [] }
   | actuals_list  { List.rev $1 }
 
 actuals_list:
