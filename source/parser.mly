@@ -10,7 +10,7 @@ STRING LIST FILE PAGE ELM RETURN EOF
 %nonassoc NOELSE /* Precedence and associativity of each operator*/
 %nonassoc ELSE
 %right ASSIGN
-%left CAND COR
+%left CAND COR CNOT
 %left LOR LAND XOR
 %left EQ NEQ
 %left LT GT LEQ GEQ
@@ -82,6 +82,15 @@ expr:
   | expr LEQ expr                 { Binop($1, Leq, $3) }
   | expr GT expr                  { Binop($1, Greater, $3) }
   | expr GEQ expr                 { Binop($1, Geq, $3) }
+  | expr XOR expr                 { Binop($1, Xor, $3) }
+  | expr CAND expr                { Binop($1, Cand, $3) }
+  | expr COR expr                 { Binop($1, Cor, $3) }
+  | expr LOR expr                 { Binop($1, Lor, $3) }
+  | expr LAND expr                { Binop($1, Land, $3) }
+  | expr MOD expr                 { Binop($1, Mod, $3) }
+  | MINUS expr                    { Unary(Minus, $2) }
+  | CNOT expr                     { Unary(Cnot, $2) }
+  | LNOT expr                     { Unary(Lnot, $2) }
   | ID ASSIGN expr                { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN  { Call($1, $3) }
   | LPAREN expr RPAREN            { $2 }
