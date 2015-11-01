@@ -23,7 +23,7 @@ rule token = parse
     (* keywords *)
   | "else"   { ELSE }    | "if"      { IF }
   | "while"  { WHILE }   | "for"     { FOR }
-  | "int"    { INT }     | "then"    { THEN }
+  | "int"    { INT }     (*| "then"    { THEN }*)
   | "float"  { FLOAT }   | "str"     { STRING }
   | "list"   { LIST }    | "FILE"   { FILE }    | "Page"    { PAGE }
   | "Element"{ ELM }     | "return"  { RETURN }

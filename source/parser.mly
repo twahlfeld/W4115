@@ -49,13 +49,22 @@ vdecl_list:
   | vdecl_list vdecl        { $2 :: $1 }
 
 vdecl:
-  INT ID SEMI               { $2 }
-  | LIST ID SEMI            { $2 }
-  | FILE ID SEMI            { $2 }
-  | ELM ID SEMI             { $2 }
-  | STRING ID SEMI          { $2 }
-  | FLOAT ID SEMI           { $2 }
-  | PAGE ID SEMI            { $2 }
+  vtype ID SEMI               { $2 }
+
+vtype:
+  obj       { $1 }
+  | prim    { $1 }
+
+obj:
+  PAGE  { Page }
+  | ELM { Elm }
+
+prim:
+  INT       { Int }
+  | LIST    { List }
+  | FILE    { File }
+  | STRING  { String }
+  | FLOAT   { Float }
 
 stmt_list:
   /* nothing */             { [] }
