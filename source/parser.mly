@@ -1,8 +1,8 @@
 %{ open Ast %}
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE MOD
-%token ASSIGN EQ NEQ LT LEQ GT GEQ RETURN IF ELSE THEN FOR WHILE INT FLOAT
-STRING LIST FILE PAGE ELM RETURN EOF
+%token ASSIGN EQ NEQ LT LEQ GT GEQ RETURN IF ELSE FOR WHILE INT FLOAT
+STRING LIST FILE PAGE ELM EOF
 %token XOR CAND COR LOR LAND CNOT LNOT
 %token <int> LITERAL
 %token <string> ID
@@ -50,11 +50,12 @@ vdecl_list:
 
 vdecl:
   INT ID SEMI               { $2 }
-  | LIST ID SEMI              { $2 }
-  | FILE ID SEMI              { $2 }
-  | ELM ID SEMI               { $2 }
-  | STRING ID SEMI            { $2 }
-  | FLOAT ID SEMI             { $2 }
+  | LIST ID SEMI            { $2 }
+  | FILE ID SEMI            { $2 }
+  | ELM ID SEMI             { $2 }
+  | STRING ID SEMI          { $2 }
+  | FLOAT ID SEMI           { $2 }
+  | PAGE ID SEMI            { $2 }
 
 stmt_list:
   /* nothing */             { [] }
