@@ -50,6 +50,11 @@ vdecl_list:
 
 vdecl:
   INT ID SEMI               { $2 }
+  | LIST ID SEMI              { $2 }
+  | FILE ID SEMI              { $2 }
+  | ELM ID SEMI               { $2 }
+  | STRING ID SEMI            { $2 }
+  | FLOAT ID SEMI             { $2 }
 
 stmt_list:
   /* nothing */             { [] }
