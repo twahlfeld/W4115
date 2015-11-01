@@ -3,6 +3,12 @@
  *)
 { open Parser }
 
+let D = ['0'-'9']
+let L = ['A'-'z']
+let E = ('E'|'e')('+'|'-')?D+
+
+
+
 rule token = parse
   | [' ' '\t' '\r' '\n']    { token lexbuf }    (* whitespace *)
   | "/*"                    { comment lexbuf }  (* comments *)
@@ -23,13 +29,14 @@ rule token = parse
     (* keywords *)
   | "else"   { ELSE }    | "if"      { IF }
   | "while"  { WHILE }   | "for"     { FOR }
-  | "int"    { INT }     (*| "then"    { THEN }*)
-  | "float"  { FLOAT }   | "str"     { STRING }
-  | "list"   { LIST }    | "FILE"   { FILE }    | "Page"    { PAGE }
+  | "int"    { INT }     | "float"  { FLOAT }
+  | "str"     { STRING } | "list"   { LIST }
+  | "FILE"   { FILE }    | "Page"    { PAGE }
   | "Element"{ ELM }     | "return"  { RETURN }
   | eof      { EOF }
-  | ['0'-'9']+ as lit { LITERAL(int_of_string lit) }
-  | ['A'-'z']['A'-'z' '0'-'9' '_']* as lit { ID(lit) }
+  | D+ as lit { LITERAL(int_of_string lit) }
+  | L(D|L|'_')* as lit { ID(lit) }
+  | (D+E) | (D*'.'D+E) | (D+'.'D*E) as lit { FLITERAL(float_of_string lit) }
   | _ as char { raise (Failure("illegal character " ^ Char.escaped char))}
 
 and comment = parse

@@ -14,7 +14,7 @@ parser.ml: parser.mly
 	ocamlyacc parser.mly
 
 ast:
-	ocamlc -c ast.ml
+	ocamlc -c ast.mli
 
 parser:
 	ocamlyacc parser.mly

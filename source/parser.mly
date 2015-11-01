@@ -5,6 +5,7 @@
 STRING LIST FILE PAGE ELM EOF
 %token XOR CAND COR LOR LAND CNOT LNOT
 %token <int> LITERAL
+%token <float> FLITERAL
 %token <string> ID
 
 %nonassoc NOELSE /* Precedence and associativity of each operator*/
@@ -49,8 +50,8 @@ vdecl_list:
   | vdecl_list vdecl        { $2 :: $1 }
 
 vdecl:
-<<<<<<< HEAD
-  vtype ID SEMI               { $2 }
+  vtype ID SEMI              { $2 }
+  | vtype ID ASSIGN expr SEMI  { Assign($2, $4) }
 
 vtype:
   obj       { $1 }
@@ -66,20 +67,6 @@ prim:
   | FILE    { File }
   | STRING  { String }
   | FLOAT   { Float }
-=======
-  prim ID SEMI              { $2 }
-  | prim ID ASSIGN expr SEMI  { $2 }
-  | obj ID SEMI               { $2 }
-  | obj ID ASSIGN expr SEMI   { $2 }
-
- /* INT ID SEMI               { $2 }
-  | LIST ID SEMI            { $2 }
-  | FILE ID SEMI            { $2 }
-  | ELM ID SEMI             { $2 }
-  | STRING ID SEMI          { $2 }
-  | FLOAT ID SEMI           { $2 }
-  | PAGE ID SEMI            { $2 }*/
->>>>>>> 20fecd01b856fc284d17357f27ba6e046720f4a4
 
 stmt_list:
   /* nothing */             { [] }
@@ -101,6 +88,7 @@ expr_opt:
 
 expr:
   LITERAL                         { Literal($1) }
+  | FLITERAL                      { Fliteral($1) }
   | ID                            { Id($1) }
   | expr PLUS expr                { Binop($1, Add, $3) }
   | expr MINUS expr               { Binop($1, Sub, $3) }

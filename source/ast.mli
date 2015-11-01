@@ -7,6 +7,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq
 
 type expr = (* Expressions *)
   Literal of int (* 42 *)
+  | Fliteral of float (* 3.14.5 *)
   | Noexpr (* for (;;) *)
   | Id of string (* foo *)
   | Assign of string * expr (* foo = 42 *)
