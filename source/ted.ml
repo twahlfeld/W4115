@@ -6,12 +6,12 @@ let vars = Array.make 26 0
 ;;
 
 let rec eval = function
-  | Lit(x) -> x
+  | Literal(x) -> x
   | Var(x) -> vars.(x)
   | Asn(x, expr) -> vars.(x) <- (eval expr); vars.(x)
   | Seq(lhs, rhs) -> eval lhs; eval rhs
   | Binop(e1, op, e2) ->
-    let v1 = eval e1 and v2 = eval e2 in
+    (let v1 = eval e1 and v2 = eval e2 in
     match op with
     | Add     -> v1 +      v2
     | Sub     -> v1 -      v2
@@ -26,7 +26,14 @@ let rec eval = function
     | Lor     -> v1 (lor)  v2
     | Land    -> v1 (land) v2
     | Xor     -> v1 (lxor) v2
-    | Mod     -> v1 (mod)  v2
+    | Mod     -> v1 (mod)  v2)
+  | Unary(unop, expr) ->
+    let value = eval e1 in
+    (match unop with
+    | Minus  -> (-value)
+    | Lnot   -> ((lnot)value)
+    | Cnot   -> (not value)
+    )
 ;;
 
 let _ =
