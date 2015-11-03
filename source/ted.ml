@@ -13,10 +13,20 @@ let rec eval = function
   | Binop(e1, op, e2) ->
     let v1 = eval e1 and v2 = eval e2 in
     match op with
-    | Add -> v1 + v2
-    | Sub -> v1 - v2
-    | Mul -> v1 * v2
-    | Div -> v1 / v2
+    | Add     -> v1 +      v2
+    | Sub     -> v1 -      v2
+    | Mult    -> v1 *      v2
+    | Div     -> v1 /      v2
+    | Equal   -> v1 =      v2
+    | Neq     -> v1 !=     v2
+    | Less    -> v1 <      v2
+    | Leq     -> v1 <=     v2
+    | Greater -> v1 >      v2
+    | Geq     -> v1 >=     v2
+    | Lor     -> v1 (lor)  v2
+    | Land    -> v1 (land) v2
+    | Xor     -> v1 (lxor) v2
+    | Mod     -> v1 (mod)  v2
 ;;
 
 let _ =
