@@ -2,8 +2,9 @@
  * Abstract Synstax Tree for the TED programming language.
  *)
 
-type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq
+type binop = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq
   | Lor | Land | Xor | Mod
+type unop = MINUS | CNOT | LNOT
 
 type expr = (* Expressions *)
   Literal of int (* 42 *)
@@ -11,7 +12,7 @@ type expr = (* Expressions *)
   | Noexpr (* for (;;) *)
   | Id of string (* foo *)
   | Assign of string * expr (* foo = 42 *)
-  | Binop of expr * op * expr (* a + b *)
+  | Binop of expr * binop * expr (* a + b *)
   | Call of string * expr list (* foo(1, 25 *)
 
 type stmt = (* Statements *)
