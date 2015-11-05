@@ -13,7 +13,8 @@ TEST10="ID LPAREN RPAREN LBRACE RBRACE"
 TEST11="ID LPAREN ID COMMA ID RPAREN LBRACE INT ID ASSIGN ID SEMI RBRACE"
 TEST12="STRING ID SEMI"
 TEST13="$TEST1 $TEST3 $TEST11"
-TEST14="ID LPAREN RPAREN SEMI"
+TEST14="INT ID ASSIGN ID LPAREN RPAREN SEMI"
+TEST15="ID LPAREN RPAREN LBRACE $TEST1 $TEST3 $TEST5 $TEST6 $TEST9 RBRACE $TEST14"
 printf "Performing test 1: parser \n1: $TEST1 declaration/int... " && echo $TEST1 | $MENHIR
 echo "Press enter to continue." && read answer
 printf "2: $TEST2 assignment/float ... " && echo $TEST2 | $MENHIR
@@ -41,4 +42,5 @@ echo "Press enter to continue." && read answer
 printf "13: $TEST13 vdecls and fdecl... " && echo $TEST13 | $MENHIR
 echo "Press enter to continue." && read answer
 printf "14: $TEST14 basic func call... " && echo $TEST14 | $MENHIR
-
+echo "Press enter to continue." && read answer
+printf "15: $TEST15 complex func decl and all... " && echo $TEST15 | $MENHIR
