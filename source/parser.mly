@@ -131,7 +131,7 @@ expr:
   | ID ASSIGN expr                { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN  { Call($1, $3) }
   | LPAREN expr RPAREN            { $2 }
-  | obj ACCVAL objval             { $3 }
+  | ID ACCVAL objval             { $3 }
 
 actuals_opt:
   /* nothing */   { [] }
