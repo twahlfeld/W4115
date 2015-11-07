@@ -5,6 +5,7 @@
 type binop = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq
   | Lor | Land | Xor | Mod
 type unop = MINUS | CNOT | LNOT
+type jmp = Break | Continue
 
 type expr = (* Expressions *)
   Literal of int (* 42 *)
@@ -22,6 +23,7 @@ type stmt = (* Statements *)
   | If of expr * stmt * stmt (* if (foo == 42) {} else {} *)
   | For of expr * expr * expr * stmt (* for (i=0;i<10;i=i+1) { ... } *)
   | While of expr * stmt (* while (i<10) { i = i + 1 } *)
+  | Jmp of stmt
 
 type func_decl = {
   fname : string; (* Name of the function *)
