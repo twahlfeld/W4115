@@ -61,6 +61,10 @@ obj:
   PAGE  { Page }
   | ELM { Elm }
 
+elmval:
+  id    { Elmid }
+  class {
+
 prim:
   INT       { Int }
   | LIST    { List }
