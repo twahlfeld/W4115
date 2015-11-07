@@ -2,8 +2,9 @@
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE MOD 
 %token ASSIGN EQ NEQ LT LEQ GT GEQ RETURN IF ELSE FOR WHILE INT FLOAT
-STRING LIST FILE PAGE ELM EOF
+STRING LIST FILE PAGE ELM ACCVAL EOF 
 %token XOR CAND COR LOR LAND CNOT LNOT
+%token ELMID CLASS HTML TEXT TYPE ATTR CHILDREN RESPONSE URL
 %token BREAK CONTINUE /* JMP INSTRUCTION */
 %token <int> LITERAL
 %token <float> FLITERAL
@@ -62,9 +63,16 @@ obj:
   PAGE  { Page }
   | ELM { Elm }
 
-elmval:
-  id    { Elmid }
-  class {
+objval:
+  ELMID       { Elmid }
+  | CLASS     { Class }
+  | HTML      { Html }
+  | TEXT      { Text }
+  | TYPE      { Type }
+  | ATTR      { Attr }
+  | CHILDREN  { Children }
+  | RESPONSE  { Response }
+  | URL       { Url }
 
 prim:
   INT       { Int }
@@ -123,6 +131,7 @@ expr:
   | ID ASSIGN expr                { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN  { Call($1, $3) }
   | LPAREN expr RPAREN            { $2 }
+  | obj ACCVAL objval             { $3 }
 
 actuals_opt:
   /* nothing */   { [] }
