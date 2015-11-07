@@ -4,6 +4,7 @@
 %token ASSIGN EQ NEQ LT LEQ GT GEQ RETURN IF ELSE FOR WHILE INT FLOAT
 STRING LIST FILE PAGE ELM EOF
 %token XOR CAND COR LOR LAND CNOT LNOT
+%token BREAK CONTINUE /* JMP INSTRUCTION */
 %token <int> LITERAL
 %token <float> FLITERAL
 %token <string> ID
@@ -24,7 +25,7 @@ STRING LIST FILE PAGE ELM EOF
 
 %%
 program:
-  decls stmt_list EOF { $1 }
+  decls EOF { $1 }
 
 decls:
   /* nothing */ { [], [] }
@@ -79,12 +80,18 @@ stmt_list:
 stmt:
   expr SEMI                                   { Expr($1) }
   | RETURN expr SEMI                          { Return($2) }
+  | jmp SEMI                                  { Jmp($1) }
   | LBRACE stmt_list RBRACE                   { Block(List.rev $2) }
   | IF LPAREN expr RPAREN stmt %prec NOELSE   { If($3, $5, Block([])) }
   | IF LPAREN expr RPAREN stmt ELSE stmt      { If($3, $5, $7) }
   | FOR LPAREN expr_opt SEMI expr_opt SEMI expr_opt RPAREN stmt
                                               { For($3, $5, $7, $9) }
   | WHILE LPAREN expr RPAREN stmt             { While($3, $5) }
+
+jmp:
+  BREAK         { Break }
+  | CONTINUE    { CONTINUE }
+
 
 expr_opt:
   /* nothing */ { Noexpr }
