@@ -1,34 +1,66 @@
-(* 
- * Abstract Synstax Tree for the TED programming language.
- *)
+type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq
 
-type binop = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq
-  | Lor | Land | Xor | Mod
-type unop = MINUS | CNOT | LNOT
-type jmp = Break | Continue
+type expr =
+    Literal of int
+  | Id of string
+  | Binop of expr * op * expr
+  | Assign of string * expr
+  | Call of string * expr list
+  | Noexpr
 
-type expr = (* Expressions *)
-  Literal of int (* 42 *)
-  | Fliteral of float (* 3.14.5 *)
-  | Noexpr (* for (;;) *)
-  | Id of string (* foo *)
-  | Assign of string * expr (* foo = 42 *)
-  | Binop of expr * binop * expr (* a + b *)
-  | Call of string * expr list (* foo(1, 25 *)
-
-type stmt = (* Statements *)
-  Block of stmt list (* { ... } *)
-  | Expr of expr (* foo = bar + 3; *)
-  | Return of expr (* return 42; *)
-  | If of expr * stmt * stmt (* if (foo == 42) {} else {} *)
-  | For of expr * expr * expr * stmt (* for (i=0;i<10;i=i+1) { ... } *)
-  | While of expr * stmt (* while (i<10) { i = i + 1 } *)
-  | Jmp of stmt
+type stmt =
+    Block of stmt list
+  | Expr of expr
+  | Return of expr
+  | If of expr * stmt * stmt
+  | For of expr * expr * expr * stmt
+  | While of expr * stmt
 
 type func_decl = {
-  fname : string; (* Name of the function *)
-  formals : string list; (* Formal argument names *)
-  locals : string list; (* Locally defined variables *)
-  body : stmt list;
-}
-type program = string list * func_decl list (* global vars, funcs *)
+    fname : string;
+    formals : string list;
+    locals : string list;
+    body : stmt list;
+  }
+
+type program = string list * func_decl list
+
+let rec string_of_expr = function
+    Literal(l) -> string_of_int l
+  | Id(s) -> s
+  | Binop(e1, o, e2) ->
+      string_of_expr e1 ^ " " ^
+      (match o with
+	Add -> "+" | Sub -> "-" | Mult -> "*" | Div -> "/"
+      | Equal -> "==" | Neq -> "!="
+      | Less -> "<" | Leq -> "<=" | Greater -> ">" | Geq -> ">=") ^ " " ^
+      string_of_expr e2
+  | Assign(v, e) -> v ^ " = " ^ string_of_expr e
+  | Call(f, el) ->
+      f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+  | Noexpr -> ""
+
+let rec string_of_stmt = function
+    Block(stmts) ->
+      "{\n" ^ String.concat "" (List.map string_of_stmt stmts) ^ "}\n"
+  | Expr(expr) -> string_of_expr expr ^ ";\n";
+  | Return(expr) -> "return " ^ string_of_expr expr ^ ";\n";
+  | If(e, s, Block([])) -> "if (" ^ string_of_expr e ^ ")\n" ^ string_of_stmt s
+  | If(e, s1, s2) ->  "if (" ^ string_of_expr e ^ ")\n" ^
+      string_of_stmt s1 ^ "else\n" ^ string_of_stmt s2
+  | For(e1, e2, e3, s) ->
+      "for (" ^ string_of_expr e1  ^ " ; " ^ string_of_expr e2 ^ " ; " ^
+      string_of_expr e3  ^ ") " ^ string_of_stmt s
+  | While(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s
+
+let string_of_vdecl id = "int " ^ id ^ ";\n"
+
+let string_of_fdecl fdecl =
+  fdecl.fname ^ "(" ^ String.concat ", " fdecl.formals ^ ")\n{\n" ^
+  String.concat "" (List.map string_of_vdecl fdecl.locals) ^
+  String.concat "" (List.map string_of_stmt fdecl.body) ^
+  "}\n"
+
+let string_of_program (vars, funcs) =
+  String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
+  String.concat "\n" (List.map string_of_fdecl funcs)
