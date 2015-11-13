@@ -4,7 +4,7 @@
 %token PLUS MINUS TIMES DIVIDE ASSIGN
 %token EQ NEQ LT LEQ GT GEQ
 %token RETURN IF ELSE FOR WHILE INT
-%token STRING LIST FILE PAGE ELEMENT RETURN
+%token STRING LIST FILE PAGE ELEMENT DOT
 %token <int> LITERAL
 %token <string> ID
 %token EOF
@@ -49,8 +49,12 @@ vdecl_list:
     /* nothing */    { [] }
   | vdecl_list vdecl { $2 :: $1 }
 
+type_specifier:
+  INT           { Int }
+  | STRING      { String }
+
 vdecl:
-   INT ID SEMI { $2 }
+   type_specifier ID SEMI { $2 }
 
 stmt_list:
     /* nothing */  { [] }
