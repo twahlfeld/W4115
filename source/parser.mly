@@ -89,7 +89,7 @@ expr:
 
 postfix_expression:
   expr              { $1 } 
-  | expr '.' ID     { $1 } /*how to access?*/
+  | postfix_expression DOT ID     { $3 } /*how to access?*/
 
 actuals_opt:
     /* nothing */ { [] }
