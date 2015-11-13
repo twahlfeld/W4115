@@ -1,10 +1,10 @@
 #!/bin/bash
 MENHIR="menhir --interpret --interpret-show-cst ../parser.mly"
 TEST1="INT ID SEMI"
-TEST2="FLOAT ID ASSIGN FLITERAL SEMI"
+TEST2="INT ID ASSIGN ID SEMI"
 TEST3="LIST ID ASSIGN ID SEMI"
 TEST4="INT ID ASSIGN LITERAL PLUS LITERAL DIVIDE LPAREN LITERAL PLUS ID RPAREN SEMI"
-TEST5="FOR LPAREN ID ASSIGN LITERAL SEMI ID LT LITERAL SEMI ID ASSIGN ID PLUS LITERAL RPAREN LBRACE ID ASSIGN ID MOD LITERAL SEMI RBRACE" 
+TEST5="FOR LPAREN ID ASSIGN LITERAL SEMI ID LT LITERAL SEMI ID ASSIGN ID PLUS LITERAL RPAREN LBRACE ID ASSIGN ID PLUS LITERAL SEMI RBRACE" 
 TEST6="WHILE LPAREN ID GT LITERAL RPAREN LBRACE ID ASSIGN ID MINUS LITERAL SEMI RBRACE"
 TEST7="LBRACE LITERAL SEMI RBRACE"
 TEST8="LITERAL SEMI"
@@ -17,9 +17,9 @@ TEST14="INT ID ASSIGN ID LPAREN RPAREN SEMI"
 TEST15="ID LPAREN RPAREN LBRACE $TEST1 $TEST3 $TEST5 $TEST6 $TEST9 RBRACE $TEST14"
 printf "Performing test 1: parser \n1: $TEST1 declaration/int... " && echo $TEST1 | $MENHIR
 echo "Press enter to continue." && read answer
-printf "2: $TEST2 assignment/float ... " && echo $TEST2 | $MENHIR
+printf "2: $TEST2 assignment ... " && echo $TEST2 | $MENHIR
 echo "Press enter to continue." && read answer
-printf "3: $TEST3 assign list to id... " && echo $TEST3 | $MENHIR
+printf "3: $TEST3 assign... " && echo $TEST3 | $MENHIR
 echo "Press enter to continue." && read answer
 printf "4: $TEST4 complex assign/parens... " && echo $TEST4 | $MENHIR
 echo "Press enter to continue." && read answer
