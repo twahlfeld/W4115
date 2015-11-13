@@ -87,6 +87,10 @@ expr:
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN { $2 }
 
+postfix_expression:
+  expr              { $1 } 
+  | expr '.' ID     { $1 } /*how to access?*/
+
 actuals_opt:
     /* nothing */ { [] }
   | actuals_list  { List.rev $1 }
