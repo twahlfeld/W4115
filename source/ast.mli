@@ -1,4 +1,5 @@
 type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq
+type arg = Lit of int | Reg of string
 
 type expr =
     Literal of int
