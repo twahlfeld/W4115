@@ -52,6 +52,10 @@ vdecl_list:
 type_specifier:
   INT           { Int }
   | STRING      { String }
+  | ELEMENT     { Element }
+  | FILE        { File }
+  | LIST        { List }
+  | PAGE        { Page }
 
 vdecl:
    type_specifier ID SEMI { $2 }
@@ -90,10 +94,10 @@ expr:
   | ID ASSIGN expr   { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN { $2 }
+  | postfix_expression
 
 postfix_expression:
-  expr              { $1 } 
-  | postfix_expression DOT ID     { $3 } /*how to access?*/
+  expr DOT ID     { $3 } 
 
 actuals_opt:
     /* nothing */ { [] }
