@@ -1,39 +1,43 @@
-(*
- * Scanner for the TED programming language
- *)
 { open Parser }
 
-rule token = parser
-  | [' ' '\t' '\r' '\n']    { token lexbuf }    (* whitespace *)
-  | "/*"                    { comment lexbuf }  (* comments *)
-    (* punctuation *)
-  | '('     { LPAREN }  | ')' { RPAREN }
-  | '{'     { LBRACE }  | '}' { RBRACE }
-  | ';'     { SEMI }    | ',' { COMMA }
-  | '+'     { PLUS }    | '-' { MINUS }
-  | '*'     { TIMES }   | '/' { DIVIDE }
-  | '='     { ASSIGN }  | "=="{ EQ }
-  | "!="    { NEQ }     | '<' { LT }
-  | "<="    { LEQ }     | '>' { GT }
-  | ">="    { GEQ }     | '^' { XOR }
-  | "&&"    { CAND }    | "||"{ COR }
-  | '|'     { LOR }     | '&' { LAND }
-  | '!'     { CNOT }    | '~' { LNOT }
-  | '%'     { MOD }
-    (* keywords *)
-  | "else"   { ELSE }    | "if"      { IF }
-  | "while"  { WHILE }   | "for"     { FOR }
-  | "int"    { INT }     | "then"    { THEN }
-  | "float"  { FLOAT }   | "str"     { STRING }
-  | "list"   { LIST }    | "boolean" { BOOL } (* <- Need Boolean ?*)
-  | "true"   { TRUE }    | "false"   { FALSE }
-  | "FILE"   { FILE }    | "Page"    { PAGE }
-  | "Element"{ ELM }     | "return"  { RETURN }
-  | eof      { EOF }
-  | ['0'-'9']+ as lit { LITERAL(int_of_string lit) }
-  | ['A'-'z']['A'-'z' '0'-'9' '_']* as lit { ID(lit) }
-  | _ as char { raise (Failure("illegal character " ^ Char.escaped char))}
+rule token = parse
+  [' ' '\t' '\r' '\n'] { token lexbuf } (* Whitespace *)
+| "/*"      { comment lexbuf }           (* Comments *)
+| '('       { LPAREN }
+| ')'       { RPAREN }
+| '{'       { LBRACE }
+| '}'       { RBRACE }
+| ';'       { SEMI }
+| ','       { COMMA }
+| '+'       { PLUS }
+| '-'       { MINUS }
+| '*'       { TIMES }
+| '/'       { DIVIDE }
+| '='       { ASSIGN }
+| "=="      { EQ }
+| "!="      { NEQ }
+| '<'       { LT }
+| "<="      { LEQ }
+| ">"       { GT }
+| ">="      { GEQ }
+| "if"      { IF }
+| "else"    { ELSE }
+| "for"     { FOR }
+| "while"   { WHILE }
+| "return"  { RETURN }
+| "int"     { INT }
+| "str"     { STRING }
+| "list"    { LIST }
+| "FILE"    { FILE }
+| "Page"    { PAGE }
+| "Element" { ELEMENT }
+| "return"  { RETURN }
+| '.'       { DOT }
+| ['0'-'9']+ as lxm { LITERAL(int_of_string lxm) }
+| ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as lxm { ID(lxm) }
+| eof { EOF }
+| _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
 
 and comment = parse
-  | "*/" { token lexbuf }   (* End Comment *)
-  | _    { comment lexbuf } (* Ignore *)
+  "*/" { token lexbuf }
+| _    { comment lexbuf }

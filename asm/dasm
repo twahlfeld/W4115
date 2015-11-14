@@ -1,0 +1,19 @@
+function dasm {
+  if [ ! -n "$1" ]; then
+    echo "No file name specified"
+  else
+    gcc -fno-asynchronous-unwind-tables -s -c -o $1.o $1.c
+    objconv -fnasm $1.o
+    rm $1.o
+  fi
+}
+
+function asm {
+  if [ ! -n "$1" ]; then
+    echo "No file name specified"
+  else
+    nasm -f elf64 $1.asm
+    gcc $1.o -o $1
+  fi
+}
+
