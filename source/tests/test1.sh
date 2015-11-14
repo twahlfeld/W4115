@@ -15,6 +15,7 @@ TEST12="STRING ID SEMI"
 TEST13="$TEST1 $TEST3 $TEST11"
 TEST14="INT ID ASSIGN ID LPAREN RPAREN SEMI"
 TEST15="ID LPAREN RPAREN LBRACE $TEST1 $TEST3 $TEST5 $TEST6 $TEST9 RBRACE $TEST14"
+TEST16="ID ASSIGN ID DOT ID SEMI"
 printf "Performing test 1: parser \n1: $TEST1 declaration/int... " && echo $TEST1 | $MENHIR
 echo "Press enter to continue." && read answer
 printf "2: $TEST2 assignment ... " && echo $TEST2 | $MENHIR

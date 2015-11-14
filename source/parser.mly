@@ -4,7 +4,7 @@
 %token PLUS MINUS TIMES DIVIDE ASSIGN
 %token EQ NEQ LT LEQ GT GEQ
 %token RETURN IF ELSE FOR WHILE INT
-%token STRING LIST FILE PAGE ELEMENT DOT
+%token STRING LIST FILE PAGE ELEMENT DOT 
 %token <int> LITERAL
 %token <string> ID
 %token EOF
@@ -16,6 +16,7 @@
 %left LT GT LEQ GEQ
 %left PLUS MINUS
 %left TIMES DIVIDE
+%left DOT
 
 %start program
 %type <Ast.program> program
@@ -94,10 +95,10 @@ expr:
   | ID ASSIGN expr   { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN { $2 }
-  | postfix_expression
-
-postfix_expression:
-  expr DOT ID     { $3 } 
+  | access { $1 }
+  
+access:
+  expr DOT ID     { Access($1, $3) } 
 
 actuals_opt:
     /* nothing */ { [] }
