@@ -36,6 +36,8 @@ let translate (globals, functions) =
     | []     -> StringMap.empty
     | hd::tl -> StringMap.add hd n (build_built_in_funcs (n-1) tl)
   in
-  let built_in_functions = build_built_in_funcs (-1) ["print"; "open"; 
-  "get"; "find"; "head"; "addafter"; "addbefore"; "remove"; "getdata"] in
+  let built_in_functions = build_built_in_funcs (-1) ["print"; "open"; "get"; 
+  "find"; "head"; "addafter"; "addbefore"; "remove"; "getdata"] in
+  let function_indexes = string_map_pairs built_in_functions
+    (enum 1 1 (List.map (fun f -> f.fname) functions)) in
 ;;
