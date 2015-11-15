@@ -19,8 +19,13 @@ type bstmt =
   | Ld_var of string          (* Load variable *)
   | Ld_reg of string          (* Load register into id *)
   | Ld_lit of int             (* Load lit into register *)
-
 ;;
+
+type prog = {
+    num_globals : int;  (* Number of global variables *)
+    text : bstmt array; (* Code for all the functions *)
+  }
+
 
 let explode s =
   let rec exp i l =

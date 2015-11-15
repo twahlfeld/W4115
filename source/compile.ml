@@ -37,7 +37,8 @@ let translate (globals, functions) =
     | hd::tl -> StringSet.add (Printf.sprintf "%s" hd) (string_set_create tl)
   in
   let function_indexes = string_set_create (["print"; "open"; "get"; 
-    "find"; "head"; "addafter"; "addbefore"; "remove"; "getdata"] @ functions) in
+    "find"; "head"; "addafter"; "addbefore"; "remove"; "getdata"] @ 
+      List.map (fun x -> Printf.sprintf "%s" x.fname) functions) in
 
   (* Translate a function in AST form into a list of bytecode statements *)
   let translate env fdecl =

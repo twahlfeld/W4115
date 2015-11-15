@@ -51,15 +51,15 @@ vdecl_list:
   | vdecl_list vdecl { $2 :: $1 }
 
 type_specifier:
-  INT           { Int, 4 }
-  | STRING      { String, 8 }
-  | ELEMENT     { Element, 56 }
-  | FILE        { File, 8 }
-  | LIST        { List, 16 }
-  | PAGE        { Page, 32 }
+    INT         { None }
+  | STRING      { None }
+  | ELEMENT     { None }
+  | FILE        { None }
+  | LIST        { None }
+  | PAGE        { None }
 
 vdecl:
-    type_specifier ID SEMI { $2 }
+   type_specifier ID SEMI { $2 }
    | type_specifier ID ASSIGN expr SEMI { $4 }
 
 stmt_list:
@@ -73,7 +73,7 @@ stmt:
   | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
   | IF LPAREN expr RPAREN stmt ELSE stmt    { If($3, $5, $7) }
   | FOR LPAREN expr_opt SEMI expr_opt SEMI expr_opt RPAREN LBRACE stmt_list
-  RBRACE { For($3, $5, $7, $10) }
+    RBRACE { For($3, $5, $7, $10) }
   | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
 
 expr_opt:
