@@ -51,16 +51,16 @@ vdecl_list:
   | vdecl_list vdecl { $2 :: $1 }
 
 type_specifier:
-  INT           { Int }
-  | STRING      { String }
-  | ELEMENT     { Element }
-  | FILE        { File }
-  | LIST        { List }
-  | PAGE        { Page }
+  INT           { Int, 4 }
+  | STRING      { String, 8 }
+  | ELEMENT     { Element, 56 }
+  | FILE        { File, 8 }
+  | LIST        { List, 16 }
+  | PAGE        { Page, 32 }
 
 vdecl:
-   type_specifier ID SEMI { $2 }
-   | type_specifier ID ASSIGN expr SEMI { $4 }
+    type_specifier ID SEMI { { tname = $1; size = $2 }, $3 }
+   | type_specifier ID ASSIGN expr SEMI { { tname = $1; size = $2 }, $5 }
 
 stmt_list:
     /* nothing */  { [] }

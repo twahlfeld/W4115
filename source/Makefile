@@ -1,7 +1,7 @@
 .PHONY: default
 default: ted
 
-ted: scanner.ml parser ast parser.cmo scanner.cmo ted.cmo
+ted: scanner.ml parser ast parser.cmo scanner.cmo compile.cmo ted.cmo
 	ocamlc -o ted parser.cmo scanner.cmo ted.cmo
 
 ted.cmo: ted.ml
@@ -12,6 +12,9 @@ parser.cmo: parser.ml
 
 scanner.cmo: scanner.ml
 	ocamlc -c scanner.ml
+
+compile.cmo: compile.ml
+	ocamlc -c compile.ml
 
 parser.ml: parser.mly
 	ocamlyacc parser.mly

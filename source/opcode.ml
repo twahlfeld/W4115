@@ -49,16 +49,16 @@ let string_of_stmt acc = function
   | Bin(Ast.Equal)   -> Bytes.to_string "\tsub\teax, edx\n"
   | Bin(Ast.Neq)     -> Bytes.to_string "\txor\teax, edx\n"
   | Bin(Ast.Less)    -> Bytes.to_string "\tsub\teax, edx\n\tshr\teax, 31\n"
-  | Bin(Ast.Leq)     -> Bytes.to_string (
-                     "\tcmp\teax, edx\n"
+  | Bin(Ast.Leq)     -> Bytes.to_string ( "" ^
+                     "\tcmp\teax, edx\n" ^
                      "\tjle LE" ^ (string_of_int acc) ^ "\n" ^ 
                       "\tmov\teax, 0\n" ^
                       "\tjmp\tENDLE" ^ (string_of_int acc) ^"\n" ^ 
                       "LE" ^ (string_of_int acc) ^ ":\n" ^
                       "\tmov eax, 1\n" ^
                       "ENDLE" ^ (string_of_int acc) ^ ":\n")
-  | Bin(Ast.Greater) -> Bytes.to_string (
-                     "\tcmp\teax, edx\n"
+  | Bin(Ast.Greater) -> Bytes.to_string ( "" ^
+                     "\tcmp\teax, edx\n" ^
                      "\tjge GE" ^ (string_of_int acc) ^ "\n" ^ 
                       "\tmov\teax, 0\n" ^
                       "\tjmp\tENDGE" ^ (string_of_int acc) ^"\n" ^ 
@@ -72,5 +72,4 @@ let string_of_stmt acc = function
   | Glob_var(s)      -> s
   | Set_gvar(s)      -> Printf.sprintf "\tmov\t[%s], eax\n" s
   | Get_gvar(s)      -> Pritnf.sprintf "\tmov\teax, [%s]\n" s
-
 ;;
