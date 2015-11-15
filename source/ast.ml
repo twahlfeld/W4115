@@ -24,7 +24,7 @@ type func_decl = {
     body : stmt list;
   }
 
-type program = string list * func_decl list;
+type program = string list * func_decl list;;
 
 let rec string_of_expr = function
     Literal(l) -> string_of_int l
