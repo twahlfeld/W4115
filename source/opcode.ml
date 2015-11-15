@@ -58,4 +58,5 @@ let string_of_stmt acc = function
                       "GE" ^ (string_of_int acc) ^ ":\n" ^
                       "\tmov eax, 1\n" ^
                       "ENDGE" ^ (string_of_int acc) ^ ":\n")
+  | Bin(Geq)          -> 
 ;;
