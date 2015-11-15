@@ -59,8 +59,8 @@ type_specifier:
   | PAGE        { Page, 32 }
 
 vdecl:
-    type_specifier ID SEMI { { tname = $1; size = $2 }, $3 }
-   | type_specifier ID ASSIGN expr SEMI { { tname = $1; size = $2 }, $5 }
+    type_specifier ID SEMI { $2 }
+   | type_specifier ID ASSIGN expr SEMI { $4 }
 
 stmt_list:
     /* nothing */  { [] }

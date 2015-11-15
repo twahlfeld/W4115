@@ -34,7 +34,7 @@ let translate (globals, functions) =
   (* Assign indexes to built-in functions is special *)
   let rec string_set_create = function
     | []     -> StringSet.empty
-    | hd::tl -> StringSet.add (Printf.sprintf "%s" hd) (build_built_in_funcs  tl)
+    | hd::tl -> StringSet.add (Printf.sprintf "%s" hd) (string_set_create tl)
   in
   let function_indexes = string_set_create (["print"; "open"; "get"; 
     "find"; "head"; "addafter"; "addbefore"; "remove"; "getdata"] @ functions) in
@@ -44,7 +44,7 @@ let translate (globals, functions) =
     (* Bookkeeping: FP offsets for locals and arguments *)
     let num_formals = List.length fdecl.formals
     and num_locals = List.length fdecl.locals
-    and local_offsets = enum -8 -8 fdecl.locals
+    and local_offsets = enum (-8) (-8) fdecl.locals
     and formal_offsets = enum (1) (1) fdecl.formals in
     let env = { env with local_index = string_map_pairs
       StringMap.empty (local_offsets @ formal_offsets) } in
@@ -52,18 +52,18 @@ let translate (globals, functions) =
     let rec expr = function
       | Literal i -> [Ld_lit i]
       | Id s ->
-        (try [Offset (StringMap.find s env.local_index)]
+        (try [Ld_var (Printf.sprintf "[rbp-%xH]" (StringMap.find s env.local_index))]
           with Not_found -> try [Glob_var (StringSet.find s env.global_index)]
           with Not_found -> raise (Failure ("undeclared variable " ^ s)))
       | Binop (e1, op, e2) -> expr e1 @ expr e2 @ [Bin op]
       | Assign (s, e) -> expr e @
-        (try [Ld_reg (StringMap.find s env.local_index)]
+        (try [Ld_reg (Printf.sprintf "[rbp-%xH]" (StringMap.find s env.local_index))]
           with Not_found -> try [Get_gvar (StringSet.find s env.global_index)]
           with Not_found -> raise (Failure ("undeclared variable" ^ s)))
       | Call (fname, actuals) -> (try
         (List.concat (List.map expr (List.rev actuals))) @
         [Call (StringSet.find fname env.function_index)]
-          with Not_found -> raise (Failure ("undeclared function" ^ s)))
+          with Not_found -> raise (Failure ("undeclared function" ^ fname)))
       | Noexpr -> []
     in
 
@@ -76,7 +76,7 @@ let translate (globals, functions) =
        *|  TODO WHILE STATEMENT
        *)
     in
-    [Prologue] @ stmt (Block fdecl.body) @ [Epilogue]
+    [Prologue fdecl.fname] @ stmt (Block fdecl.body) @ [Epilogue]
   in
   let env = {
     function_index = function_indexes;
