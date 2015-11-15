@@ -1,16 +1,23 @@
 type bstmt =
   | Lit of int             (* Integer Literal *)
   | Str of string          (* String Literal *)
-  (*| Flit of float          (* Float Literal *)*)
-  | Bin of Ast.op        (* Binary Operators *)
+  (*| Flit of float        (* Float Literal *)*)
+  | Bin of Ast.op          (* Binary Operators *)
   (*| Unop of Ast.unop     (* Unary Operators *)*)
-  | Mov of Ast.arg*Ast.arg (* Fetch global var *)
+  | Mov of Ast.arg*Ast.arg (* Mov instruction *)
+  | Local_var of int       (* Local Variables, Relative Frame Pointer offset *)
+  | Glob_var of string     (* Global Variables, by absolute label *)
+  | Get_gvar of string     (* Gets Global Variables *)
+  | Set_gvar of string     (* Sets Global Variables  *)
   | Call of Ast.arg        (* Call function by name or address *)
   | Push of Ast.arg        (* Pushes arg onto stack *)
   | Pop of string          (* Pop statck in register *)
   | Ret                    (* Returns to prev stack frame *)
   | Fdecl of string        (* Function Declaration *)
   | Imprt of string        (* Import/Extern function *)
+  | Prologue               (* Start of every stack frame *)
+  | Epilogue               (* End of every stack frame *)
+
 ;;
 
 let explode s =
@@ -31,7 +38,7 @@ let rec define_global acc = function
 ;;
 
 let string_of_stmt acc = function
-  | Lit(x) -> string_of_int x
+  | Lit(x)           -> string_of_int x
   | Str(x)           -> Bytes.to_string 
                        ("STRING" ^ (string_of_int acc) ^ ":" ^ 
                        (define_global 0 (explode x)))
@@ -58,4 +65,12 @@ let string_of_stmt acc = function
                       "GE" ^ (string_of_int acc) ^ ":\n" ^
                       "\tmov eax, 1\n" ^
                       "ENDGE" ^ (string_of_int acc) ^ ":\n")
+  | Mov(dst, src)    -> Printf.sprintf "\tmov\t%s, %s\n" dst src
+  | Prologue         -> Bytes.to_string "\tpush\tebp\n\tmov\tebp, esp\n"
+  | Epilogue         -> Bytes.to_string "\tpop\tebp\n\tret\n"
+  | Local_var(x)     -> Printf.sprintf "[ebp-%xH]" (x*4)
+  | Glob_var(s)      -> s
+  | Set_gvar(s)      -> Printf.sprintf "\tmov\t[%s], eax\n" s
+  | Get_gvar(s)      -> Pritnf.sprintf "\tmov\teax, [%s]\n" s
+
 ;;
