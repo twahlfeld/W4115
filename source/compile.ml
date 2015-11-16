@@ -50,15 +50,27 @@ let translate (globals, functions) =
     let env = { env with local_index = string_map_pairs
       StringMap.empty (local_offsets @ formal_offsets) } in
 
+    let int_to_var = function
+      | 1 -> "rdi"
+      | 2 -> "rsi"
+      | 3 -> "rdx"
+      | 4 -> "rcx"
+      | 5 -> "r8"
+      | 6 -> "r9"
+      | x -> if x > 6 then Printf.sprintf "rbp+%x" ((x-4)*8) 
+        else Printf.sprintf "rbp-%xH" (abs x)
+    in
+
     let rec expr = function
       | Literal i -> [Ld_lit i]
-      | Id s ->
-        (try [Ld_var (Printf.sprintf "[rbp-%xH]" (StringMap.find s env.local_index))]
+      | Id s -> 
+        (try [Ld_var (int_to_var (StringMap.find s env.local_index))]
           with Not_found -> try [Glob_var (StringSet.find s env.global_index)]
           with Not_found -> raise (Failure ("undeclared variable " ^ s)))
+      | String s -> [Str s]
       | Binop (e1, op, e2) -> expr e1 @ expr e2 @ [Bin op]
       | Assign (s, e) -> expr e @
-        (try [Ld_reg (Printf.sprintf "[rbp-%xH]" (StringMap.find s env.local_index))]
+        (try [Ld_reg (int_to_var (StringMap.find s env.local_index))]
           with Not_found -> try [Get_gvar (StringSet.find s env.global_index)]
           with Not_found -> raise (Failure ("undeclared variable" ^ s)))
       | Call (fname, actuals) -> (try

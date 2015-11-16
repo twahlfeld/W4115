@@ -19,7 +19,8 @@ type bstmt =
   | Ld_var of string          (* Load variable *)
   | Ld_reg of string          (* Load register into id *)
   | Ld_lit of int             (* Load lit into register *)
-  | Header                    (* Creates standard header *)
+  | Header of string          (* Creates standard header *)
+  | Tail of string            (* Creates a standard string *)
 ;;
 
 type prog = {
@@ -67,7 +68,7 @@ let string_of_stmt = function
                      "\tsetge dl" ^
                      "\tmovzx\trax, dl\n"
   | Mov(dst, src)     -> Printf.sprintf "\tmov\t%s, %s\n" dst src
-  | Prologue(s)       -> Printf.sprintf "%s\n\tpush\tebp\n\tmov\tebp, esp\n" s
+  | Prologue(s)       -> Printf.sprintf "%s:\n\tpush\tebp\n\tmov\tebp, esp\n" s
   | Epilogue          -> Bytes.to_string "\tpop\tebp\n\tret\n"
   | Local_var(x)      -> Printf.sprintf "[ebp-%xH]" (x*4)
   | Glob_var(s)       -> s
@@ -76,11 +77,11 @@ let string_of_stmt = function
   | Call(s)           -> Printf.sprintf "\tcall\t%s\n" s
   | Push(s)           -> Printf.sprintf "\tpush\t%s\n" s
   | Pop(s)            -> Printf.sprintf "\tpop\t%s\n" s
-  | Fdecl(s)          -> Printf.sprintf "%s:\n" s
+  | Fdecl(s)          -> Printf.sprintf "global %s\n" s
   | Imprt             -> Printf.sprintf "extern fprintf\nextern fopen\n"
   | Assign(dest, src) -> Printf.sprintf "\tmov\trax, [%s]\n\tmov\t[%s], rax\n" src dest
   | Ld_var(var)       -> Printf.sprintf "\tmov\trdx, rax\n\tmov\t[%s], rax\n" var
-  | Ld_reg(reg)       -> Printf.sprintf "\tmov\t%s, rax\n" reg
+  | Ld_reg(reg)       -> Printf.sprintf "\tmov\t[%s], rax\n" reg
   | Ld_lit(lit)       -> Printf.sprintf "\tmov\trax, %s\n" (string_of_int lit)
   | Header(s)         -> Printf.sprintf "%s\n\nSECTION .text\n" s
   | Tail(s)           -> Printf.sprintf "SECTION .data\nSECTION .bss\nSECTION .rodata\n\n%s" s
