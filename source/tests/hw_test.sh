@@ -6,6 +6,7 @@ MINUS="minus(x, y) { return x - y; }"
 DIVIDE="divide(x, y) { return x / y; }"
 MULT="mult(x, y) { return x * y; }"
 MAIN="main() { int x; int y; int z; x = 2; y = 3; z = add(x, y); }"
+PRINT="main() { print(); return 0; }"
 
 printf "Test 1: main() { };\n" 
 echo "main() { }" | $TED
@@ -34,3 +35,8 @@ $NEXT && $PROMPT
 printf "Test8: $ADD $MINUS $MULT $DIVIDE $MAIN\n"
 echo "$ADD $MINUS $MULT $DIVIDE $MAIN" | $TED
 $NEXT && $PROMPT
+
+printf "Test9: $PRINT\n"
+echo "$PRINT" | $TED
+$NEXT && $PROMPT
+
