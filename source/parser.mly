@@ -60,7 +60,7 @@ type_specifier:
 
 vdecl:
    type_specifier ID SEMI { $2 }
-   | type_specifier ID ASSIGN expr SEMI { $4 }
+   /*| type_specifier ID ASSIGN expr SEMI { $4 }*/
 
 stmt_list:
     /* nothing */  { [] }
@@ -72,8 +72,7 @@ stmt:
   | LBRACE stmt_list RBRACE { Block(List.rev $2) }
   | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
   | IF LPAREN expr RPAREN stmt ELSE stmt    { If($3, $5, $7) }
-  | FOR LPAREN expr_opt SEMI expr_opt SEMI expr_opt RPAREN LBRACE stmt_list
-    RBRACE { For($3, $5, $7, $10) }
+  | FOR LPAREN expr_opt SEMI expr_opt SEMI expr_opt RPAREN LBRACE stmt { For($3, $5, $7, $10) }
   | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
 
 expr_opt:
@@ -96,10 +95,10 @@ expr:
   | ID ASSIGN expr   { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN { $2 }
-  | access { $1 }
+/*  | access { $1 }
   
 access:
-  expr DOT ID     { Access($1, $3) } 
+  expr DOT ID     { Access($1, $3) } */
 
 actuals_opt:
     /* nothing */ { [] }

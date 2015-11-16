@@ -70,14 +70,14 @@ let translate (globals, functions) =
 
     let rec stmt = function
       | Block sl        -> List.concat (List.map stmt sl)
-      | Expr e          -> expr e
+      | Expr e          -> expr e @ []
       | Return e        -> expr e @ [Epilogue]
       (*|  TODO IF STATEMENT
        *|  TODO FOR STATEMENT
        *|  TODO WHILE STATEMENT
        *)
     in
-    [Prologue fdecl.fname] @ stmt (Block fdecl.body) @ [Epilogue]
+    [Prologue fdecl.fname] @ stmt(Block fdecl.body) @ [Epilogue]
   in
   let env = {
     function_index = function_indexes;
