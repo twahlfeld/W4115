@@ -4,7 +4,6 @@
 %token PLUS MINUS TIMES DIVIDE ASSIGN
 %token EQ NEQ LT LEQ GT GEQ
 %token RETURN IF ELSE FOR WHILE INT
-%token STRING LIST FILE PAGE ELEMENT DOT 
 %token <int> LITERAL
 %token <string> ID
 %token EOF
@@ -16,7 +15,6 @@
 %left LT GT LEQ GEQ
 %left PLUS MINUS
 %left TIMES DIVIDE
-%left DOT
 
 %start program
 %type <Ast.program> program
@@ -50,17 +48,8 @@ vdecl_list:
     /* nothing */    { [] }
   | vdecl_list vdecl { $2 :: $1 }
 
-type_specifier:
-    INT         { None }
-  | STRING      { None }
-  | ELEMENT     { None }
-  | FILE        { None }
-  | LIST        { None }
-  | PAGE        { None }
-
 vdecl:
-   type_specifier ID SEMI { $2 }
-   /*| type_specifier ID ASSIGN expr SEMI { $4 }*/
+   INT ID SEMI { $2 }
 
 stmt_list:
     /* nothing */  { [] }
@@ -72,7 +61,8 @@ stmt:
   | LBRACE stmt_list RBRACE { Block(List.rev $2) }
   | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
   | IF LPAREN expr RPAREN stmt ELSE stmt    { If($3, $5, $7) }
-  | FOR LPAREN expr_opt SEMI expr_opt SEMI expr_opt RPAREN LBRACE stmt { For($3, $5, $7, $10) }
+  | FOR LPAREN expr_opt SEMI expr_opt SEMI expr_opt RPAREN stmt
+     { For($3, $5, $7, $9) }
   | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
 
 expr_opt:
@@ -95,10 +85,6 @@ expr:
   | ID ASSIGN expr   { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN { $2 }
-/*  | access { $1 }
-  
-access:
-  expr DOT ID     { Access($1, $3) } */
 
 actuals_opt:
     /* nothing */ { [] }
