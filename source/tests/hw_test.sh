@@ -6,7 +6,7 @@ MINUS="minus(x, y) { return x - y; }"
 DIVIDE="divide(x, y) { return x / y; }"
 MULT="mult(x, y) { return x * y; }"
 MAIN="main() { int x; int y; int z; x = 2; y = 3; z = add(x, y); }"
-PRINT="main() { print(); return 0; }"
+PRINT="main() { print(0, \"This\", 0); return 0; }"
 
 printf "Test 1: main() { };\n" 
 echo "main() { }" | $TED

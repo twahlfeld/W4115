@@ -46,11 +46,17 @@ let rec define_global acc = function
       (Printf.sprintf "%02xH, " hd) ^ define_global (acc+1) tl
 ;;
 
+let build_str s = 
+  Bytes.to_string "STRING:" ^ (define_global 0 (explode s))
+;;
+
+
 let string_of_stmt = function
   | Lit(x)            -> string_of_int x
-  | Str(x)            -> Bytes.to_string 
+  | Str(s)            -> "SRING"
+  (*| Build_str(s)      -> Bytes.to_string 
                        ("STRING:" ^ 
-                       (define_global 0 (explode x)))
+                       (define_global 0 (explode x)))*)
   | Bin(Ast.Add)      -> Bytes.to_string "\tadd\trax, rdx\n"
   | Bin(Ast.Sub)      -> Bytes.to_string "\tsub\trax, rdx\n"
   | Bin(Ast.Mult)     -> Bytes.to_string "\tmul\trdx\n"
@@ -59,14 +65,14 @@ let string_of_stmt = function
   | Bin(Ast.Neq)      -> Bytes.to_string "\txor\trax, rdx\n"
   | Bin(Ast.Less)     -> Bytes.to_string "\tsub\trax, rdx\n\tshr\trax, 63\n"
   | Bin(Ast.Leq)      -> Printf.sprintf "\tcmp\trax, rdx\n" ^
-                     "\tsetle dl" ^
-                     "\tmovzx\trax, dl\n"
+                         "\tsetle dl" ^
+                         "\tmovzx\trax, dl\n"
   | Bin(Ast.Greater)  -> Printf.sprintf "\tcmp\trax, rdx\n" ^
-                     "\tsetg dl" ^
-                     "\tmovzx\trax, dl\n"
+                         "\tsetg dl" ^
+                         "\tmovzx\trax, dl\n"
   | Bin(Ast.Geq)      -> Printf.sprintf "\tcmp\trax, rdx\n" ^
-                     "\tsetge dl" ^
-                     "\tmovzx\trax, dl\n"
+                         "\tsetge dl" ^
+                         "\tmovzx\trax, dl\n"
   | Mov(dst, src)     -> Printf.sprintf "\tmov\t%s, %s\n" dst src
   | Prologue(s)       -> Printf.sprintf "%s:\n\tpush\tebp\n\tmov\tebp, esp\n" s
   | Epilogue          -> Bytes.to_string "\tpop\tebp\n\tret\n"
@@ -83,6 +89,6 @@ let string_of_stmt = function
   | Ld_var(var)       -> Printf.sprintf "\tmov\trdx, rax\n\tmov\t[%s], rax\n" var
   | Ld_reg(reg)       -> Printf.sprintf "\tmov\t[%s], rax\n" reg
   | Ld_lit(lit)       -> Printf.sprintf "\tmov\trax, %s\n" (string_of_int lit)
-  | Header(s)         -> Printf.sprintf "%s\n\nSECTION .text\n" s
-  | Tail(s)           -> Printf.sprintf "SECTION .data\nSECTION .bss\nSECTION.rodata\n\n%s" s 
+  | Header(s)         -> Printf.sprintf "%s\nextern fprintf\n\nSECTION .text\n" s
+  | Tail(s)           -> Printf.sprintf "SECTION .data\nSECTION .bss\nSECTION .rodata\n%s\n" s 
 ;;
