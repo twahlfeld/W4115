@@ -84,5 +84,5 @@ let string_of_stmt = function
   | Ld_reg(reg)       -> Printf.sprintf "\tmov\t[%s], rax\n" reg
   | Ld_lit(lit)       -> Printf.sprintf "\tmov\trax, %s\n" (string_of_int lit)
   | Header(s)         -> Printf.sprintf "%s\n\nSECTION .text\n" s
-  | Tail(s)           -> Printf.sprintf "SECTION .data\nSECTION .bss\nSECTION .rodata\n\n%s" s
+  | Tail(s)           -> Printf.sprintf "SECTION .data\nSECTION .bss\nSECTION.rodata\n\n%s" s 
 ;;
