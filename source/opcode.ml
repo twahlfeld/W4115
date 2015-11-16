@@ -1,6 +1,7 @@
 type bstmt =
   | Lit of int                (* Integer Literal *)
   | Str of string             (* String Literal *)
+  | Arg of string * bstmt
   | Bin of Ast.op             (* Binary Operators *)
   (*| Unop of Ast.unop        (* Unary Operators *)*)
   | Mov of string * string    (* Mov instruction *)
@@ -19,15 +20,17 @@ type bstmt =
   | Ld_var of string          (* Load variable *)
   | Ld_reg of string          (* Load register into id *)
   | Ld_lit of int             (* Load lit into register *)
+  | Str_var of string         (* Stores variable *)
   | Header of string          (* Creates standard header *)
   | Tail of string            (* Creates a standard string *)
+  | Fakenop
+  | Ret of bstmt
 ;;
 
 type prog = {
     num_globals : int;  (* Number of global variables *)
     text : bstmt array; (* Code for all the functions *)
   }
-
 
 let explode s =
   let rec exp i l =
@@ -51,12 +54,10 @@ let build_str s =
 ;;
 
 
-let string_of_stmt = function
+let rec string_of_stmt = function
   | Lit(x)            -> string_of_int x
-  | Str(s)            -> "SRING"
-  (*| Build_str(s)      -> Bytes.to_string 
-                       ("STRING:" ^ 
-                       (define_global 0 (explode x)))*)
+  | Str(s)            -> "STRING"
+  | Arg(lhs, rhs)     -> Printf.sprintf "\tmov\t%s, %s\n" lhs (string_of_stmt rhs)
   | Bin(Ast.Add)      -> Bytes.to_string "\tadd\trax, rdx\n"
   | Bin(Ast.Sub)      -> Bytes.to_string "\tsub\trax, rdx\n"
   | Bin(Ast.Mult)     -> Bytes.to_string "\tmul\trdx\n"
@@ -74,10 +75,11 @@ let string_of_stmt = function
                          "\tsetge dl" ^
                          "\tmovzx\trax, dl\n"
   | Mov(dst, src)     -> Printf.sprintf "\tmov\t%s, %s\n" dst src
-  | Prologue(s)       -> Printf.sprintf "%s:\n\tpush\tebp\n\tmov\tebp, esp\n" s
-  | Epilogue          -> Bytes.to_string "\tpop\tebp\n\tret\n"
-  | Local_var(x)      -> Printf.sprintf "[ebp-%xH]" (x*4)
-  | Glob_var(s)       -> s
+  | Ret(b)            -> Printf.sprintf "\tmov\teax, %s\n" (string_of_stmt b)
+  | Prologue(s)       -> Printf.sprintf "%s:\n\tpush\trbp\n\tmov\trbp, rsp\n" s
+  | Epilogue          -> Bytes.to_string "\tpop\trbp\n\tret\n"
+  | Local_var(x)      -> Printf.sprintf "[rbp-%xH]" (x*4)
+  | Glob_var(s)       -> "["^s^"]"
   | Set_gvar(s)       -> Printf.sprintf "\tmov\t[%s], rax\n" s
   | Get_gvar(s)       -> Printf.sprintf "\tmov\trax, [%s]\n" s
   | Call(s)           -> Printf.sprintf "\tcall\t%s\n" s
@@ -86,9 +88,12 @@ let string_of_stmt = function
   | Fdecl(s)          -> Printf.sprintf "global %s\n" s
   | Imprt             -> Printf.sprintf "extern fprintf\nextern fopen\n"
   | Assign(dest, src) -> Printf.sprintf "\tmov\trax, [%s]\n\tmov\t[%s], rax\n" src dest
-  | Ld_var(var)       -> Printf.sprintf "\tmov\trdx, rax\n\tmov\t[%s], rax\n" var
-  | Ld_reg(reg)       -> Printf.sprintf "\tmov\t[%s], rax\n" reg
+  | Ld_var(var)       -> Printf.sprintf "\tmov\trdx, rax\n\tmov\t%s, rax\n" var
+  | Ld_reg(reg)       -> Printf.sprintf "\tmov\trax, %s\n" reg
   | Ld_lit(lit)       -> Printf.sprintf "\tmov\trax, %s\n" (string_of_int lit)
-  | Header(s)         -> Printf.sprintf "%s\nextern fprintf\n\nSECTION .text\n" s
+  | Str_var(var)      -> Printf.sprintf "\tmov\tqword [%s], rax\n" var
+  | Header(s)         -> s ^ "\nextern fprintf\nextern fopen\nextern stdout\n"^
+                             "\nSECTION .text\n"
   | Tail(s)           -> Printf.sprintf "SECTION .data\nSECTION .bss\nSECTION .rodata\n%s\n" s 
+  | Fakenop           -> ""
 ;;

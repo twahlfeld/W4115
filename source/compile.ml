@@ -30,6 +30,7 @@ let translate (globals, functions) =
 
   (* Allocate "addresses for each global variable" *)
   let global_indexes = StringSet.empty in (*= string_map_pairs StringMap.empty (enum 1 0 globals) in*)
+  let global_indexes = StringSet.add "stdout" global_indexes in
 
   (* Assign indexes to built-in functions is special *)
   let rec string_set_create = function
@@ -41,6 +42,7 @@ let translate (globals, functions) =
     ("addafter", "addafter"); ("addbefore", "addbefore"); ("remove", "remove");
     ("getdata", "getdata")] @ 
       List.map (fun x -> (x.fname, x.fname)) functions) in
+  
 
   (* Translate a function in AST form into a list of bytecode statements *)
   let translate env fdecl =
@@ -62,9 +64,27 @@ let translate (globals, functions) =
       | x -> if x > 6 then Printf.sprintf "rbp+%x" ((x-4)*8) 
         else Printf.sprintf "rbp-%xH" (abs x)
     in
-
+    (*let rec arg l = *)
+      let rec to_arg acc hd =
+          let hd = 
+            if (StringSet.mem (Opcode.string_of_stmt hd) global_indexes) then
+              Glob_var (Opcode.string_of_stmt hd)
+            else hd
+          in
+          match acc with
+              | 0 -> Arg("rdi", hd)
+              | 1 -> Arg("rsi", hd)
+              | 2 -> Arg("rdx", hd)
+              | 3 -> Arg("rcx", hd)
+              | 4 -> Arg("r9", hd)
+              | 5 -> Arg("r8",  hd)
+              | _ -> Arg("", Fakenop)
+            
+      (*in
+      to_arg 0 l*)
+      in
     let rec expr = function
-      | Literal i -> [Ld_lit i]
+      | Literal i -> [Lit i]
       | Id s -> 
         (try [Ld_var (int_to_var (StringMap.find s env.local_index))]
           with Not_found -> try [Glob_var (StringSet.find s env.global_index)]
@@ -72,11 +92,11 @@ let translate (globals, functions) =
       | String s -> [Str s]
       | Binop (e1, op, e2) -> expr e1 @ expr e2 @ [Bin op]
       | Assign (s, e) -> expr e @
-        (try [Ld_reg (int_to_var (StringMap.find s env.local_index))]
+        (try [Str_var (int_to_var (StringMap.find s env.local_index))]
           with Not_found -> try [Get_gvar (StringSet.find s env.global_index)]
           with Not_found -> raise (Failure ("undeclared variable" ^ s)))
       | Call (fname, actuals) -> (try
-        (List.concat (List.map expr (List.rev actuals))) @
+        (List.rev (List.mapi to_arg (List.concat (List.map expr actuals)))) @
         [Call (StringMap.find fname env.function_index)]
           with Not_found -> raise (Failure ("undeclared function" ^ fname)))
       | Noexpr -> []
@@ -85,7 +105,7 @@ let translate (globals, functions) =
     let rec stmt = function
       | Block sl        -> List.concat (List.map stmt sl)
       | Expr e          -> expr e @ []
-      | Return e        -> expr e @ [Epilogue]
+      | Return e        -> [Epilogue]
       (*|  TODO IF STATEMENT
        *|  TODO FOR STATEMENT
        *|  TODO WHILE STATEMENT
