@@ -4,9 +4,8 @@
 %token PLUS MINUS TIMES DIVIDE ASSIGN
 %token EQ NEQ LT LEQ GT GEQ
 %token RETURN IF ELSE FOR WHILE INT
-%token STRING LIST FILE PAGE ELEMENT DOT 
 %token <int> LITERAL
-%token <string> ID
+%token <string> ID STRING
 %token EOF
 
 %nonassoc NOELSE
@@ -16,7 +15,6 @@
 %left LT GT LEQ GEQ
 %left PLUS MINUS
 %left TIMES DIVIDE
-%left DOT
 
 %start program
 %type <Ast.program> program
@@ -50,16 +48,8 @@ vdecl_list:
     /* nothing */    { [] }
   | vdecl_list vdecl { $2 :: $1 }
 
-type_specifier:
-  INT           { Int }
-  | STRING      { String }
-  | ELEMENT     { Element }
-  | FILE        { File }
-  | LIST        { List }
-  | PAGE        { Page }
-
 vdecl:
-   type_specifier ID SEMI { $2 }
+   INT ID SEMI { $2 }
 
 stmt_list:
     /* nothing */  { [] }
@@ -82,6 +72,7 @@ expr_opt:
 expr:
     LITERAL          { Literal($1) }
   | ID               { Id($1) }
+  | STRING           { String($1) }
   | expr PLUS   expr { Binop($1, Add,   $3) }
   | expr MINUS  expr { Binop($1, Sub,   $3) }
   | expr TIMES  expr { Binop($1, Mult,  $3) }
@@ -95,10 +86,6 @@ expr:
   | ID ASSIGN expr   { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN { $2 }
-  | access { $1 }
-  
-access:
-  expr DOT ID     { Access($1, $3) } 
 
 actuals_opt:
     /* nothing */ { [] }

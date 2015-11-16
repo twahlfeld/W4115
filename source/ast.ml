@@ -1,9 +1,9 @@
 type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq
-type arg = Lit of int | Reg of string
 
 type expr =
     Literal of int
   | Id of string
+  | String of string
   | Binop of expr * op * expr
   | Assign of string * expr
   | Call of string * expr list
@@ -24,11 +24,12 @@ type func_decl = {
     body : stmt list;
   }
 
-type program = string list * func_decl list;
+type program = string list * func_decl list
 
 let rec string_of_expr = function
     Literal(l) -> string_of_int l
   | Id(s) -> s
+  | String(s) -> s
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^
       (match o with
