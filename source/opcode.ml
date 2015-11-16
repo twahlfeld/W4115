@@ -19,7 +19,7 @@ type bstmt =
   | Ld_var of string          (* Load variable *)
   | Ld_reg of string          (* Load register into id *)
   | Ld_lit of int             (* Load lit into register *)
-  | Header                    (* Creates standard header *)
+  | Header of string          (* Creates standard header *)
 ;;
 
 type prog = {
@@ -83,5 +83,6 @@ let string_of_stmt = function
   | Ld_reg(reg)       -> Printf.sprintf "\tmov\t%s, rax\n" reg
   | Ld_lit(lit)       -> Printf.sprintf "\tmov\trax, %s\n" (string_of_int lit)
   | Header(s)         -> Printf.sprintf "%s\n\nSECTION .text\n" s
-  | Tail(s)           -> Printf.sprintf "SECTION .data\nSECTION .bss\nSECTION .rodata\n\n%s" s
+  (*| Tail(s)           -> Printf.sprintf "SECTION .data\nSECTION .bss\nSECTION
+   * .rodata\n\n%s" s *)
 ;;
