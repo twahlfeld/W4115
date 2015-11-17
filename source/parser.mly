@@ -4,9 +4,8 @@
 %token PLUS MINUS TIMES DIVIDE ASSIGN
 %token EQ NEQ LT LEQ GT GEQ
 %token RETURN IF ELSE FOR WHILE INT
-%token STRING LIST FILE PAGE ELEMENT DOT
 %token <int> LITERAL
-%token <string> ID
+%token <string> ID STRING
 %token EOF
 
 %nonassoc NOELSE
@@ -31,11 +30,11 @@ decls:
  | decls fdecl { fst $1, ($2 :: snd $1) }
 
 fdecl:
-   ID LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
-     { { fname = $1;
-	 formals = $3;
-	 locals = List.rev $6;
-	 body = List.rev $7 } }
+   INT ID LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
+     { { fname = $2;
+	 formals = $4;
+	 locals = List.rev $7;
+	 body = List.rev $8 } }
 
 formals_opt:
     /* nothing */ { [] }
@@ -49,12 +48,8 @@ vdecl_list:
     /* nothing */    { [] }
   | vdecl_list vdecl { $2 :: $1 }
 
-type_specifier:
-  INT           { Int }
-  | STRING      { String }
-
 vdecl:
-   type_specifier ID SEMI { $2 }
+   INT ID SEMI { $2 }
 
 stmt_list:
     /* nothing */  { [] }
@@ -77,6 +72,7 @@ expr_opt:
 expr:
     LITERAL          { Literal($1) }
   | ID               { Id($1) }
+  | STRING           { String($1) }
   | expr PLUS   expr { Binop($1, Add,   $3) }
   | expr MINUS  expr { Binop($1, Sub,   $3) }
   | expr TIMES  expr { Binop($1, Mult,  $3) }
@@ -90,10 +86,6 @@ expr:
   | ID ASSIGN expr   { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN { $2 }
-
-postfix_expression:
-  expr              { $1 } 
-  | postfix_expression DOT ID     { $3 } /*how to access?*/
 
 actuals_opt:
     /* nothing */ { [] }
