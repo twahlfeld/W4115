@@ -1,9 +1,23 @@
-(*let _ =
-  let lexbuf = Lexing.from_channel stdin in
-  let program = Parser.program Scanner.token lexbuf in
-  Array.iter (fun x -> Printf.printf "%s" x) (Array.map Opcode.string_of_stmt (Compile.translate program).text)
-*)let _ =
-  let lexbuf = Lexing.from_channel stdin in
+let _ =
+  let rec file_in =
+    if Array.length Sys.argv > 1 then
+      (try
+        open_in Sys.argv.(1)
+      with e-> 
+        close_in_noerr; 
+        Printf.printf "Error Opening File %s\n" Sys.argv.(1);
+        raise e;
+      )
+    else 
+      stdin
+  in 
+  let file_out =
+    if Array.length Sys.argv > 1 then
+      open_out ((String.sub (Sys.argv.(1)) 0 (String.index Sys.argv.(1) '.'))^".ted")
+    else
+      stdout
+  in
+  let lexbuf = Lexing.from_channel file_in in
   let program = Parser.program Scanner.token lexbuf in
   let prg = (Compile.translate program).text in
   let prg_ops = Array.to_list prg in
@@ -31,5 +45,5 @@
   let full_prg = 
       [Opcode.Header (makeheader prg_ops)] @ prg_ops @ [Opcode.Tail (maketail prg_ops)]
   in
-  List.iter (fun x -> Printf.printf "%s" x) (List.map Opcode.string_of_stmt full_prg)
+  List.iter (fun x -> Printf.fprintf file_out "%s" x) (List.map Opcode.string_of_stmt full_prg)
 
