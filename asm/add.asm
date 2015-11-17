@@ -1,45 +1,34 @@
-; Disassembly of file: add.o
-; Mon Nov 16 22:25:27 2015
-; Mode: 64 bits
-; Syntax: YASM/NASM
-; Instruction set: 8086, x64
 
 global main
 
-extern fprintf                                          ; near
-extern stdout                                           ; qword
+extern fprintf
+extern fopen
+extern stdout
 
+SECTION .text
+main:
+  push  rbp
+  mov rbp, rsp
+  mov rax, 1
+  mov qword [rbp-8H], rax
+  mov rax, 2
+  mov qword [rbp-10H], rax
+  mov rax, 
+  mov qword [rbp-18H], rax
+  mov rdx,  mov rdx, rax
+  mov rbp-18H, rax
 
-SECTION .text   
-
-main:   ; Function begin
-        push    rbp                                     ; 0000 _ 55
-        mov     rbp, rsp                                ; 0001 _ 48: 89. E5
-        sub     rsp, 16                                 ; 0004 _ 48: 83. EC, 10
-        mov     dword [rbp-4H], edi                     ; 0008 _ 89. 7D, FC
-        mov     qword [rbp-10H], rsi                    ; 000B _ 48: 89. 75, F0
-        mov     ecx, ?_001                              ; 000F _ B9, 00000000(d)
-        mov     rax, qword [stdout]                    ; 0014 _ 48: 8B. 05, 00000000(rel)
-        mov     edx, 5                                  ; 001B _ BA, 00000005
-        mov     rsi, rcx                                ; 0020 _ 48: 89. CE
-        mov     rdi, rax                                ; 0023 _ 48: 89. C7
-        mov     eax, 0                                  ; 0026 _ B8, 00000000
-        call    fprintf                                 ; 002B _ E8, 00000000(rel)
-        mov     eax, 0                                  ; 0030 _ B8, 00000000
-        leave                                           ; 0035 _ C9
-        ret                                             ; 0036 _ C3
-; main End of function
-
-
-SECTION .data  
-
-
-SECTION .bss  
-
-
+  mov rsi, STRING
+  mov rdi, [stdout]
+  call  fprintf
+  pop rbp
+  ret
+  pop rbp
+  ret
+SECTION .data
+SECTION .bss
 SECTION .rodata
-
-?_001:                                                  ; byte
-        db 25H, 64H, 0AH, 00H                           ; 0000 _ %d..
-
+STRING:
+    db 78H, 2BH, 79H, 3DH, 25H, 64H, 5CH, 6EH
+    db 00H
 
