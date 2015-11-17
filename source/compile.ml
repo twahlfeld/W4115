@@ -38,7 +38,7 @@ let translate (globals, functions) =
     | (fn, fp)::tl -> StringMap.add fn fp (string_map_create tl)
   in
   let function_indexes = string_map_create ([("print", "fprintf"); 
-    ("open", "fopen"); ("get", "get"); ("find", "find"); ("head", "head"); 
+    ("open", "fopen"); ("get", "get_title"); ("find", "find"); ("head", "head"); 
     ("addafter", "addafter"); ("addbefore", "addbefore"); ("remove", "remove");
     ("getdata", "getdata")] @ 
       List.map (fun x -> (x.fname, x.fname)) functions) 

@@ -68,7 +68,12 @@ let build_str s =
 let rec string_of_stmt = function
   | Lit(x)            -> string_of_int x
   | Str(s)            -> "STRING"
-  | Arg(lhs, rhs)     -> Printf.sprintf "\tmov\t%s, %s\n" lhs (string_of_stmt rhs)
+  | Arg(lhs, rhs)     -> 
+    (match rhs with 
+    | Call s -> Printf.sprintf "\t%s\tmov\t%s, rax\n" (string_of_stmt rhs) lhs
+    | Str  s -> Printf.sprintf "%s" (string_of_stmt rhs) 
+    | _      -> Printf.sprintf "\tmov\t%s, %s\n" lhs (string_of_stmt rhs)
+    )
   | Bin(Ast.Add)      -> Printf.sprintf "\tadd\trax, rdx\n"
   | Bin(Ast.Sub)      -> Printf.sprintf "\tsub\trax, rdx\n"
   | Bin(Ast.Mult)     -> Printf.sprintf "\tmul\trdx\n"
@@ -103,7 +108,7 @@ let rec string_of_stmt = function
   | Ld_reg(reg)       -> Printf.sprintf "\tmov\trax, %s\n" reg
   | Ld_lit(lit)       -> Printf.sprintf "\tmov\trax, %s\n" (string_of_int lit)
   | Str_var(var)      -> Printf.sprintf "\tmov\tqword [%s], rax\n" var
-  | Header(s)         -> s ^ "\nextern fprintf\nextern fopen\nextern stdout\n"^
+  | Header(s)         -> s ^ "\nextern fprintf\nextern fopen\nextern stdout\nextern get_title\n"^
                              "\nSECTION .text\n"
   | Tail(s)           -> Printf.sprintf "SECTION .data\nSECTION .bss\nSECTION .rodata\n%s\n" s 
   | Fakenop           -> ""
