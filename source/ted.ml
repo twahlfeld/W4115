@@ -13,7 +13,8 @@ let _ =
   in 
   let file_out =
     if Array.length Sys.argv > 1 then
-      open_out ((String.sub (Sys.argv.(1)) 0 (String.index Sys.argv.(1) '.'))^".ted")
+      open_out ((String.sub (Sys.argv.(1)) 0 (String.index Sys.argv.(1)
+      '.'))^".asm")
     else
       stdout
   in

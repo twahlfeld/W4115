@@ -33,15 +33,16 @@ let translate (globals, functions) =
   let global_indexes = StringSet.add "stdout" global_indexes in
 
   (* Assign indexes to built-in functions is special *)
-  let rec string_set_create = function
+  let rec string_map_create = function
     | []     -> StringMap.empty
-    | (fn, fp)::tl -> StringMap.add fn fp (string_set_create tl)
+    | (fn, fp)::tl -> StringMap.add fn fp (string_map_create tl)
   in
-  let function_indexes = string_set_create ([("print", "fprintf"); 
+  let function_indexes = string_map_create ([("print", "fprintf"); 
     ("open", "fopen"); ("get", "get"); ("find", "find"); ("head", "head"); 
     ("addafter", "addafter"); ("addbefore", "addbefore"); ("remove", "remove");
     ("getdata", "getdata")] @ 
-      List.map (fun x -> (x.fname, x.fname)) functions) in
+      List.map (fun x -> (x.fname, x.fname)) functions) 
+  in
   
 
   (* Translate a function in AST form into a list of bytecode statements *)
@@ -107,8 +108,11 @@ let translate (globals, functions) =
           with Not_found -> raise (Failure ("undeclared variable" ^ s)))
       | Call (fname, actuals) -> (try
         (List.rev (List.mapi to_arg (List.concat (List.map expr actuals)))) @
-        [Call (StringMap.find fname env.function_index)]
-          with Not_found -> raise (Failure ("undeclared function " ^ fname)))
+        [Opcode.Call (StringMap.find fname env.function_index)]
+          with Not_found -> 
+            StringMap.iter (fun k v -> Printf.printf "%s->%s\n" k v) env.function_index;
+            Printf.printf "TESTING:%s\n" (StringMap.find fname env.function_index);
+            raise (Failure ("undeclared function " ^ fname)))
       | Noexpr -> []
     in
 
