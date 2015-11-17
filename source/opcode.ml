@@ -50,7 +50,7 @@ let rec define_global acc = function
 ;;
 
 let build_str s = 
-  Bytes.to_string "STRING:" ^ (define_global 0 (explode s))
+  Printf.sprintf "STRING:" ^ (define_global 0 (explode s))
 ;;
 
 
@@ -58,13 +58,13 @@ let rec string_of_stmt = function
   | Lit(x)            -> string_of_int x
   | Str(s)            -> "STRING"
   | Arg(lhs, rhs)     -> Printf.sprintf "\tmov\t%s, %s\n" lhs (string_of_stmt rhs)
-  | Bin(Ast.Add)      -> Bytes.to_string "\tadd\trax, rdx\n"
-  | Bin(Ast.Sub)      -> Bytes.to_string "\tsub\trax, rdx\n"
-  | Bin(Ast.Mult)     -> Bytes.to_string "\tmul\trdx\n"
-  | Bin(Ast.Div)      -> Bytes.to_string "\tdiv\trcx\n"
-  | Bin(Ast.Equal)    -> Bytes.to_string "\tsub\trax, rdx\n"
-  | Bin(Ast.Neq)      -> Bytes.to_string "\txor\trax, rdx\n"
-  | Bin(Ast.Less)     -> Bytes.to_string "\tsub\trax, rdx\n\tshr\trax, 63\n"
+  | Bin(Ast.Add)      -> Printf.sprintf "\tadd\trax, rdx\n"
+  | Bin(Ast.Sub)      -> Printf.sprintf "\tsub\trax, rdx\n"
+  | Bin(Ast.Mult)     -> Printf.sprintf "\tmul\trdx\n"
+  | Bin(Ast.Div)      -> Printf.sprintf "\tdiv\trcx\n"
+  | Bin(Ast.Equal)    -> Printf.sprintf "\tsub\trax, rdx\n"
+  | Bin(Ast.Neq)      -> Printf.sprintf "\txor\trax, rdx\n"
+  | Bin(Ast.Less)     -> Printf.sprintf "\tsub\trax, rdx\n\tshr\trax, 63\n"
   | Bin(Ast.Leq)      -> Printf.sprintf "\tcmp\trax, rdx\n" ^
                          "\tsetle dl" ^
                          "\tmovzx\trax, dl\n"
@@ -77,7 +77,7 @@ let rec string_of_stmt = function
   | Mov(dst, src)     -> Printf.sprintf "\tmov\t%s, %s\n" dst (string_of_stmt src)
   | Ret(b)            -> Printf.sprintf "\tmov\teax, %s\n" (string_of_stmt b)
   | Prologue(s)       -> Printf.sprintf "%s:\n\tpush\trbp\n\tmov\trbp, rsp\n" s
-  | Epilogue          -> Bytes.to_string "\tpop\trbp\n\tret\n"
+  | Epilogue          -> Printf.sprintf "\tpop\trbp\n\tret\n"
   | Local_var(x)      -> Printf.sprintf "[rbp-%XH]" (x*4)
   | Glob_var(s)       -> "["^s^"]"
   | Set_gvar(s)       -> Printf.sprintf "\tmov\t[%s], rax\n" s
