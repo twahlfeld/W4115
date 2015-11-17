@@ -34,7 +34,18 @@ type prog = {
 
 let explode s =
   let rec exp i l =
-    if i < 0 then l else exp (i - 1) ((Char.code s.[i]) :: l) in
+    if i < 0 then l 
+    else
+      let ch = s.[i] in
+        (if i > 1 && ch = 'n' && s.[i-1] = '\\' then
+          let tl = function
+            | []     -> []
+            | hd::[] -> []
+            | hd::hd'::tl -> tl
+          in
+          exp (i - 2) (Char.code '\n' :: (tl l)) 
+        else exp (i - 1) (Char.code ch :: l))
+  in
   exp (String.length s - 1) []
 ;;
 
