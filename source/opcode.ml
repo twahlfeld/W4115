@@ -67,10 +67,10 @@ let build_str s =
 
 let rec string_of_stmt = function
   | Lit(x)            -> string_of_int x
-  | Str(s)            -> "STRING"
+  | Str(s)            -> ""
   | Arg(lhs, rhs)     -> 
     (match rhs with 
-    | Call s -> Printf.sprintf "\t%s\tmov\t%s, rax\n" (string_of_stmt rhs) lhs
+    | Call s -> Printf.sprintf "%s\tmov\t%s, rax\n" (string_of_stmt rhs) lhs
     | Str  s -> Printf.sprintf "%s" (string_of_stmt rhs) 
     | _      -> Printf.sprintf "\tmov\t%s, %s\n" lhs (string_of_stmt rhs)
     )

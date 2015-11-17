@@ -1,4 +1,5 @@
 int main()
 {
+    "http://www.findmine.us/";
    print(stdout, get("http://www.findmine.us/"));
 }
