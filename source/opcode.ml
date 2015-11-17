@@ -98,7 +98,7 @@ let rec string_of_stmt = function
   | Pop(s)            -> Printf.sprintf "\tpop\t%s\n" s
   | Fdecl(s)          -> Printf.sprintf "global %s\n" s
   | Imprt             -> Printf.sprintf "extern fprintf\nextern fopen\n"
-  | Assign(dest, src) -> Printf.sprintf "\tmov\trax, [%s]\n\tmov\t[%s], rax\n" src dest
+  | Assign(dst, src) -> Printf.sprintf "\tmov\trax, %s\n%s" src dst
   | Ld_var(var)       -> Printf.sprintf "\tmov\trdx, rax\n\tmov\t%s, rax\n" var
   | Ld_reg(reg)       -> Printf.sprintf "\tmov\trax, %s\n" reg
   | Ld_lit(lit)       -> Printf.sprintf "\tmov\trax, %s\n" (string_of_int lit)

@@ -102,10 +102,23 @@ let translate (globals, functions) =
           with Not_found -> raise (Failure ("undeclared variable " ^ s)))
       | String s -> [Str s]
       | Binop (e1, op, e2) -> expr e1 @ expr e2 @ [Bin op]
-      | Assign (s, e) -> expr e @
-        (try [Str_var (int_to_var (StringMap.find s env.local_index))]
-          with Not_found -> try [Get_gvar (StringSet.find s env.global_index)]
-          with Not_found -> raise (Failure ("undeclared variable" ^ s)))
+      | Assign (s, e) -> 
+        let exp = 
+          match expr e with
+          | [x] -> Opcode.string_of_stmt x;
+          | _   -> ""
+        in
+        let bassign = 
+          (try [Str_var (int_to_var (StringMap.find s env.local_index))]
+            with Not_found -> try [Get_gvar (StringSet.find s env.global_index)]
+            with Not_found -> raise (Failure ("undeclared variable" ^ s)))
+        in
+        let asn = 
+          match bassign with
+          | [x] -> Opcode.string_of_stmt x
+          | _   -> ""
+        in
+        [Opcode.Assign(asn, exp)]
       | Call (fname, actuals) -> (try
         (List.rev (List.mapi to_arg (List.concat (List.map expr actuals)))) @
         [Opcode.Call (StringMap.find fname env.function_index)]
