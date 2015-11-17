@@ -1,5 +1,5 @@
 FILE=$1
-TED="./ted $FILE.t"
+TED="./ted $FILE.ted"
 ASSEMBLE="nasm -f elf64 $FILE.asm"
 GCC="gcc $FILE.o -o $FILE"
 
