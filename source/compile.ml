@@ -71,12 +71,22 @@ let translate (globals, functions) =
               Glob_var (Opcode.string_of_stmt hd)
             else hd
           in
+          let hd =
+            match hd with
+            | x -> 
+              (match x with
+              | Ld_var s -> (Local_var (StringMap.find s env.local_index))
+              | bst      -> bst
+              | _        -> Fakenop
+              )
+            | _   -> Fakenop
+          in
           match acc with
               | 0 -> Arg("rdi", hd)
               | 1 -> Arg("rsi", hd)
               | 2 -> Arg("rdx", hd)
               | 3 -> Arg("rcx", hd)
-              | 4 -> Arg("r9", hd)
+              | 4 -> Arg("r9",  hd)
               | 5 -> Arg("r8",  hd)
               | _ -> Arg("", Fakenop)
             
@@ -98,7 +108,7 @@ let translate (globals, functions) =
       | Call (fname, actuals) -> (try
         (List.rev (List.mapi to_arg (List.concat (List.map expr actuals)))) @
         [Call (StringMap.find fname env.function_index)]
-          with Not_found -> raise (Failure ("undeclared function" ^ fname)))
+          with Not_found -> raise (Failure ("undeclared function " ^ fname)))
       | Noexpr -> []
     in
 

@@ -37,8 +37,8 @@ let _ =
       | [] -> ""
       | hd :: tl ->
         (match hd with
-          | Opcode.Str s -> Opcode.build_str s ^ (maketail tl)
-          | Opcode.Arg(_, Str s) -> Opcode.build_str s ^ (maketail tl)
+          | Opcode.Str s         -> Opcode.build_str s ^ (maketail tl)
+          | Opcode.Arg(_, Opcode.Str s) -> Opcode.build_str s ^ (maketail tl)
           | _ ->  maketail tl
         )
   in
