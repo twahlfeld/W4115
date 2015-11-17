@@ -60,7 +60,7 @@ char *get_title(char *uri) {
         dup2(pipefd[1], STDOUT_FILENO);
         dup2(pipefd[1], STDERR_FILENO);
 
-        execl("/usr/bin/phantomjs", "phantomjs", js_file, timeout, uri, NULL);
+        execl("/usr/bin/phantomjs", "phantomjs", "--ssl-protocol=tlsv1", "--ignore-ssl-errors=true", js_file, timeout, uri, NULL);
         return NULL;
     }
 
