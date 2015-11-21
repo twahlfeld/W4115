@@ -5,19 +5,19 @@ TED="./ted"
 # Set time limit for all operations
 ulimit -t 30
 
-globallog=testall.log
-rm -f $globallog
-error=0
-globalerror=0
+#globallog=testall.log
+#rm -f $globallog
+#error=0
+#globalerror=0
 
-keep=0
+#keep=0
 
-Usage() {
-    echo "Usage: testall.sh [options] [.ted files]"
-    echo "-k    Keep intermediate files"
-    echo "-h    Print this help"
-    exit 1
-}
+#Usage() {
+#    echo "Usage: testall.sh [options] [.ted files]"
+#    echo "-k    Keep intermediate files"
+#    echo "-h    Print this help"
+#    exit 1
+#}
 
 SignalError() {
     if [ $error -eq 0 ] ; then
@@ -30,9 +30,9 @@ SignalError() {
 # Compare <outfile> <reffile> <difffile>
 # Compares the outfile with reffile.  Differences, if any, written to difffile
 Compare() {
-    generatedfiles="$generatedfiles $3"
-    echo diff -b $1 $2 ">" $3 1>&2
-    diff -b "$1" "$2" > "$3" 2>&1 || {
+    #generatedfiles="$generatedfiles $3" 
+    #echo diff -b $1 $2
+    diff -b "$1" "$2" || {
 	SignalError "$1 differs"
 	echo "FAILED $1 differs from $2" 1>&2
     }
@@ -41,11 +41,12 @@ Compare() {
 # Run <args>
 # Report the command, run it, and report any errors
 Run() {
-    echo $* 1>&2
-    eval $* || {
-	SignalError "$1 failed on $*"
-	return 1
-    }
+    #echo $* 
+    eval $* 
+    #|| {
+	#SignalError "$1 failed on $*"
+	#return 1
+    #}
 }
 
 Check() {
@@ -55,16 +56,16 @@ Check() {
     reffile=`echo $1 | sed 's/.ted$//'`
     basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
 
-    echo -n "$basename..."
+    #echo -n "$basename..."
 
-    echo 1>&2
-    echo "###### Testing $basename" 1>&2
+    #echo 1>&2
+    echo "###### Testing $basename"
 
-    generatedfiles=""
+   # generatedfiles=""
 
-    generatedfiles="$generatedfiles ${basename}.i.out" &&
-    Run "../tedc.sh" "<" $1 ">" ${basename}.i.out &&
-    Compare ${basename}.i.out ${reffile}.out ${basename}.i.diff
+   # generatedfiles="$generatedfiles ${basename}.i.out" &&
+    Run "./ted_test.sh" $reffile ">" ${basename}.i.out
+    Compare ${basename}.i.out ${reffile}.out
 
    # generatedfiles="$generatedfiles ${basename}.c.out" &&
    # Run "$TED" "-c" "<" $1 ">" ${basename}.c.out &&
@@ -72,16 +73,16 @@ Check() {
 
     # Report the status and clean up the generated files
 
-    if [ $error -eq 0 ] ; then
-	if [ $keep -eq 0 ] ; then
-	    rm -f $generatedfiles
-	fi
-	echo "OK"
-	echo "###### SUCCESS" 1>&2
-    else
-	echo "###### FAILED" 1>&2
-	globalerror=$error
-    fi
+    #if [ $error -eq 0 ] ; then
+	#if [ $keep -eq 0 ] ; then
+	#    rm -f $generatedfiles
+	#fi
+	#echo "OK"
+	#echo "###### SUCCESS" 1>&2
+    #else
+	#echo "###### FAILED" 1>&2
+	#globalerror=$error
+    #fi
 }
 
 while getopts kdpsh c; do
@@ -108,15 +109,15 @@ for file in $files
 do
     case $file in
 	*test-*)
-	    Check $file 2>> $globallog
+	    Check $file 
 	    ;;
-	*fail-*)
-	    CheckFail $file 2>> $globallog
-	    ;;
-	*)
-	    echo "unknown file type $file"
-	    globalerror=1
-	    ;;
+#    *fail-*)
+#        CheckFail $file 2>> $globallog
+#        ;;
+#	*)
+#	    echo "unknown file type $file"
+#	    globalerror=1
+#	    ;;
     esac
 done
 
