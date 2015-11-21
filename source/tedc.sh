@@ -7,7 +7,6 @@ if [ -f $FILE.asm ]; then
   rm $FILE.asm
 fi
 
-
 if [ -f $FILE.o ]; then
   rm $FILE.o
 fi

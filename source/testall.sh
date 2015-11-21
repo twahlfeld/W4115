@@ -63,12 +63,12 @@ Check() {
     generatedfiles=""
 
     generatedfiles="$generatedfiles ${basename}.i.out" &&
-    Run "$TED" "-i" "<" $1 ">" ${basename}.i.out &&
+    Run "../tedc.sh" "<" $1 ">" ${basename}.i.out &&
     Compare ${basename}.i.out ${reffile}.out ${basename}.i.diff
 
-    generatedfiles="$generatedfiles ${basename}.c.out" &&
-    Run "$TED" "-c" "<" $1 ">" ${basename}.c.out &&
-    Compare ${basename}.c.out ${reffile}.out ${basename}.c.diff
+   # generatedfiles="$generatedfiles ${basename}.c.out" &&
+   # Run "$TED" "-c" "<" $1 ">" ${basename}.c.out &&
+   # Compare ${basename}.c.out ${reffile}.out ${basename}.c.diff
 
     # Report the status and clean up the generated files
 
