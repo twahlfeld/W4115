@@ -1,3 +1,5 @@
+module StringMap = Map.Make(String)
+
 type bstmt =
   | Lit of int                (* Integer Literal *)
   | Str of string             (* String Literal *)
@@ -16,7 +18,7 @@ type bstmt =
   | Imprt                     (* Import/Extern function *)
   | Prologue of string        (* Start of every stack frame *)
   | Epilogue                  (* End of every stack frame *)
-  | Assign of string * string (* Set variable *)
+  | Assign of bstmt * bstmt (* Set variable *)
   | Ld_var of string          (* Load variable *)
   | Ld_reg of string          (* Load register into id *)
   | Ld_lit of int             (* Load lit into register *)
@@ -50,7 +52,10 @@ let explode s =
 ;;
 
 let rec define_global acc = function
-  | [] -> if acc = 0 then "\n\t\tdb 00H\n" else "00H\n"
+  | [] -> 
+    if acc = 0 then "\n\t\tdb 00H\n" 
+    else if acc mod 4 = 0 then "00H\n"
+    else "00H, " ^ define_global (acc+1) []
   | hd :: tl -> 
     if acc = 0 then 
       "\n\t\tdb " ^ (Printf.sprintf "%02XH, " hd) ^ define_global (acc+1) tl
@@ -60,19 +65,23 @@ let rec define_global acc = function
       (Printf.sprintf "%02XH, " hd) ^ define_global (acc+1) tl
 ;;
 
-let build_str s = 
-  Printf.sprintf "STRING:" ^ (define_global 0 (explode s))
+let rec build_str kv_list =
+  match kv_list with
+    | []     -> ""
+    | (k, v)::tl -> v ^ ":" ^ (define_global 0 (explode k))^(build_str tl)
 ;;
 
 
-let rec string_of_stmt = function
+let rec string_of_stmt strlit_map blist =
+  let to_string x = string_of_stmt strlit_map x in
+  match blist with
   | Lit(x)            -> string_of_int x
-  | Str(s)            -> ""
+  | Str(s)            -> StringMap.find s strlit_map
   | Arg(lhs, rhs)     -> 
     (match rhs with 
-    | Call s -> Printf.sprintf "%s\tmov\t%s, rax\n" (string_of_stmt rhs) lhs
-    | Str  s -> Printf.sprintf "%s" (string_of_stmt rhs) 
-    | _      -> Printf.sprintf "\tmov\t%s, %s\n" lhs (string_of_stmt rhs)
+    | Call s -> Printf.sprintf "%s\tmov\t%s, rax\n" (to_string rhs) lhs
+    | Str  s -> Printf.sprintf "%s" (to_string rhs) 
+    | _      -> Printf.sprintf "\tmov\t%s, %s\n" lhs (to_string rhs)
     )
   | Bin(Ast.Add)      -> Printf.sprintf "\tadd\trax, rdx\n"
   | Bin(Ast.Sub)      -> Printf.sprintf "\tsub\trax, rdx\n"
@@ -90,8 +99,8 @@ let rec string_of_stmt = function
   | Bin(Ast.Geq)      -> Printf.sprintf "\tcmp\trax, rdx\n" ^
                          "\tsetge dl" ^
                          "\tmovzx\trax, dl\n"
-  | Mov(dst, src)     -> Printf.sprintf "\tmov\t%s, %s\n" dst (string_of_stmt src)
-  | Ret(b)            -> Printf.sprintf "\tmov\teax, %s\n" (string_of_stmt b)
+  | Mov(dst, src)     -> Printf.sprintf "\tmov\t%s, %s\n" dst (to_string src)
+  | Ret(b)            -> Printf.sprintf "\tmov\teax, %s\n" (to_string b)
   | Prologue(s)       -> Printf.sprintf "%s:\n\tpush\trbp\n\tmov\trbp, rsp\n" s
   | Epilogue          -> Printf.sprintf "\tpop\trbp\n\tret\n"
   | Local_var(x)      -> Printf.sprintf "[rbp-%XH]" (x*4)
@@ -103,13 +112,17 @@ let rec string_of_stmt = function
   | Pop(s)            -> Printf.sprintf "\tpop\t%s\n" s
   | Fdecl(s)          -> Printf.sprintf "global %s\n" s
   | Imprt             -> Printf.sprintf "extern fprintf\nextern fopen\n"
-  | Assign(dst, src) -> Printf.sprintf "\tmov\trax, %s\n%s" src dst
+  | Assign(dst, src) ->  Printf.sprintf "\tmov\trax, %s\n%s" (to_string src) (to_string dst)
   | Ld_var(var)       -> Printf.sprintf "\tmov\trdx, rax\n\tmov\t%s, rax\n" var
   | Ld_reg(reg)       -> Printf.sprintf "\tmov\trax, %s\n" reg
   | Ld_lit(lit)       -> Printf.sprintf "\tmov\trax, %s\n" (string_of_int lit)
   | Str_var(var)      -> Printf.sprintf "\tmov\tqword [%s], rax\n" var
   | Header(s)         -> s ^ "\nextern fprintf\nextern fopen\nextern stdout\nextern get_title\n"^
                              "\nSECTION .text\n"
-  | Tail(s)           -> Printf.sprintf "SECTION .data\nSECTION .bss\nSECTION .rodata\n%s\n" s 
+  | Tail(s)           -> "SECTION .data\n" ^
+                         "SECTION .bss\n" ^
+                         "SECTION .rodata\n" ^
+                         (build_str (StringMap.bindings strlit_map)) ^ "\n" ^ 
+                         s ^ "\n"
   | Fakenop           -> ""
 ;;
