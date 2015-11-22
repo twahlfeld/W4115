@@ -35,9 +35,9 @@ Check() {
 
     Run "./ted_test.sh" $reffile ">" ${basename}.i.out
     Compare ${basename}.i.out ${reffile}.out $basename
-    rm -f ${reffile}.o
-    rm -f ${reffile}.asm
-    rm -f $reffile
+#    rm -f ${reffile}.o
+#    rm -f ${reffile}.asm
+#    rm -f $reffile
 }
 
 shift `expr $OPTIND - 1`
