@@ -38,7 +38,7 @@ let translate (globals, functions) =
     | (fn, fp)::tl -> StringMap.add fn fp (string_map_create tl)
   in
   let function_indexes = string_map_create ([("print", "fprintf"); 
-    ("open", "fopen"); ("get", "get"); ("find", "find"); ("head", "head"); 
+    ("open", "fopen"); ("get", "get_title"); ("find", "find"); ("head", "head"); 
     ("addafter", "addafter"); ("addbefore", "addbefore"); ("remove", "remove");
     ("getdata", "getdata")] @ 
       List.map (fun x -> (x.fname, x.fname)) functions) 
@@ -65,35 +65,16 @@ let translate (globals, functions) =
       | x -> if x > 6 then Printf.sprintf "rbp+%x" ((x-4)*8) 
         else Printf.sprintf "rbp-%xH" (abs x)
     in
-    (*let rec arg l = *)
-      let rec to_arg acc hd =
-          let hd = 
-            if (StringSet.mem (Opcode.string_of_stmt hd) global_indexes) then
-              Glob_var (Opcode.string_of_stmt hd)
-            else hd
-          in
-          let hd =
-            match hd with
-            | x -> 
-              (match x with
-              | Ld_var s -> (Local_var (StringMap.find s env.local_index))
-              | bst      -> bst
-              | _        -> Fakenop
-              )
-            | _   -> Fakenop
-          in
-          match acc with
-              | 0 -> Arg("rdi", hd)
-              | 1 -> Arg("rsi", hd)
-              | 2 -> Arg("rdx", hd)
-              | 3 -> Arg("rcx", hd)
-              | 4 -> Arg("r9",  hd)
-              | 5 -> Arg("r8",  hd)
-              | _ -> Arg("", Fakenop)
-            
-      (*in
-      to_arg 0 l*)
-      in
+    let rec to_arg acc hd =
+      match acc with
+      | 0 -> Arg("rdi", hd)
+      | 1 -> Arg("rsi", hd)
+      | 2 -> Arg("rdx", hd)
+      | 3 -> Arg("rcx", hd)
+      | 4 -> Arg("r9",  hd)
+      | 5 -> Arg("r8",  hd)
+      | _ -> Arg("", Fakenop)
+    in
     let rec expr = function
       | Literal i -> [Lit i]
       | Id s -> 
@@ -105,8 +86,8 @@ let translate (globals, functions) =
       | Assign (s, e) -> 
         let exp = 
           match expr e with
-          | [x] -> Opcode.string_of_stmt x;
-          | _   -> ""
+          | [x] -> x
+          | _   ->  Fakenop
         in
         let bassign = 
           (try [Str_var (int_to_var (StringMap.find s env.local_index))]
@@ -115,8 +96,8 @@ let translate (globals, functions) =
         in
         let asn = 
           match bassign with
-          | [x] -> Opcode.string_of_stmt x
-          | _   -> ""
+          | [x] -> x
+          | _   -> Fakenop
         in
         [Opcode.Assign(asn, exp)]
       | Call (fname, actuals) -> (try
@@ -132,13 +113,13 @@ let translate (globals, functions) =
     let rec stmt = function
       | Block sl        -> List.concat (List.map stmt sl)
       | Expr e          -> expr e @ []
-      | Return e        -> [Epilogue]
+      | Return e        -> expr e
       (*|  TODO IF STATEMENT
        *|  TODO FOR STATEMENT
        *|  TODO WHILE STATEMENT
        *)
     in
-    [Prologue fdecl.fname] @ stmt(Block fdecl.body) @ [Epilogue]
+    [Prologue(fdecl.fname, (List.length fdecl.locals))] @ stmt(Block fdecl.body) @ [Epilogue]
   in
   let env = {
     function_index = function_indexes;
