@@ -26,10 +26,10 @@ rule token = parse
 | "while"  { WHILE }
 | "return" { RETURN }
 | "int"    { INT }
-| "string" { STRING }
+ (* | "string" { STRING }
 | "list"   { LIST }
 | "Page"   { PAGE }
-| "Element" { ELEMENT }
+| "Element" { ELEMENT } *)
 | ['0'-'9']+ as lxm { LITERAL(int_of_string lxm) }
 | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as lxm { ID(lxm) }
 | '\"' [' '-'~']* '\"' as lxm { STRING(String.sub lxm 1 (String.length lxm - 2)) }

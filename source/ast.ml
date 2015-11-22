@@ -4,6 +4,7 @@ type expr =
     Literal of int
   | Id of string
   | String of string
+ (* | Tipe of type_identifier *)
   | Binop of expr * op * expr
   | Assign of string * expr
   | Call of string * expr list
@@ -24,9 +25,16 @@ type func_decl = {
     body : stmt list;
   }
 
+(* type type_identifier =
+    Int of int 
+    | String of string
+    | List
+    | Page
+    | Element *)
+
 type program = string list * func_decl list
 
-let rec string_of_expr = function
+(* let rec string_of_expr = function
     Literal(l) -> string_of_int l
   | Id(s) -> s
   | String(s) -> s
@@ -65,4 +73,4 @@ let string_of_fdecl fdecl =
 
 let string_of_program (vars, funcs) =
   String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
-  String.concat "\n" (List.map string_of_fdecl funcs)
+  String.concat "\n" (List.map string_of_fdecl funcs) *)
