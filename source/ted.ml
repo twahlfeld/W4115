@@ -46,7 +46,7 @@ let _ =
     | [] -> ""
     | hd :: tl ->
       (match hd with
-        | Opcode.Prologue s ->
+        | Opcode.Prologue(s, _) ->
           (match s with
             | "fprintf" -> makeheader tl
             | "fopen"   -> makeheader tl

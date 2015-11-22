@@ -16,9 +16,9 @@ type bstmt =
   | Pop of string             (* Pop statck in register *)
   | Fdecl of string           (* Function Declaration *)
   | Imprt                     (* Import/Extern function *)
-  | Prologue of string        (* Start of every stack frame *)
+  | Prologue of string * int  (* Start of every stack frame *)
   | Epilogue                  (* End of every stack frame *)
-  | Assign of bstmt * bstmt (* Set variable *)
+  | Assign of bstmt * bstmt   (* Set variable *)
   | Ld_var of string          (* Load variable *)
   | Ld_reg of string          (* Load register into id *)
   | Ld_lit of int             (* Load lit into register *)
@@ -53,8 +53,8 @@ let explode s =
 
 let rec define_global acc = function
   | [] -> 
-    if acc = 0 then "\n\t\tdb 00H\n" 
-    else if acc mod 4 = 0 then "00H\n"
+    if acc = 0 then "\n\t\tdb 00H, 00H, 00H, 00H\n" 
+    else if (acc+1) mod 4 = 0 then "00H\n"
     else "00H, " ^ define_global (acc+1) []
   | hd :: tl -> 
     if acc = 0 then 
@@ -79,8 +79,8 @@ let rec string_of_stmt strlit_map blist =
   | Str(s)            -> StringMap.find s strlit_map
   | Arg(lhs, rhs)     -> 
     (match rhs with 
-    | Call s -> Printf.sprintf "%s\tmov\t%s, rax\n" (to_string rhs) lhs
-    | Str  s -> Printf.sprintf "%s" (to_string rhs) 
+    | Call s -> Printf.sprintf "\tmov\t%s, rax\nRHS:%s" lhs (to_string rhs)
+    | Str  s -> Printf.sprintf "\tmov\t%s, %s\n" lhs (to_string rhs)
     | _      -> Printf.sprintf "\tmov\t%s, %s\n" lhs (to_string rhs)
     )
   | Bin(Ast.Add)      -> Printf.sprintf "\tadd\trax, rdx\n"
@@ -101,7 +101,7 @@ let rec string_of_stmt strlit_map blist =
                          "\tmovzx\trax, dl\n"
   | Mov(dst, src)     -> Printf.sprintf "\tmov\t%s, %s\n" dst (to_string src)
   | Ret(b)            -> Printf.sprintf "\tmov\teax, %s\n" (to_string b)
-  | Prologue(s)       -> Printf.sprintf "%s:\n\tpush\trbp\n\tmov\trbp, rsp\n" s
+  | Prologue(s, n)    -> s ^ ":\n\tpush\trbp\n\tmov\trbp, rsp\n\tsub\tesp, " ^ (string_of_int n) ^ "\n"
   | Epilogue          -> Printf.sprintf "\tpop\trbp\n\tret\n"
   | Local_var(x)      -> Printf.sprintf "[rbp-%XH]" (x*4)
   | Glob_var(s)       -> "["^s^"]"

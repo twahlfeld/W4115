@@ -1,5 +1,4 @@
 int main()
 {
-    "ihttp://www.findmine.us/";
-   print(stdout, get("http://www.findmine.us/"));
-}
+   print(stdout, "%s %s\n  ", "Don't", "Panic");
+   }

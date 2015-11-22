@@ -9,9 +9,8 @@ SECTION .text
 main:
 	push	rbp
 	mov	rbp, rsp
-Str0	call	get_title
-	mov	rdx, rax
-	mov	rsi, Str1
+	sub	esp, 0
+	mov	rsi, Str0
 	mov	rdi, [stdout]
 	call	fprintf
 	pop	rbp
@@ -19,14 +18,10 @@ Str0	call	get_title
 SECTION .data
 SECTION .bss
 SECTION .rodata
-Str1:
-		db 68H, 74H, 74H, 70H, 3AH, 2FH, 2FH, 77H
-		db 77H, 77H, 2EH, 66H, 69H, 6EH, 64H, 6DH
-		db 69H, 6EH, 65H, 2EH, 75H, 73H, 2FH, 00H, 00H
 Str0:
-		db 69H, 68H, 74H, 74H, 70H, 3AH, 2FH, 2FH
-		db 77H, 77H, 77H, 2EH, 66H, 69H, 6EH, 64H
-		db 6DH, 69H, 6EH, 65H, 2EH, 75H, 73H, 2FH
-		db 00H
+		db 25H, 73H, 20H, 25H, 73H, 0AH, 22H, 2CH
+		db 20H, 22H, 44H, 6FH, 6EH, 27H, 74H, 22H
+		db 2CH, 20H, 22H, 50H, 61H, 6EH, 69H, 63H
+		db 00H, 00H, 00H, 00H
 
 
