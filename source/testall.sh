@@ -14,8 +14,8 @@ SignalError() {
 # Compare <outfile> <reffile> <difffile>
 Compare() {
     if diff -b "$1" "$2" 
-    then echo "##TEST SUCCESS $3" && rm -f $1
-    else echo "##TEST FAIL $1 differs from $2" 
+    then echo "########## TEST SUCCESS $3 ##########" && rm -f $1
+    else echo "########## TEST FAIL $1 differs from $2 ##########" 
     fi
 }
 
@@ -30,7 +30,7 @@ Check() {
                              s/.ted//'`
     reffile=`echo $1 | sed 's/.ted$//'`
 
-    echo "###### Testing $basename"
+    echo "########## Testing $basename ##########"
 
 
     Run "./ted_test.sh" $reffile ">" ${basename}.i.out

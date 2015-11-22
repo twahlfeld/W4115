@@ -1,10 +1,10 @@
 int add(int a, int b) {
-    return a + b
+    return a + b;
 }
 
 int main() {
     int x;
     x = add(21, 21);
-    printf(stdout, "%d\n", x)
+    printf(stdout, "%d\n", x);
     return 0;
 }
