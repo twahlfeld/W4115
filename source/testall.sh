@@ -14,7 +14,7 @@ SignalError() {
 # Compare <outfile> <reffile> <difffile>
 Compare() {
     if diff -b "$1" "$2" 
-    then echo "##TEST SUCCESS" && rm -f $1
+    then echo "##TEST SUCCESS $3" && rm -f $1
     else echo "##TEST FAIL $1 differs from $2" 
     fi
 }
@@ -34,7 +34,7 @@ Check() {
 
 
     Run "./ted_test.sh" $reffile ">" ${basename}.i.out
-    Compare ${basename}.i.out ${reffile}.out
+    Compare ${basename}.i.out ${reffile}.out $basename
     rm -f ${reffile}.o
     rm -f ${reffile}.asm
     rm -f $reffile
@@ -54,6 +54,7 @@ do
     case $file in
 	*test-*)
 	    Check $file
+	    echo "Press enter to continue..." && read answer
 	    ;;
     esac
 done

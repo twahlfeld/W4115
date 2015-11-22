@@ -1,0 +1,11 @@
+int main() {
+    int x;
+    x = 42;
+    if (x > 42) {
+        print(stdout, "fail");
+    }
+    else {
+        print(stdout, "success\n");
+    }                         
+    return 0;
+}

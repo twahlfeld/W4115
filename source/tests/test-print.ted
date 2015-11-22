@@ -1,0 +1,4 @@
+int main() {
+    print(stdout, "slartibartfast\n");
+    return 0;
+}
