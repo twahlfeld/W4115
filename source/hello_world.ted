@@ -1,0 +1,33 @@
+int add(x, y)
+{
+    x+y;
+    return x+y;
+}
+
+int sub(x, y)
+{
+    x-y;
+    return x-y;
+}
+
+int mult(x, y)
+{
+    x*y;
+    return x*y;
+}
+
+int div(x, y)
+{
+    x/y;
+    return x/y;
+}
+
+int main()
+{
+    add(1, 1);
+    sub(3, 1);
+    mult(2, 2);
+    div(4, 2);
+
+    print(stdout, "Hello World\n  Don't Painc\n  %d\n", 42);
+}

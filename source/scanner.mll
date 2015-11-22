@@ -32,7 +32,7 @@ rule token = parse
 | "Element" { ELEMENT } *)
 | ['0'-'9']+ as lxm { LITERAL(int_of_string lxm) }
 | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as lxm { ID(lxm) }
-| '\"' [' '-'~']* '\"' as lxm { STRING(String.sub lxm 1 (String.length lxm - 2)) }
+| '\"' [' '-'!' '#'-'~']* '\"' as lxm { STRING(String.sub lxm 1 (String.length lxm - 2)) }
 | eof { EOF }
 | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
 
