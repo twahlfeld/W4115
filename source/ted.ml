@@ -34,7 +34,7 @@ let _ =
         (match hd with
         | Opcode.Str s -> s :: filter_string tl
         | Opcode.Arg(_, Opcode.Str s ) -> s :: filter_string tl
-        | Opcode.Arg(_, (Opcode.Arg(_, Opcode.Str s))) -> s :: filter_string tl
+        (*| Opcode.Arg(_, (Opcode.Arg(_, Opcode.Str s))) -> s :: filter_string tl*)
         | _        -> filter_string tl
         )
     in
