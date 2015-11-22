@@ -6,7 +6,7 @@
 %token RETURN IF ELSE FOR WHILE INT
 %token <int> LITERAL
 %token <string> ID STRING
-%token EOF
+%token EOF ELEMENT PAGE LIST
 
 %nonassoc NOELSE
 %nonassoc ELSE
@@ -30,7 +30,7 @@ decls:
  | decls fdecl { fst $1, ($2 :: snd $1) }
 
 fdecl:
-   INT ID LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
+   type_decl ID LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
      { { fname = $2;
 	 formals = $4;
 	 locals = List.rev $7;
@@ -41,15 +41,28 @@ formals_opt:
   | formal_list   { List.rev $1 }
 
 formal_list:
-    ID                   { [$1] }
-  | formal_list COMMA ID { $3 :: $1 }
+    type_decl ID                   { [$1] }
+  | formal_list COMMA type_decl ID { $3 :: $1 }
 
 vdecl_list:
     /* nothing */    { [] }
   | vdecl_list vdecl { $2 :: $1 }
 
 vdecl:
-   INT ID SEMI { $2 }
+   type_decl ID SEMI { $2 }
+
+type_decl:
+    prim_type
+    | obj_type
+
+prim_type:
+    INT
+    | STRING
+    | LIST
+
+obj_type:
+    PAGE
+    | ELEMENT
 
 stmt_list:
     /* nothing */  { [] }
