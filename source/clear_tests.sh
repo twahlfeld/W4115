@@ -1,1 +1,1 @@
-rm -f test-*
+rm -f test-*.i.out

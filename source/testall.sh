@@ -32,10 +32,14 @@ SignalError() {
 Compare() {
     #generatedfiles="$generatedfiles $3" 
     #echo diff -b $1 $2
-    diff -b "$1" "$2" || {
-	SignalError "$1 differs"
-	echo "FAILED $1 differs from $2" 1>&2
-    }
+    #diff -b "$1" "$2" || {
+	#SignalError "$1 differs"
+	#echo "FAILED $1 differs from $2" 1>&2
+    #}
+    if diff -b "$1" "$2" 
+    then echo "##TEST SUCCESS" && rm -f $1
+    else echo "##TEST FAIL $1 differs from $2" 
+    fi
 }
 
 # Run <args>
@@ -54,7 +58,7 @@ Check() {
     basename=`echo $1 | sed 's/.*\\///
                              s/.ted//'`
     reffile=`echo $1 | sed 's/.ted$//'`
-    basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
+    basedir="`echo $1 | sed 's/\/[^\/]*$//'`/"
 
     #echo -n "$basename..."
 
@@ -66,6 +70,9 @@ Check() {
    # generatedfiles="$generatedfiles ${basename}.i.out" &&
     Run "./ted_test.sh" $reffile ">" ${basename}.i.out
     Compare ${basename}.i.out ${reffile}.out
+    rm -f ${reffile}.o
+    rm -f ${reffile}.asm
+    rm -f $reffile
 
    # generatedfiles="$generatedfiles ${basename}.c.out" &&
    # Run "$TED" "-c" "<" $1 ">" ${basename}.c.out &&
@@ -102,14 +109,14 @@ if [ $# -ge 1 ]
 then
     files=$@
 else
-    files="tests/fail-*.ted tests/test-*.ted"
+    files="tests/test-*.ted"
 fi
 
 for file in $files
 do
     case $file in
 	*test-*)
-	    Check $file 
+	    Check $file
 	    ;;
 #    *fail-*)
 #        CheckFail $file 2>> $globallog
