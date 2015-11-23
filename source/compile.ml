@@ -48,9 +48,12 @@ let translate (globals, functions) =
   (* Translate a function in AST form into a list of bytecode statements *)
   let translate env fdecl =
     (* Bookkeeping: FP offsets for locals and arguments *)
+    let string_of_var = function
+      | Var(_, s, _) -> s
+    in
     let num_formals = List.length fdecl.formals
     and num_locals = List.length fdecl.locals
-    and local_offsets = enum (-8) (-8) fdecl.locals
+    and local_offsets = enum (-8) (-8) (List.map string_of_var fdecl.locals)
     and formal_offsets = enum (1) (1) fdecl.formals in
     let env = { env with local_index = string_map_pairs
       StringMap.empty (local_offsets @ formal_offsets) } in
