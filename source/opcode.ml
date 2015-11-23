@@ -106,7 +106,7 @@ let rec string_of_stmt strlit_map blist =
     | Call _                           -> (to_string b)
     | _                                -> ""
     )
-  | Prologue(s, n)    -> Printf.sprintf "%s:\n\tpush\trbp\n\tmov\trbp, rsp\n\tsub\trsp, %02XH\n" s n
+  | Prologue(s, n)    -> Printf.sprintf "%s:\n\tpush\trbp\n\tmov\trbp, rsp\n\tsub\trsp, %02XH\n" s (n+8)
   | Epilogue          -> Printf.sprintf "\tleave\n\tret\n"
   | Local_var(x)      -> Printf.sprintf "[rbp-%XH]" (abs x)
   | Glob_var(s)       -> "["^s^"]"
