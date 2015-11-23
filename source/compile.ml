@@ -84,7 +84,10 @@ let translate (globals, functions) =
             with Not_found -> try [Get_gvar (StringSet.find s env.global_index)]
             with Not_found -> raise (Failure ("undeclared variable" ^ s)))
         in
-        [Opcode.Assign(unlist asn, unlist (expr e))]
+        (match e with
+        | Call(fn, a) -> (expr e) @ [Opcode.Assign(unlist asn, Call fn)]
+        | _ -> [Opcode.Assign(unlist asn, unlist (expr e))]
+        )
       | Call (fname, actuals) -> (try
         (List.rev (List.mapi to_arg (List.concat (List.map expr actuals)))) @
         [Opcode.Call (StringMap.find fname env.function_index)]

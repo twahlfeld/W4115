@@ -117,7 +117,10 @@ let rec string_of_stmt strlit_map blist =
   | Pop(s)            -> Printf.sprintf "\tpop\t%s\n" s
   | Fdecl(s)          -> Printf.sprintf "global %s\n" s
   | Imprt             -> Printf.sprintf "extern fprintf\nextern fopen\n"
-  | Assign(dst, src) ->  Printf.sprintf "\tmov\trax, %s\n%s" (to_string src) (to_string dst)
+  | Assign(dst, src)  -> 
+    (match src with
+    | Call s -> (to_string dst)
+    | _      -> Printf.sprintf "\tmov\trax, %s\n%s" (to_string src) (to_string dst))
   | Ld_var(var)       -> Printf.sprintf "\tmov\trdx, rax\n\tmov\t%s, rax\n" var
   | Ld_reg(reg)       -> Printf.sprintf "\tmov\trax, %s\n" reg
   | Ld_lit(lit)       -> Printf.sprintf "\tmov\trax, %s\n" (string_of_int lit)
