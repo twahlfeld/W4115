@@ -56,6 +56,7 @@ let translate (globals, functions) =
       enum (1) (1) (List.map (fun x -> match x with Ast.Arg(_, s) -> s) fdecl.formals) in
     let env = { env with local_index = string_map_pairs
       StringMap.empty (local_offsets @ formal_offsets) } in
+    let unlist = function [x] -> x | _ -> Fakenop in
     let int_to_var = function
       | 1 -> "rdi"
       | 2 -> "rsi"
@@ -67,14 +68,7 @@ let translate (globals, functions) =
         else Printf.sprintf "rbp-%xH" (abs x)
     in
     let rec to_arg acc hd =
-      match acc with
-      | 0 -> Arg("rdi", hd)
-      | 1 -> Arg("rsi", hd)
-      | 2 -> Arg("rdx", hd)
-      | 3 -> Arg("rcx", hd)
-      | 4 -> Arg("r9",  hd)
-      | 5 -> Arg("r8",  hd)
-      | _ -> Arg("", Fakenop)
+      Arg((int_to_var (acc+1)), hd)
     in
     let rec expr = function
       | Literal i -> [Lit i]
@@ -85,22 +79,12 @@ let translate (globals, functions) =
       | Stringlit s    -> [Str s]
       | Binop (e1, op, e2) -> expr e1 @ expr e2 @ [Bin op]
       | Assign (s, e) -> 
-        let exp = 
-          match expr e with
-          | [x] -> x
-          | _   ->  Fakenop
-        in
-        let bassign = 
+        let asn = 
           (try [Str_var (int_to_var (StringMap.find s env.local_index))]
             with Not_found -> try [Get_gvar (StringSet.find s env.global_index)]
             with Not_found -> raise (Failure ("undeclared variable" ^ s)))
         in
-        let asn = 
-          match bassign with
-          | [x] -> x
-          | _   -> Fakenop
-        in
-        [Opcode.Assign(asn, exp)]
+        [Opcode.Assign(unlist asn, unlist (expr e))]
       | Call (fname, actuals) -> (try
         (List.rev (List.mapi to_arg (List.concat (List.map expr actuals)))) @
         [Opcode.Call (StringMap.find fname env.function_index)]
@@ -114,7 +98,7 @@ let translate (globals, functions) =
     let rec stmt = function
       | Block sl        -> List.concat (List.map stmt sl)
       | Expr e          -> expr e @ []
-      | Return e        -> [Fakenop]
+      | Return e        -> [Ret (unlist (expr e))]
       (*|  TODO IF STATEMENT
        *|  TODO FOR STATEMENT
        *|  TODO WHILE STATEMENT
