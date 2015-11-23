@@ -51,12 +51,11 @@ let translate (globals, functions) =
     let num_formals = List.length fdecl.formals
     and num_locals = List.length fdecl.locals
     and local_offsets = 
-      enum (0) (-8) (List.map (fun x -> match x with Ast.Var(_, s, _) -> s) fdecl.locals)
+      enum (-8) (0) (List.map (fun x -> match x with Ast.Var(_, s, _) -> s) fdecl.locals)
     and formal_offsets = 
       enum (1) (1) (List.map (fun x -> match x with Ast.Arg(_, s) -> s) fdecl.formals) in
     let env = { env with local_index = string_map_pairs
       StringMap.empty (local_offsets @ formal_offsets) } in
-
     let int_to_var = function
       | 1 -> "rdi"
       | 2 -> "rsi"

@@ -106,7 +106,7 @@ let rec string_of_stmt strlit_map blist =
     | Call _                           -> (to_string b)
     | _                                -> ""
     )
-  | Prologue(s, n)    -> Printf.sprintf "%s:\n\tpush\trbp\n\tmov\trbp, rsp\n\tsub\trsp, %02XH\n" s (n+8)
+  | Prologue(s, n)    -> Printf.sprintf "%s:\n\tpush\trbp\n\tmov\trbp, rsp\n\tsub\trsp, %02XH\n" s (n+16)
   | Epilogue          -> Printf.sprintf "\tleave\n\tret\n"
   | Local_var(x)      -> Printf.sprintf "[rbp-%XH]" (abs x)
   | Glob_var(s)       -> "["^s^"]"
@@ -124,7 +124,7 @@ let rec string_of_stmt strlit_map blist =
   | Str_var(var)      -> Printf.sprintf "\tmov\tqword [%s], rax\n" var
   | Header(s)         -> s ^ "\nextern fprintf\nextern fopen\nextern stdout\nextern get_title\n"^
                              "\nSECTION .text\n"
-  | Tail(s)           -> "SECTION .data\n" ^
+  | Tail(s)           -> "\nSECTION .data\n" ^
                          "SECTION .bss\n" ^
                          "SECTION .rodata\n" ^
                          (build_str (StringMap.bindings strlit_map)) ^ "\n" ^ 

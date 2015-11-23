@@ -32,7 +32,7 @@ scanner.ml: scanner.mll
 
 .PHONY: clean
 clean:
-	rm -f *.cmo *.cmi *.o *.asm scanner.ml parser.mli parser.ml ted
+	rm -f *.cmo *.cmi *.o *.asm scanner.ml parser.mli parser.ml
 
 .PHONY: all
 all: clean default
