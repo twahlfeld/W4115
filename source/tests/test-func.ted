@@ -5,6 +5,6 @@ int add(int a, int b) {
 int main() {
     int x;
     x = add(21, 21);
-    printf(stdout, "%d\n", x);
+    print(stdout, "%d\n", x);
     return 0;
 }
