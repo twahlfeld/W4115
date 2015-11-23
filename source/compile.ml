@@ -81,7 +81,7 @@ let translate (globals, functions) =
         (try [Ld_var (int_to_var (StringMap.find s env.local_index))]
           with Not_found -> try [Glob_var (StringSet.find s env.global_index)]
           with Not_found -> raise (Failure ("undeclared variable " ^ s)))
-      | String s -> [Str s]
+      | Stringlit s    -> [Str s]
       | Binop (e1, op, e2) -> expr e1 @ expr e2 @ [Bin op]
       | Assign (s, e) -> 
         let exp = 

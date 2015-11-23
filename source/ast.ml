@@ -16,19 +16,23 @@ type stmt =
   | If of expr * stmt * stmt
   | For of expr * expr * expr * stmt
   | While of expr * stmt
+                
+type type_def =
+    Int
+    | String
 
+(* type * ID * value *)
+type var =
+    Var of type_def * string * expr
+                
 type func_decl = {
     fname : string;
     formals : string list;
-    locals : string list;
+    locals : var list;
     body : stmt list;
 }         
 
-type Tipe =
-    Int of int 
-    | String of string
-
-type program = string list * func_decl list
+type program = var list * func_decl list
 
 (* let rec string_of_expr = function
     Literal(l) -> string_of_int l

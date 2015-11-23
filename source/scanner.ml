@@ -868,7 +868,7 @@ let
 # 869 "scanner.ml"
 = Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_start_pos lexbuf.Lexing.lex_curr_pos in
 # 32 "scanner.mll"
-                                      ( STRING(String.sub lxm 1 (String.length lxm - 2)) )
+                                      ( STRING_LIT(String.sub lxm 1 (String.length lxm - 2)) )
 # 873 "scanner.ml"
 
   | 29 ->
