@@ -3,8 +3,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq
 type expr =
     Literal of int
   | Id of string
-  | String of string
- (* | Tipe of type_identifier *)
+  | Stringlit of string  
   | Binop of expr * op * expr
   | Assign of string * expr
   | Call of string * expr list
@@ -23,14 +22,11 @@ type func_decl = {
     formals : string list;
     locals : string list;
     body : stmt list;
-  }
+}         
 
-(* type type_identifier =
+type Tipe =
     Int of int 
     | String of string
-    | List
-    | Page
-    | Element *)
 
 type program = string list * func_decl list
 

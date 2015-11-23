@@ -113,7 +113,7 @@ let translate (globals, functions) =
     let rec stmt = function
       | Block sl        -> List.concat (List.map stmt sl)
       | Expr e          -> expr e @ []
-      | Return e        -> expr e
+      | Return e        -> [Fakenop]
       (*|  TODO IF STATEMENT
        *|  TODO FOR STATEMENT
        *|  TODO WHILE STATEMENT

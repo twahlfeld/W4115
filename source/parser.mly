@@ -7,7 +7,6 @@
 %token <int> LITERAL
 %token <string> ID STRING
 %token EOF 
-/* %token ELEMENT PAGE LIST */
 
 %nonassoc NOELSE
 %nonassoc ELSE
@@ -43,7 +42,7 @@ formals_opt:
 
 formal_list:
     ID                   { [$1] }
-  | formal_list COMMA  ID { $3 :: $1 }
+  | formal_list COMMA ID { $3 :: $1 }
 
 vdecl_list:
     /* nothing */    { [] }
@@ -52,18 +51,9 @@ vdecl_list:
 vdecl:
    INT ID SEMI { $2 }
 
-/* type_decl:
-    prim_type { $1 }
-    | obj_type { $1 }
-
- prim_type:
+type_decl:
     INT { Int }
     | STRING { String }
-    | LIST { List }
-
-obj_type:
-    PAGE { Page }
-    | ELEMENT { Element } */
 
 stmt_list:
     /* nothing */  { [] }
@@ -86,7 +76,8 @@ expr_opt:
 expr:
     LITERAL          { Literal($1) }
   | ID               { Id($1) }
-  | STRING           { String($1) }
+  | type_decl        { Tipe($1) }
+  /* | STRING           { String($1) } */
   | expr PLUS   expr { Binop($1, Add,   $3) }
   | expr MINUS  expr { Binop($1, Sub,   $3) }
   | expr TIMES  expr { Binop($1, Mult,  $3) }
