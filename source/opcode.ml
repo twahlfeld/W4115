@@ -108,7 +108,7 @@ let rec string_of_stmt strlit_map blist =
     )
   | Prologue(s, n)    -> Printf.sprintf "%s:\n\tpush\trbp\n\tmov\trbp, rsp\n\tsub\trsp, %02XH\n" s n
   | Epilogue          -> Printf.sprintf "\tpop\trbp\n\tret\n"
-  | Local_var(x)      -> Printf.sprintf "[rbp-%XH]" (x*4)
+  | Local_var(x)      -> Printf.sprintf "[rbp-%XH]" (abs x)
   | Glob_var(s)       -> "["^s^"]"
   | Set_gvar(s)       -> Printf.sprintf "\tmov\t[%s], rax\n" s
   | Get_gvar(s)       -> Printf.sprintf "\tmov\trax, [%s]\n" s

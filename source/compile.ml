@@ -80,7 +80,7 @@ let translate (globals, functions) =
     let rec expr = function
       | Literal i -> [Lit i]
       | Id s -> 
-        (try [Ld_var (int_to_var (StringMap.find s env.local_index))]
+        (try [Local_var (StringMap.find s env.local_index)]
           with Not_found -> try [Glob_var (StringSet.find s env.global_index)]
           with Not_found -> raise (Failure ("undeclared variable " ^ s)))
       | Stringlit s    -> [Str s]
@@ -121,7 +121,7 @@ let translate (globals, functions) =
        *|  TODO WHILE STATEMENT
        *)
     in
-    [Prologue(fdecl.fname, (List.length fdecl.locals))] @ stmt(Block fdecl.body) @ [Epilogue]
+    [Prologue(fdecl.fname, ((List.length fdecl.locals)*8))] @ stmt(Block fdecl.body) @ [Epilogue]
   in
   let env = {
     function_index = function_indexes;
