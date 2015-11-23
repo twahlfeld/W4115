@@ -44,21 +44,21 @@ formals_opt:
 formal_list:
     type_decl ID                   { [$2] }
   | formal_list COMMA ID { $3 :: $1 }
- 
+
 type_decl:
     INT { Int }
     | STRING { String }
     | LIST { List }
     | ELEMENT { Element }
     | PAGE { Page }
-                              
+
 vdecl_list:
     /* nothing */    { [] }
   | vdecl_list vdecl { $2 :: $1 }
 
 vdecl:
    type_decl ID SEMI { Var($1, $2, Noexpr) }
-   | type_decl ID ASSIGN expr { Var($1, $2, $4) }
+   | type_decl ID ASSIGN expr SEMI { Var($1, $2, $4) }
 
 stmt_list:
     /* nothing */  { [] }

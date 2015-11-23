@@ -16,7 +16,7 @@ type stmt =
   | If of expr * stmt * stmt
   | For of expr * expr * expr * stmt
   | While of expr * stmt
-                
+
 type type_def =
     Int
     | String
@@ -27,13 +27,13 @@ type type_def =
 (* type * ID * value *)
 type var =
     Var of type_def * string * expr
-                
+
 type func_decl = {
     fname : string;
     formals : string list;
     locals : var list;
     body : stmt list;
-}         
+}
 
 type program = var list * func_decl list
 
