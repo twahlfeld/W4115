@@ -42,8 +42,8 @@ formals_opt:
   | formal_list   { List.rev $1 }
 
 formal_list:
-    type_decl ID                   { [$2] }
-  | formal_list COMMA ID { $3 :: $1 }
+    type_decl ID                   { [Arg($1, $2)] }
+  | formal_list COMMA type_decl ID { Arg($3, $4) :: $1 }
 
 type_decl:
     INT { Int }

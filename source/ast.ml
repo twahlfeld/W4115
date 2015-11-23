@@ -25,12 +25,13 @@ type type_def =
     | Element
 
 (* type * ID * value *)
-type var =
-    Var of type_def * string * expr
+type var = Var of type_def * string * expr
+
+type arg = Arg of type_def * string
 
 type func_decl = {
     fname : string;
-    formals : string list;
+    formals : arg list;
     locals : var list;
     body : stmt list;
 }
