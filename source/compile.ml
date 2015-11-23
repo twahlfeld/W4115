@@ -104,7 +104,18 @@ let translate (globals, functions) =
        *|  TODO WHILE STATEMENT
        *)
     in
-    [Prologue(fdecl.fname, ((List.length fdecl.locals)*8))] @ stmt(Block fdecl.body) @ [Epilogue]
+    let rec var_asn_list = function
+      | []     -> []
+      | Var(_, s, e)::tl ->
+        (match e with
+        | Noexpr -> var_asn_list tl
+        | _     -> (Expr (Ast.Assign(s, e))) :: var_asn_list tl
+        )
+    in
+    [Prologue(fdecl.fname, ((List.length fdecl.locals)*8))] @ 
+      stmt(Block (
+        (var_asn_list fdecl.locals) @ fdecl.body)) @ 
+      [Epilogue]
   in
   let env = {
     function_index = function_indexes;
