@@ -1,24 +1,20 @@
 int add(x, y)
 {
-    x+y;
     return x+y;
 }
 
 int sub(x, y)
 {
-    x-y;
     return x-y;
 }
 
 int mult(x, y)
 {
-    x*y;
     return x*y;
 }
 
 int div(x, y)
 {
-    x/y;
     return x/y;
 }
 
