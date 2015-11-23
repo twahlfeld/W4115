@@ -100,8 +100,13 @@ let rec string_of_stmt strlit_map blist =
                          "\tsetge dl" ^
                          "\tmovzx\trax, dl\n"
   | Mov(dst, src)     -> Printf.sprintf "\tmov\t%s, %s\n" dst (to_string src)
-  | Ret(b)            -> Printf.sprintf "\tmov\teax, %s\n" (to_string b)
-  | Prologue(s, n)    -> s ^ ":\n\tpush\trbp\n\tmov\trbp, rsp\n\tsub\tesp, " ^ (string_of_int n) ^ "\n"
+  | Ret(b)            -> 
+    (match b with
+    | Lit _ | Str _ | Glob_var _ | Local_var _ -> Printf.sprintf "\tmov\trax, %s\n" (to_string b)
+    | Call _                           -> (to_string b)
+    | _                                -> ""
+    )
+  | Prologue(s, n)    -> Printf.sprintf "%s:\n\tpush\trbp\n\tmov\trbp, rsp\n\tsub\trsp, %02XH\n" s n
   | Epilogue          -> Printf.sprintf "\tpop\trbp\n\tret\n"
   | Local_var(x)      -> Printf.sprintf "[rbp-%XH]" (x*4)
   | Glob_var(s)       -> "["^s^"]"
