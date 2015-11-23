@@ -20,6 +20,9 @@ type stmt =
 type type_def =
     Int
     | String
+    | List
+    | Page
+    | Element
 
 (* type * ID * value *)
 type var =

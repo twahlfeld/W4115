@@ -27,6 +27,7 @@ rule token = parse
 | "return" { RETURN }
 | "int"    { INT }
 | "string" { STRING }
+| "List"   { LIST }
 | ['0'-'9']+ as lxm { LITERAL(int_of_string lxm) }
 | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as lxm { ID(lxm) }
 | '\"' [' '-'!' '#'-'~']* '\"' as lxm { STRING_LIT(String.sub lxm 1 (String.length lxm - 2)) }
