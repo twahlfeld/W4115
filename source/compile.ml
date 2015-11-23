@@ -113,9 +113,7 @@ let translate (globals, functions) =
         )
     in
     [Prologue(fdecl.fname, ((List.length fdecl.locals)*8))] @ 
-      stmt(Block (
-        (var_asn_list fdecl.locals) @ fdecl.body)) @ 
-      [Epilogue]
+      stmt(Block ((var_asn_list fdecl.locals) @ fdecl.body)) @ [Epilogue]
   in
   let env = {
     function_index = function_indexes;
