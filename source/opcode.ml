@@ -4,9 +4,10 @@ type bstmt =
   | Lit of int                (* Integer Literal *)
   | Str of string             (* String Literal *)
   | Arg of string * bstmt
+  | Reg of string
   | Bin of Ast.op             (* Binary Operators *)
   (*| Unop of Ast.unop        (* Unary Operators *)*)
-  | Mov of string * bstmt    (* Mov instruction *)
+  | Mov of string * bstmt     (* Mov instruction *)
   | Local_var of int          (* Local Variables, Relative Frame Pointer offset *)
   | Glob_var of string        (* Global Variables, by absolute label *)
   | Get_gvar of string        (* Gets Global Variables *)
@@ -25,6 +26,7 @@ type bstmt =
   | Str_var of string         (* Stores variable *)
   | Header of string          (* Creates standard header *)
   | Tail of string            (* Creates a standard string *)
+  | Arg_to_var of string * string
   | Fakenop
   | Ret of bstmt
 ;;
@@ -83,20 +85,20 @@ let rec string_of_stmt strlit_map blist =
     | Str  s -> Printf.sprintf "\tmov\t%s, %s\n" lhs (to_string rhs)
     | _      -> Printf.sprintf "\tmov\t%s, %s\n" lhs (to_string rhs)
     )
-  | Bin(Ast.Add)      -> Printf.sprintf "\tadd\trax, rdx\n"
-  | Bin(Ast.Sub)      -> Printf.sprintf "\tsub\trax, rdx\n"
-  | Bin(Ast.Mult)     -> Printf.sprintf "\tmul\trdx\n"
-  | Bin(Ast.Div)      -> Printf.sprintf "\tdiv\trcx\n"
-  | Bin(Ast.Equal)    -> Printf.sprintf "\tsub\trax, rdx\n"
-  | Bin(Ast.Neq)      -> Printf.sprintf "\txor\trax, rdx\n"
-  | Bin(Ast.Less)     -> Printf.sprintf "\tsub\trax, rdx\n\tshr\trax, 63\n"
+  | Bin(Ast.Add)      -> Printf.sprintf "\tadd\trax, rcx\n"
+  | Bin(Ast.Sub)      -> Printf.sprintf "\tsub\trax, rcx\n"
+  | Bin(Ast.Mult)     -> Printf.sprintf "\tmuli\trcx\n"
+  | Bin(Ast.Div)      -> Printf.sprintf "\tdivi\trcx\n"
+  | Bin(Ast.Equal)    -> Printf.sprintf "\tsub\trax, rcx\n"
+  | Bin(Ast.Neq)      -> Printf.sprintf "\txor\trax, rcx\n"
+  | Bin(Ast.Less)     -> Printf.sprintf "\tsub\trax, rcx\n\tshr\trax, 63\n"
   | Bin(Ast.Leq)      -> Printf.sprintf "\tcmp\trax, rdx\n" ^
                          "\tsetle dl" ^
                          "\tmovzx\trax, dl\n"
-  | Bin(Ast.Greater)  -> Printf.sprintf "\tcmp\trax, rdx\n" ^
+  | Bin(Ast.Greater)  -> Printf.sprintf "\tcmp\trax, rcx\n" ^
                          "\tsetg dl" ^
                          "\tmovzx\trax, dl\n"
-  | Bin(Ast.Geq)      -> Printf.sprintf "\tcmp\trax, rdx\n" ^
+  | Bin(Ast.Geq)      -> Printf.sprintf "\tcmp\trax, rcx\n" ^
                          "\tsetge dl" ^
                          "\tmovzx\trax, dl\n"
   | Mov(dst, src)     -> Printf.sprintf "\tmov\t%s, %s\n" dst (to_string src)
@@ -104,20 +106,22 @@ let rec string_of_stmt strlit_map blist =
     (match b with
     | Lit _ | Str _ | Glob_var _ | Local_var _ -> Printf.sprintf "\tmov\trax, %s\n" (to_string b)
     | Call _                           -> (to_string b)
+    | Bin _                            -> (to_string b)
     | _                                -> ""
     )
-  | Prologue(s, n)    -> Printf.sprintf "%s:\n\tpush\trbp\n\tmov\trbp, rsp\n\tsub\trsp, %02XH\n" s (n+16)
-  | Epilogue          -> Printf.sprintf "\tleave\n\tret\n"
-  | Local_var(x)      -> Printf.sprintf "[rbp-%XH]" (abs x)
-  | Glob_var(s)       -> "["^s^"]"
-  | Set_gvar(s)       -> Printf.sprintf "\tmov\t[%s], rax\n" s
-  | Get_gvar(s)       -> Printf.sprintf "\tmov\trax, [%s]\n" s
-  | Call(s)           -> Printf.sprintf "\tcall\t%s\n" s
-  | Push(s)           -> Printf.sprintf "\tpush\t%s\n" s
-  | Pop(s)            -> Printf.sprintf "\tpop\t%s\n" s
-  | Fdecl(s)          -> Printf.sprintf "global %s\n" s
-  | Imprt             -> Printf.sprintf "extern fprintf\nextern fopen\n"
-  | Assign(dst, src)  -> 
+  | Prologue(s, n)       -> Printf.sprintf "%s:\n\tpush\trbp\n\tmov\trbp, rsp\n\tsub\trsp, %02XH\n" s (n+16)
+  | Epilogue             -> Printf.sprintf "\tleave\n\tret\n"
+  | Local_var(x)         -> Printf.sprintf "[rbp-%XH]" (abs x)
+  | Arg_to_var(var, arg) -> Printf.sprintf "\tmov\t[%s], %s\n" var arg
+  | Glob_var(s)          -> "["^s^"]"
+  | Set_gvar(s)          -> Printf.sprintf "\tmov\t[%s], rax\n" s
+  | Get_gvar(s)          -> Printf.sprintf "\tmov\trax, [%s]\n" s
+  | Call(s)              -> Printf.sprintf "\tcall\t%s\n" s
+  | Push(s)              -> Printf.sprintf "\tpush\t%s\n" s
+  | Pop(s)               -> Printf.sprintf "\tpop\t%s\n" s
+  | Fdecl(s)             -> Printf.sprintf "global %s\n" s
+  | Imprt                -> Printf.sprintf "extern fprintf\nextern fopen\n"
+  | Assign(dst, src)     -> 
     (match src with
     | Call s -> (to_string dst)
     | _      -> Printf.sprintf "\tmov\trax, %s\n%s" (to_string src) (to_string dst))

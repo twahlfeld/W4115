@@ -43,19 +43,19 @@ let translate (globals, functions) =
     ("getdata", "getdata")] @ 
       List.map (fun x -> (x.fname, x.fname)) functions) 
   in
-  
 
   (* Translate a function in AST form into a list of bytecode statements *)
   let translate env fdecl =
     (* Bookkeeping: FP offsets for locals and arguments *)
+    let formal_strings = (List.map (fun x -> match x with Ast.Arg(_, s) -> s) fdecl.formals) in
     let num_formals = List.length fdecl.formals
     and num_locals = List.length fdecl.locals
     and local_offsets = 
       enum (-8) (0) (List.map (fun x -> match x with Ast.Var(_, s, _) -> s) fdecl.locals)
     and formal_offsets = 
-      enum (1) (1) (List.map (fun x -> match x with Ast.Arg(_, s) -> s) fdecl.formals) in
+      enum (-8) ((List.length fdecl.locals)*(-8)) formal_strings in
     let env = { env with local_index = string_map_pairs
-      StringMap.empty (local_offsets @ formal_offsets) } in
+      StringMap.empty (formal_offsets @ local_offsets) } in
     let unlist = function [x] -> x | _ -> Fakenop in
     let int_to_var = function
       | 1 -> "rdi"
@@ -77,7 +77,7 @@ let translate (globals, functions) =
           with Not_found -> try [Glob_var (StringSet.find s env.global_index)]
           with Not_found -> raise (Failure ("undeclared variable " ^ s)))
       | Stringlit s    -> [Str s]
-      | Binop (e1, op, e2) -> expr e1 @ expr e2 @ [Bin op]
+      | Binop (lhs, op, rhs) -> [Mov("rcx", unlist (expr lhs))] @ [Mov("rax", unlist (expr rhs))] @ [Bin op]
       | Assign (s, e) -> 
         let asn = 
           (try [Str_var (int_to_var (StringMap.find s env.local_index))]
@@ -101,7 +101,10 @@ let translate (globals, functions) =
     let rec stmt = function
       | Block sl        -> List.concat (List.map stmt sl)
       | Expr e          -> expr e @ []
-      | Return e        -> [Ret (unlist (expr e))]
+      | Return e        -> 
+        (match e with
+        | Binop(_, _, _) -> expr e
+        | _              -> [Ret (unlist (expr e))])
       (*|  TODO IF STATEMENT
        *|  TODO FOR STATEMENT
        *|  TODO WHILE STATEMENT
@@ -115,8 +118,11 @@ let translate (globals, functions) =
         | _     -> (Expr (Ast.Assign(s, e))) :: var_asn_list tl
         )
     in
-    [Prologue(fdecl.fname, ((List.length fdecl.locals)*8))] @ 
-      stmt(Block ((var_asn_list fdecl.locals) @ fdecl.body)) @ [Epilogue]
+    let arg_to_var = 
+        List.mapi (fun x arg -> Arg_to_var(int_to_var (StringMap.find arg env.local_index), (int_to_var (x+1)))) formal_strings
+    in
+    [Prologue(fdecl.fname, ((StringMap.cardinal env.local_index)*8))] @ 
+      (stmt (Block (var_asn_list fdecl.locals))) @ (arg_to_var) @ (stmt (Block fdecl.body)) @ [Epilogue]
   in
   let env = {
     function_index = function_indexes;
