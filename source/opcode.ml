@@ -109,7 +109,10 @@ let rec string_of_stmt strlit_map blist =
     | Bin _                            -> (to_string b)
     | _                                -> ""
     )
-  | Prologue(s, n)       -> Printf.sprintf "%s:\n\tpush\trbp\n\tmov\trbp, rsp\n\tsub\trsp, %02XH\n" s (n+24)
+  | Prologue(s, n)       -> 
+      let offset = if n mod 16 = 0 then n+16 else n+24 in
+      s ^ ":\n\tpush\trbp\n\tmov\trbp, rsp\n\tsub\trsp, " ^ 
+      Printf.sprintf "%02XH\n" offset
   | Epilogue             -> Printf.sprintf "\tleave\n\tret\n"
   | Local_var(x)         -> Printf.sprintf "[rbp-%XH]" (abs x)
   | Arg_to_var(var, arg) -> Printf.sprintf "\tmov\t[%s], %s\n" var arg
