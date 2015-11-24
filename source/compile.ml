@@ -51,9 +51,9 @@ let translate (globals, functions) =
     let num_formals = List.length fdecl.formals
     and num_locals = List.length fdecl.locals
     and local_offsets = 
-      enum (-8) (0) (List.map (fun x -> match x with Ast.Var(_, s, _) -> s) fdecl.locals)
+      enum (-8) (-8) (List.map (fun x -> match x with Ast.Var(_, s, _) -> s) fdecl.locals)
     and formal_offsets = 
-      enum (-8) ((List.length fdecl.locals)*(-8)) formal_strings in
+      enum (-8) (((List.length fdecl.locals)+1)*(-8)) formal_strings in
     let env = { env with local_index = string_map_pairs
       StringMap.empty (formal_offsets @ local_offsets) } in
     let unlist = function [x] -> x | _ -> Fakenop in
