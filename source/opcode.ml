@@ -95,7 +95,7 @@ let rec string_of_stmt strlit_map blist =
   | Bin(Ast.Equal)    -> "\txor\trax, rcx\n\tcmp\trax, 0\n"
   | Bin(Ast.Neq)      -> "\tcmp\trax, rcx\n\tsetne\tdl\n\tcmp\tdl, 1\n"
   | Bin(Ast.Less)     -> "\tcmp\trax, rcx\n\tsetl\tdl\n\tcmp\tdl, 1\n"
-  | Bin(Ast.Leq)      -> "\tcmp\trax, rdx\n" ^
+  | Bin(Ast.Leq)      -> "\tcmp\trax, rcx\n" ^
                          "\tsetle dl\n" ^
                          "\tcmp\tdl, 1\n"
   | Bin(Ast.Greater)  -> "\tcmp\trax, rcx\n" ^
