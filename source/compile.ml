@@ -108,11 +108,14 @@ let translate (globals, functions) =
         )
       | If(p, t, f) -> 
         let tblock = stmt (fnameb^"t") t and fblock = stmt (fnameb^"f") f in
-        expr p @ [Jmp_false (fnameb ^ "t")] @ fblock @ [Jmp (fnameb^"end")] @ 
-        [Label (fnameb ^ "t")] @ tblock @ [Label (fnameb^"end")]
-      (*|  TODO FOR STATEMENT
-       *|  TODO WHILE STATEMENT
-       *)
+        expr p @ [Jmp_true (fnameb ^ "t")] @ fblock @ [Jmp (fnameb^"bend")] @ 
+        [Label (fnameb ^ "t")] @ tblock @ [Label (fnameb^"bend")]
+      | While(e, b) ->
+        let fnameb = fnameb ^ "w" in
+        let blk = stmt fnameb b and cond = expr e in
+        [Label fnameb] @ cond @ [Jmp_false (fnameb ^ "end")] @ blk @ 
+        [Jmp (fnameb)] @ [Label (fnameb^"end")]
+      (*|  TODO FOR STATEMENT *)
     in
     let rec var_asn_list = function
       | []     -> []

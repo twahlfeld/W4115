@@ -22,7 +22,8 @@ type bstmt =
   | Ld_reg of string          (* Load register into id *)
   | Ld_lit of int             (* Load lit into register *)
   | Str_var of string         (* Stores variable *)
-  | Jmp_false of string       (* Jump if not equal to zero *)
+  | Jmp_true of string        (* Jump if equal to zero *)
+  | Jmp_false of string       (* Jump if not equal to zero*)
   | Jmp of string             (* Unconditional Jump to label *)
   | Label of string           (* Label for jumps *)
   | Header of string          (* Creates standard header *)
@@ -129,7 +130,8 @@ let rec string_of_stmt strlit_map blist =
     | Call s -> (to_string dst)
     | _      -> "\tmov\trax, " ^ (to_string src)  ^ "\n" ^ (to_string dst)
     )
-  | Jmp_false(lbl)    -> "\tjz " ^ lbl ^ "\n"
+  | Jmp_true(lbl)     -> "\tjz " ^ lbl ^ "\n"
+  | Jmp_false(lbl)    -> "\tjnz " ^ lbl ^ "\n"
   | Jmp(lbl)          -> "\tjmp " ^ lbl ^ "\n"
   | Label(lbl)        -> lbl ^ ":\n"
   | Ld_var(var)       -> "\tmov\trdx, rax\n\tmov\t" ^ var ^ ", rax\n"
