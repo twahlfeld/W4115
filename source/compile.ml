@@ -62,8 +62,8 @@ let translate (globals, functions) =
       | 4 -> "rcx"
       | 5 -> "r8"
       | 6 -> "r9"
-      | x -> if x > 6 then Printf.sprintf "rbp+%x" ((x-4)*8) 
-        else Printf.sprintf "rbp-%xH" (abs x)
+      | x -> if x > 6 then Printf.sprintf "[rbp+%x]" ((x-4)*8) 
+             else Printf.sprintf "[rbp-%xH]" (abs x)
     in
     let rec to_arg acc hd =
       Arg((int_to_var (acc+1)), hd)

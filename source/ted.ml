@@ -52,7 +52,7 @@ let _ =
       in
       filter_strings 0 (Array.to_list prg)
   in
-  StringMap.iter (fun k v -> Printf.printf "%s->%s\n" k v) stringlit;
+  (*StringMap.iter (fun k v -> Printf.printf "%s->%s\n" k v) stringlit;*)
   let prg_ops = Array.to_list prg in
   let rec makeheader = function
     | [] -> ""
