@@ -116,7 +116,8 @@ let translate (globals, functions) =
         let blk = stmt fnameb b and cond = expr e in
         [Label fnameb] @ cond @ [Jmp_false (fnameb ^ "end")] @ blk @ 
         [Jmp (fnameb)] @ [Label (fnameb^"end")]
-      (*|  TODO FOR STATEMENT *)
+      | For(e1, e2, e3, b) ->
+        stmt (fnameb^"f") (Block([Expr(e1); While(e2, Block([b; Expr(e3)]))]))
     in
     let rec var_asn_list = function
       | []     -> []
