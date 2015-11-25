@@ -90,18 +90,18 @@ let rec string_of_stmt strlit_map blist =
   | Bin(Ast.Sub)      -> "\tsub\trax, rcx\n"
   | Bin(Ast.Mult)     -> "\tmuli\trcx\n"
   | Bin(Ast.Div)      -> "\tdivi\trcx\n"
-  | Bin(Ast.Equal)    -> "\tsub\trax, rcx\n"
-  | Bin(Ast.Neq)      -> "\txor\trax, rcx\n"
-  | Bin(Ast.Less)     -> "\tsub\trax, rcx\n\tshr\trax, 63\n"
+  | Bin(Ast.Equal)    -> "\txor\trax, rcx\n\tcmp\trax, 0\n"
+  | Bin(Ast.Neq)      -> "\tcmp\trax, rcx\n\tsetne\tdl\n\tcmp\tdl, 1\n"
+  | Bin(Ast.Less)     -> "\tsub\trax, rcx\n\tshr\trax, 63\n\tcmp\tdl, 1\n"
   | Bin(Ast.Leq)      -> "\tcmp\trax, rdx\n" ^
                          "\tsetle dl" ^
-                         "\tmovzx\trax, dl\n"
-  | Bin(Ast.Greater)  -> Printf.sprintf "\tcmp\trax, rcx\n" ^
-                         "\tsetg dl" ^
-                         "\tmovzx\trax, dl\n"
+                         "\tcmp\tdl, 1\n"
+  | Bin(Ast.Greater)  -> "\tcmp\trax, rcx\n" ^
+                         "\tsetg dl\n" ^
+                         "\tcmp\tdl, 1\n"
   | Bin(Ast.Geq)      -> "\tcmp\trax, rcx\n" ^
                          "\tsetge dl" ^
-                         "\tmovzx\trax, dl\n"
+                         "\tcmp\tdl, 1\n"
   | Mov(dst, src)     -> Printf.sprintf "\tmov\t%s, %s\n" dst (to_string src)
   | Ret(b)            -> 
     (match b with
