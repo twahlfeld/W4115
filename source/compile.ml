@@ -97,8 +97,8 @@ let translate (globals, functions) =
       | Noexpr -> []
     in
 
-    let rec stmt fnameb = function
-      | Block sl        -> List.concat (List.map (stmt fnameb) sl)
+    let rec stmt fnameb n = function
+      | Block sl        -> List.concat (List.mapi (stmt fnameb) sl)
       | Expr e          -> expr e @ []
       | Return e        -> 
         (match e with
@@ -106,16 +106,18 @@ let translate (globals, functions) =
         | _              -> [Ret (unlist (expr e))]
         )
       | If(p, t, f) -> 
-        let tblock = stmt (fnameb^"t") t and fblock = stmt (fnameb^"f") f in
+        let fnameb = fnameb ^ (string_of_int n) in
+        let tblock = stmt (fnameb^"t") n t and fblock = stmt (fnameb^"f") n f in
         expr p @ [Jmp_true (fnameb ^ "t")] @ fblock @ [Jmp (fnameb^"bend")] @ 
         [Label (fnameb ^ "t")] @ tblock @ [Label (fnameb^"bend")]
       | While(e, b) ->
-        let fnameb = fnameb ^ "w" in
-        let blk = stmt fnameb b and cond = expr e in
+        let fnameb = fnameb ^ (string_of_int n) ^ "w" in
+        let blk = stmt fnameb n b and cond = expr e in
         [Label fnameb] @ cond @ [Jmp_false (fnameb ^ "end")] @ blk @ 
         [Jmp (fnameb)] @ [Label (fnameb^"end")]
       | For(e1, e2, e3, b) ->
-        stmt (fnameb^"f") (Block([Expr(e1); While(e2, Block([b; Expr(e3)]))]))
+        stmt (fnameb ^ (string_of_int n) ^ "f") n 
+        (Block([Expr(e1); While(e2, Block([b; Expr(e3)]))]))
     in
     let rec var_asn_list = function
       | []     -> []
@@ -129,8 +131,8 @@ let translate (globals, functions) =
         List.mapi (fun x arg -> Arg_to_var(int_to_var (StringMap.find arg env.local_index), (int_to_var (x+1)))) formal_strings
     in
     [Prologue(fdecl.fname, ((StringMap.cardinal env.local_index)*8))] @ 
-      (stmt fdecl.fname (Block (var_asn_list fdecl.locals))) @ (arg_to_var) @
-      (stmt fdecl.fname (Block fdecl.body)) @ [Epilogue]
+      (stmt fdecl.fname 0 (Block (var_asn_list fdecl.locals))) @ (arg_to_var) @
+      (stmt fdecl.fname 0 (Block fdecl.body)) @ [Epilogue]
   in
   let env = {
     function_index = function_indexes;
