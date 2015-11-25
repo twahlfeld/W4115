@@ -24,11 +24,12 @@ let _ =
   let ast = Parser.program Scanner.token lexbuf in
   let program = ast in
   let prg = (Compile.translate program).text in
-  let stringlit =
-    let add_string map str =
-      StringMap.add str ("Str" ^ (string_of_int (StringMap.cardinal map))) map
+  let stringlit = 
+    let add_string str n map =
+      if StringMap.mem str map then map 
+      else StringMap.add str ("Str" ^ (string_of_int n)) map
     in
-    let rec filter_string = function
+    (*let rec filter_string = function
       | []     -> []
       | hd::tl ->
         (match hd with
@@ -38,9 +39,20 @@ let _ =
         | _        -> filter_string tl
         )
     in
-    List.fold_left add_string StringMap.empty (filter_string (Array.to_list prg))
+    List.fold_left add_string StringMap.empty (filter_string (Array.to_list prg))*)
+      let rec filter_strings n = function
+        | []     -> StringMap.empty
+        | hd::tl -> 
+          (match hd with
+          | Opcode.Str s | Opcode.Arg(_, Opcode.Str s)
+          | Opcode.Arg(_, (Opcode.Arg(_, Opcode.Str s))) -> 
+            add_string s n (filter_strings (n+1) tl)
+          | _   -> filter_strings (n) tl
+          )
+      in
+      filter_strings 0 (Array.to_list prg)
   in
-  (*StringMap.iter (fun k v -> Printf.printf "%s->%s\n" k v) stringlit;*)
+  StringMap.iter (fun k v -> Printf.printf "%s->%s\n" k v) stringlit;
   let prg_ops = Array.to_list prg in
   let rec makeheader = function
     | [] -> ""
