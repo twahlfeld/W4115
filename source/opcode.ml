@@ -91,18 +91,18 @@ let rec string_of_stmt strlit_map blist =
   | Bin(Ast.Add)      -> "\tadd\trax, rcx\n"
   | Bin(Ast.Sub)      -> "\tsub\trax, rcx\n"
   | Bin(Ast.Mult)     -> "\tmuli\trcx\n"
-  | Bin(Ast.Div)      -> "\tdivi\trcx\n"
+  | Bin(Ast.Div)      -> "\tidiv\trcx\n"
   | Bin(Ast.Equal)    -> "\txor\trax, rcx\n\tcmp\trax, 0\n"
   | Bin(Ast.Neq)      -> "\tcmp\trax, rcx\n\tsetne\tdl\n\tcmp\tdl, 1\n"
   | Bin(Ast.Less)     -> "\tcmp\trax, rcx\n\tsetl\tdl\n\tcmp\tdl, 1\n"
   | Bin(Ast.Leq)      -> "\tcmp\trax, rdx\n" ^
-                         "\tsetle dl" ^
+                         "\tsetle dl\n" ^
                          "\tcmp\tdl, 1\n"
   | Bin(Ast.Greater)  -> "\tcmp\trax, rcx\n" ^
                          "\tsetg dl\n" ^
                          "\tcmp\tdl, 1\n"
   | Bin(Ast.Geq)      -> "\tcmp\trax, rcx\n" ^
-                         "\tsetge dl" ^
+                         "\tsetge dl\n" ^
                          "\tcmp\tdl, 1\n"
   | Mov(dst, src)     -> Printf.sprintf "\tmov\t%s, %s\n" dst (to_string src)
   | Ret(b)            -> 
