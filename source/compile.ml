@@ -85,8 +85,9 @@ let translate (globals, functions) =
             with Not_found -> raise (Failure ("undeclared variable" ^ s)))
         in
         (match e with
-        | Call(fn, a) -> (expr e) @ [Opcode.Assign(unlist asn, Call fn)]
-        | _ -> [Opcode.Assign(unlist asn, unlist (expr e))]
+        | Call(fn, a)    -> (expr e) @ [Opcode.Assign(unlist asn, Call fn)]
+        | Binop(_, _, _) -> (expr e) @ [Opcode.Assign(unlist asn, Fakenop)]
+        | _              -> [Opcode.Assign(unlist asn, unlist (expr e))]
         )
       | Call (fname, actuals) -> (try
         (List.rev (List.mapi to_arg (List.concat (List.map expr actuals)))) @

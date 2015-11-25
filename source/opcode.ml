@@ -87,13 +87,14 @@ let rec string_of_stmt strlit_map blist =
     | Str  s -> Printf.sprintf "\tmov\t%s, %s\n" lhs (to_string rhs)
     | _      -> Printf.sprintf "\tmov\t%s, %s\n" lhs (to_string rhs)
     )
+  | Reg s             -> s
   | Bin(Ast.Add)      -> "\tadd\trax, rcx\n"
   | Bin(Ast.Sub)      -> "\tsub\trax, rcx\n"
   | Bin(Ast.Mult)     -> "\tmuli\trcx\n"
   | Bin(Ast.Div)      -> "\tdivi\trcx\n"
   | Bin(Ast.Equal)    -> "\txor\trax, rcx\n\tcmp\trax, 0\n"
   | Bin(Ast.Neq)      -> "\tcmp\trax, rcx\n\tsetne\tdl\n\tcmp\tdl, 1\n"
-  | Bin(Ast.Less)     -> "\tsub\trax, rcx\n\tshr\trax, 63\n\tcmp\tdl, 1\n"
+  | Bin(Ast.Less)     -> "\tsub\trax, rcx\n\tshr\trax, 63\n\tcmp\tal, 1\n"
   | Bin(Ast.Leq)      -> "\tcmp\trax, rdx\n" ^
                          "\tsetle dl" ^
                          "\tcmp\tdl, 1\n"
@@ -127,8 +128,9 @@ let rec string_of_stmt strlit_map blist =
   | Imprt                -> "extern fprintf\nextern fopen\n"
   | Assign(dst, src)     -> 
     (match src with
-    | Call s -> (to_string dst)
-    | _      -> "\tmov\trax, " ^ (to_string src)  ^ "\n" ^ (to_string dst)
+    | Call s  -> (to_string dst)
+    | Fakenop -> (to_string dst)
+    | _       -> "\tmov\trax, " ^ (to_string src)  ^ "\n" ^ (to_string dst)
     )
   | Jmp_true(lbl)     -> "\tjz " ^ lbl ^ "\n"
   | Jmp_false(lbl)    -> "\tjnz " ^ lbl ^ "\n"
