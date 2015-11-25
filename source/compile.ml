@@ -48,9 +48,7 @@ let translate (globals, functions) =
   let translate env fdecl =
     (* Bookkeeping: FP offsets for locals and arguments *)
     let formal_strings = (List.map (fun x -> match x with Ast.Arg(_, s) -> s) fdecl.formals) in
-    let num_formals = List.length fdecl.formals
-    and num_locals = List.length fdecl.locals
-    and local_offsets = 
+    let local_offsets = 
       enum (-8) (-8) (List.map (fun x -> match x with Ast.Var(_, s, _) -> s) fdecl.locals)
     and formal_offsets = 
       enum (-8) (((List.length fdecl.locals)+1)*(-8)) formal_strings in
