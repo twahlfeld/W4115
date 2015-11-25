@@ -40,7 +40,7 @@ let _ =
     in
     List.fold_left add_string StringMap.empty (filter_string (Array.to_list prg))
   in
-  (*StringMap.iter (fun k v -> Printf.printf "%s->%s\n" k v) stringlit;*)
+  StringMap.iter (fun k v -> Printf.printf "%s->%s\n" k v) stringlit;
   let prg_ops = Array.to_list prg in
   let rec makeheader = function
     | [] -> ""
