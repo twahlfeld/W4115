@@ -77,7 +77,7 @@ let translate (globals, functions) =
           with Not_found -> try [Glob_var (StringSet.find s env.global_index)]
           with Not_found -> raise (Failure ("undeclared variable " ^ s)))
       | Stringlit s    -> [Str s]
-      | Binop (lhs, op, rhs) -> [Mov("rcx", unlist (expr lhs))] @ [Mov("rax", unlist (expr rhs))] @ [Bin op]
+      | Binop (lhs, op, rhs) -> [Mov("rcx", unlist (expr rhs))] @ [Mov("rax", unlist (expr lhs))] @ [Bin op]
       | Assign (s, e) -> 
         let asn = 
           (try [Str_var (int_to_var (StringMap.find s env.local_index))]
