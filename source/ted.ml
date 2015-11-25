@@ -1,3 +1,4 @@
+open Opcode
 module StringMap = Map.Make(String)
 
 let _ =
@@ -6,7 +7,6 @@ let _ =
       (try
         open_in Sys.argv.(1)
       with e-> 
-        close_in_noerr; 
         Printf.printf "Error Opening File %s\n" Sys.argv.(1);
         raise e;
       )
