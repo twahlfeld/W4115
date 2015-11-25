@@ -85,7 +85,8 @@ let rec string_of_stmt strlit_map blist =
     (match rhs with 
     | Call s -> Printf.sprintf "\tmov\t%s, rax\nRHS:%s" lhs (to_string rhs)
     | Str  s -> Printf.sprintf "\tmov\t%s, %s\n" lhs (to_string rhs)
-    | _      -> Printf.sprintf "\tmov\t%s, %s\n" lhs (to_string rhs)
+    | _      -> if lhs.[0] = '[' then "\tpush\t" ^ (to_string rhs) ^ "\n"
+                else Printf.sprintf "\tmov\t%s, %s\n" lhs (to_string rhs)
     )
   | Reg s             -> s
   | Bin(Ast.Add)      -> "\tadd\trax, rcx\n"

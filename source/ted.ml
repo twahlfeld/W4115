@@ -29,28 +29,17 @@ let _ =
       if StringMap.mem str map then map 
       else StringMap.add str ("Str" ^ (string_of_int n)) map
     in
-    (*let rec filter_string = function
-      | []     -> []
-      | hd::tl ->
+    let rec filter_strings n = function
+      | []     -> StringMap.empty
+      | hd::tl -> 
         (match hd with
-        | Opcode.Str s -> s :: filter_string tl
-        | Opcode.Arg(_, Opcode.Str s ) -> s :: filter_string tl
-        (*| Opcode.Arg(_, (Opcode.Arg(_, Opcode.Str s))) -> s :: filter_string tl*)
-        | _        -> filter_string tl
+        | Opcode.Str s | Opcode.Arg(_, Opcode.Str s)
+        | Opcode.Arg(_, (Opcode.Arg(_, Opcode.Str s))) -> 
+          add_string s n (filter_strings (n+1) tl)
+        | _   -> filter_strings (n) tl
         )
     in
-    List.fold_left add_string StringMap.empty (filter_string (Array.to_list prg))*)
-      let rec filter_strings n = function
-        | []     -> StringMap.empty
-        | hd::tl -> 
-          (match hd with
-          | Opcode.Str s | Opcode.Arg(_, Opcode.Str s)
-          | Opcode.Arg(_, (Opcode.Arg(_, Opcode.Str s))) -> 
-            add_string s n (filter_strings (n+1) tl)
-          | _   -> filter_strings (n) tl
-          )
-      in
-      filter_strings 0 (Array.to_list prg)
+    filter_strings 0 (Array.to_list prg)
   in
   (*StringMap.iter (fun k v -> Printf.printf "%s->%s\n" k v) stringlit;*)
   let prg_ops = Array.to_list prg in
@@ -66,15 +55,6 @@ let _ =
         | _ -> makeheader tl
       )
   in
-  (*let rec maketail = function
-      | [] -> ""
-      | hd :: tl ->
-        (match hd with
-          | Opcode.Str s         -> Opcode.build_str s ^ (maketail tl)
-          | Opcode.Arg(_, Opcode.Str s) -> Opcode.build_str s ^ (maketail tl)
-          | _ ->  maketail tl
-        )
-  in*)
   let full_prg = 
       [Opcode.Header (makeheader prg_ops)] @ prg_ops @ [Opcode.Tail ("")]
   in
