@@ -13,8 +13,6 @@ type bstmt =
   | Get_gvar of string        (* Gets Global Variables *)
   | Set_gvar of string        (* Sets Global Variables  *)
   | Call of string            (* Call function by name or address *)
-  | Push of string            (* Pushes arg onto stack *)
-  | Pop of string             (* Pop statck in register *)
   | Fdecl of string           (* Function Declaration *)
   | Imprt                     (* Import/Extern function *)
   | Prologue of string * int  (* Start of every stack frame *)
@@ -24,6 +22,9 @@ type bstmt =
   | Ld_reg of string          (* Load register into id *)
   | Ld_lit of int             (* Load lit into register *)
   | Str_var of string         (* Stores variable *)
+  | Jmp_false of string       (* Jump if not equal to zero *)
+  | Jmp of string             (* Unconditional Jump to label *)
+  | Label of string           (* Label for jumps *)
   | Header of string          (* Creates standard header *)
   | Tail of string            (* Creates a standard string *)
   | Arg_to_var of string * string
@@ -85,55 +86,59 @@ let rec string_of_stmt strlit_map blist =
     | Str  s -> Printf.sprintf "\tmov\t%s, %s\n" lhs (to_string rhs)
     | _      -> Printf.sprintf "\tmov\t%s, %s\n" lhs (to_string rhs)
     )
-  | Bin(Ast.Add)      -> Printf.sprintf "\tadd\trax, rcx\n"
-  | Bin(Ast.Sub)      -> Printf.sprintf "\tsub\trax, rcx\n"
-  | Bin(Ast.Mult)     -> Printf.sprintf "\tmuli\trcx\n"
-  | Bin(Ast.Div)      -> Printf.sprintf "\tdivi\trcx\n"
-  | Bin(Ast.Equal)    -> Printf.sprintf "\tsub\trax, rcx\n"
-  | Bin(Ast.Neq)      -> Printf.sprintf "\txor\trax, rcx\n"
-  | Bin(Ast.Less)     -> Printf.sprintf "\tsub\trax, rcx\n\tshr\trax, 63\n"
-  | Bin(Ast.Leq)      -> Printf.sprintf "\tcmp\trax, rdx\n" ^
+  | Bin(Ast.Add)      -> "\tadd\trax, rcx\n"
+  | Bin(Ast.Sub)      -> "\tsub\trax, rcx\n"
+  | Bin(Ast.Mult)     -> "\tmuli\trcx\n"
+  | Bin(Ast.Div)      -> "\tdivi\trcx\n"
+  | Bin(Ast.Equal)    -> "\tsub\trax, rcx\n"
+  | Bin(Ast.Neq)      -> "\txor\trax, rcx\n"
+  | Bin(Ast.Less)     -> "\tsub\trax, rcx\n\tshr\trax, 63\n"
+  | Bin(Ast.Leq)      -> "\tcmp\trax, rdx\n" ^
                          "\tsetle dl" ^
                          "\tmovzx\trax, dl\n"
   | Bin(Ast.Greater)  -> Printf.sprintf "\tcmp\trax, rcx\n" ^
                          "\tsetg dl" ^
                          "\tmovzx\trax, dl\n"
-  | Bin(Ast.Geq)      -> Printf.sprintf "\tcmp\trax, rcx\n" ^
+  | Bin(Ast.Geq)      -> "\tcmp\trax, rcx\n" ^
                          "\tsetge dl" ^
                          "\tmovzx\trax, dl\n"
   | Mov(dst, src)     -> Printf.sprintf "\tmov\t%s, %s\n" dst (to_string src)
   | Ret(b)            -> 
     (match b with
-    | Lit _ | Str _ | Glob_var _ | Local_var _ -> Printf.sprintf "\tmov\trax, %s\n" (to_string b)
-    | Call _                           -> (to_string b)
-    | Bin _                            -> (to_string b)
-    | _                                -> ""
+    | Lit _ | Str _ 
+    | Glob_var _ | Local_var _ -> "\tmov\trax, " ^ (to_string b) ^ "\n"
+    | Call _                   -> (to_string b)
+    | Bin _                    -> (to_string b)
+    | _                        -> ""
     )
   | Prologue(s, n)       -> 
       let offset = if n mod 16 = 0 then n+16 else n+24 in
       s ^ ":\n\tpush\trbp\n\tmov\trbp, rsp\n\tsub\trsp, " ^ 
       Printf.sprintf "%02XH\n" offset
-  | Epilogue             -> Printf.sprintf "\tleave\n\tret\n"
+  | Epilogue             -> "\tleave\n\tret\n"
   | Local_var(x)         -> Printf.sprintf "[rbp-%XH]" (abs x)
-  | Arg_to_var(var, arg) -> Printf.sprintf "\tmov\t[%s], %s\n" var arg
+  | Arg_to_var(var, arg) -> "\tmov\t[" ^ var ^ "], " ^ arg ^ "\n"
   | Glob_var(s)          -> "["^s^"]"
-  | Set_gvar(s)          -> Printf.sprintf "\tmov\t[%s], rax\n" s
-  | Get_gvar(s)          -> Printf.sprintf "\tmov\trax, [%s]\n" s
-  | Call(s)              -> Printf.sprintf "\tcall\t%s\n" s
-  | Push(s)              -> Printf.sprintf "\tpush\t%s\n" s
-  | Pop(s)               -> Printf.sprintf "\tpop\t%s\n" s
-  | Fdecl(s)             -> Printf.sprintf "global %s\n" s
-  | Imprt                -> Printf.sprintf "extern fprintf\nextern fopen\n"
+  | Set_gvar(s)          -> "\tmov\t[" ^ s ^ "], rax\n"
+  | Get_gvar(s)          -> "\tmov\trax, [" ^ s ^ "]\n"
+  | Call(s)              -> "\tcall\t" ^ s ^ "\n"
+  | Fdecl(s)             -> "global " ^ s ^ "\n"
+  | Imprt                -> "extern fprintf\nextern fopen\n"
   | Assign(dst, src)     -> 
     (match src with
     | Call s -> (to_string dst)
-    | _      -> Printf.sprintf "\tmov\trax, %s\n%s" (to_string src) (to_string dst))
-  | Ld_var(var)       -> Printf.sprintf "\tmov\trdx, rax\n\tmov\t%s, rax\n" var
-  | Ld_reg(reg)       -> Printf.sprintf "\tmov\trax, %s\n" reg
-  | Ld_lit(lit)       -> Printf.sprintf "\tmov\trax, %s\n" (string_of_int lit)
-  | Str_var(var)      -> Printf.sprintf "\tmov\tqword [%s], rax\n" var
-  | Header(s)         -> s ^ "\nextern fprintf\nextern fopen\nextern stdout\nextern get_title\n"^
-                             "\nSECTION .text\n"
+    | _      -> "\tmov\trax, " ^ (to_string src)  ^ "\n" ^ (to_string dst)
+    )
+  | Jmp_false(lbl)    -> "\tjz " ^ lbl ^ "\n"
+  | Jmp(lbl)          -> "\tjmp " ^ lbl ^ "\n"
+  | Label(lbl)        -> lbl ^ ":\n"
+  | Ld_var(var)       -> "\tmov\trdx, rax\n\tmov\t" ^ var ^ ", rax\n"
+  | Ld_reg(reg)       -> "\tmov\trax, " ^ reg ^ "\n"
+  | Ld_lit(lit)       -> "\tmov\trax, " ^ (string_of_int lit) ^ "\n" 
+  | Str_var(var)      -> "\tmov\tqword [" ^ var ^"], rax\n"
+  | Header(s)         -> s ^ "\nextern fprintf\nextern fopen\n" ^
+                         "extern stdout\nextern get_title\n"^
+                         "\nSECTION .text\n"
   | Tail(s)           -> "\nSECTION .data\n" ^
                          "SECTION .bss\n" ^
                          "SECTION .rodata\n" ^

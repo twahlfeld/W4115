@@ -98,15 +98,19 @@ let translate (globals, functions) =
       | Noexpr -> []
     in
 
-    let rec stmt = function
-      | Block sl        -> List.concat (List.map stmt sl)
+    let rec stmt fnameb = function
+      | Block sl        -> List.concat (List.map (stmt fnameb) sl)
       | Expr e          -> expr e @ []
       | Return e        -> 
         (match e with
         | Binop(_, _, _) -> expr e
-        | _              -> [Ret (unlist (expr e))])
-      (*|  TODO IF STATEMENT
-       *|  TODO FOR STATEMENT
+        | _              -> [Ret (unlist (expr e))]
+        )
+      | If(p, t, f) -> 
+        let tblock = stmt (fnameb^"t") t and fblock = stmt (fnameb^"f") f in
+        expr p @ [Jmp_false (fnameb ^ "t")] @ fblock @ [Jmp (fnameb^"end")] @ 
+        [Label (fnameb ^ "t")] @ tblock @ [Label (fnameb^"end")]
+      (*|  TODO FOR STATEMENT
        *|  TODO WHILE STATEMENT
        *)
     in
@@ -122,7 +126,8 @@ let translate (globals, functions) =
         List.mapi (fun x arg -> Arg_to_var(int_to_var (StringMap.find arg env.local_index), (int_to_var (x+1)))) formal_strings
     in
     [Prologue(fdecl.fname, ((StringMap.cardinal env.local_index)*8))] @ 
-      (stmt (Block (var_asn_list fdecl.locals))) @ (arg_to_var) @ (stmt (Block fdecl.body)) @ [Epilogue]
+      (stmt fdecl.fname (Block (var_asn_list fdecl.locals))) @ (arg_to_var) @
+      (stmt fdecl.fname (Block fdecl.body)) @ [Epilogue]
   in
   let env = {
     function_index = function_indexes;
