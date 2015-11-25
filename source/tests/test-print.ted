@@ -1,4 +1,5 @@
 int main() {
     print(stdout, "slartibartfast\n");
+    print(stdout, "ford\narthur\ntrillian\n");
     return 0;
 }

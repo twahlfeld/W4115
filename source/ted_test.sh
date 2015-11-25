@@ -11,7 +11,4 @@ GCC="gcc $FILE.o -o $FILE"
 #  rm $FILE.o
 #fi
 
-$TED $INFILE
-$ASSEMBLE
-$GCC
-./$1
+$TED $INFILE && $ASSEMBLE && $GCC && ./$1
