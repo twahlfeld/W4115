@@ -34,7 +34,11 @@ Check() {
 
 
     Run "./ted_test.sh" $reffile ">" ${basename}.i.out
-    Compare ${basename}.i.out ${reffile}.out $basename
+    if [ -f ${basename}.i.out ]; then
+      Compare ${basename}.i.out ${reffile}.out $basename
+    else
+      echo "########## TEST FAIL (COMPILATION ERROR) ##########"
+    fi
 #    rm -f ${reffile}.o
 #    rm -f ${reffile}.asm
 #    rm -f $reffile
