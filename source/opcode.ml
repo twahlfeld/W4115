@@ -119,10 +119,10 @@ let rec string_of_stmt strlit_map blist =
       Printf.sprintf "%02XH\n" offset
   | Epilogue             -> "\tleave\n\tret\n"
   | Local_var(x)         -> Printf.sprintf "[rbp-%XH]" (abs x)
-  | Arg_to_var(var, arg) -> "\tmov\t[" ^ var ^ "], " ^ arg ^ "\n"
+  | Arg_to_var(var, arg) -> "\tmov\t" ^ var ^ ", " ^ arg ^ "\n"
   | Glob_var(s)          -> "["^s^"]"
-  | Set_gvar(s)          -> "\tmov\t[" ^ s ^ "], rax\n"
-  | Get_gvar(s)          -> "\tmov\trax, [" ^ s ^ "]\n"
+  | Set_gvar(s)          -> "\tmov\t" ^ s ^ ", rax\n"
+  | Get_gvar(s)          -> "\tmov\trax, " ^ s ^ "\n"
   | Call(s)              -> "\tcall\t" ^ s ^ "\n"
   | Fdecl(s)             -> "global " ^ s ^ "\n"
   | Imprt                -> "extern fprintf\nextern fopen\n"
@@ -139,7 +139,7 @@ let rec string_of_stmt strlit_map blist =
   | Ld_var(var)       -> "\tmov\trdx, rax\n\tmov\t" ^ var ^ ", rax\n"
   | Ld_reg(reg)       -> "\tmov\trax, " ^ reg ^ "\n"
   | Ld_lit(lit)       -> "\tmov\trax, " ^ (string_of_int lit) ^ "\n" 
-  | Str_var(var)      -> "\tmov\tqword [" ^ var ^"], rax\n"
+  | Str_var(var)      -> "\tmov\tqword " ^ var ^", rax\n"
   | Header(s)         -> s ^ "\nextern fprintf\nextern fopen\n" ^
                          "extern stdout\nextern get_title\n"^
                          "\nSECTION .text\n"
