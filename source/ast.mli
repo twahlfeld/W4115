@@ -1,32 +1,40 @@
-(* 
- * Abstract Synstax Tree for the TED programming language.
- *)
+type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq
 
-type binop = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq
-  | Lor | Land | Xor | Mod
-type unop = MINUS | CNOT | LNOT
+type expr =
+    Literal of int
+  | Id of string
+  | Stringlit of string  
+  | Binop of expr * op * expr
+  | Assign of string * expr
+  | Call of string * expr list
+  | Noexpr
 
-type expr = (* Expressions *)
-  Literal of int (* 42 *)
-  | Fliteral of float (* 3.14.5 *)
-  | Noexpr (* for (;;) *)
-  | Id of string (* foo *)
-  | Assign of string * expr (* foo = 42 *)
-  | Binop of expr * binop * expr (* a + b *)
-  | Call of string * expr list (* foo(1, 25 *)
+type stmt =
+    Block of stmt list
+  | Expr of expr
+  | Return of expr
+  | If of expr * stmt * stmt
+  | For of expr * expr * expr * stmt
+  | While of expr * stmt
 
-type stmt = (* Statements *)
-  Block of stmt list (* { ... } *)
-  | Expr of expr (* foo = bar + 3; *)
-  | Return of expr (* return 42; *)
-  | If of expr * stmt * stmt (* if (foo == 42) {} else {} *)
-  | For of expr * expr * expr * stmt (* for (i=0;i<10;i=i+1) { ... } *)
-  | While of expr * stmt (* while (i<10) { i = i + 1 } *)
+type type_def =
+    Int
+    | String
+    | List
+    | Page
+    | Element
+
+(* type * ID * value *)
+type var = Var of type_def * string * expr
+
+type arg = Arg of type_def * string
 
 type func_decl = {
-  fname : string; (* Name of the function *)
-  formals : string list; (* Formal argument names *)
-  locals : string list; (* Locally defined variables *)
-  body : stmt list;
+    fname : string;
+    formals : arg list;
+    locals : var list;
+    body : stmt list;
 }
-type program = string list * func_decl list (* global vars, funcs *)
+
+type program = var list * func_decl list
+

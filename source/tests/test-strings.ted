@@ -1,0 +1,4 @@
+int main() {
+    print(stdout, "%s %s    \n  ", "Don't", "Panic");
+    return 0;
+}
