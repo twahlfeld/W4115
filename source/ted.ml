@@ -2,6 +2,7 @@ open Opcode
 module StringMap = Map.Make(String)
 
 let _ =
+  (* Reading File or stdin(put) *)
   let rec file_in =
     if Array.length Sys.argv > 1 then
       (try
@@ -13,6 +14,7 @@ let _ =
     else 
       stdin
   in 
+  (* Creates output file or print to stdout *)
   let file_out =
     if Array.length Sys.argv > 1 then
       open_out ((String.sub (Sys.argv.(1)) 0 (String.index Sys.argv.(1)
@@ -20,10 +22,14 @@ let _ =
     else
       stdout
   in
+  (* Lexing *)
   let lexbuf = Lexing.from_channel file_in in
+  (* AST Building *)
   let ast = Parser.program Scanner.token lexbuf in
   let program = ast in
+  (* Creates an array of correlating bstmts(opcode.ml) *)
   let prg = (Compile.translate program).text in
+  (* Creates the stringmap for string literals *)
   let stringlit = 
     let add_string str n map =
       if StringMap.mem str map then map 
@@ -42,10 +48,11 @@ let _ =
     filter_strings 0 (Array.to_list prg)
   in
   (*StringMap.iter (fun k v -> Printf.printf "%s->%s\n" k v) stringlit;*)
+  (* Transfroms array into a list *)
   let prg_ops = Array.to_list prg in
   let rec makeheader = function
     | [] -> ""
-    | hd :: tl ->
+    | hd :: tl -> (* Looks for functions *)
       (match hd with
         | Opcode.Prologue(s, _) ->
           (match s with
