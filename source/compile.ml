@@ -55,14 +55,14 @@ let translate (globals, functions) =
     let env = { env with local_index = string_map_pairs
       StringMap.empty (formal_offsets @ local_offsets) } in
     let unlist = function [x] -> x | _ -> Fakenop in
-    let int_to_var = function
+    let int_to_var max = function
       | 1 -> "rdi"
       | 2 -> "rsi"
       | 3 -> "rdx"
       | 4 -> "rcx"
       | 5 -> "r8"
       | 6 -> "r9"
-      | x -> if x > 6 then Printf.sprintf "[rbp+%x]" ((x-4)*8) 
+      | x -> if x > 6 then Printf.sprintf "[rbp+%x]" ((x-6)) 
              else Printf.sprintf "[rbp-%xH]" (abs x)
     in
     let rec to_arg acc hd =
@@ -152,3 +152,4 @@ let translate (globals, functions) =
           | _ as s -> s) (List.concat func_bodies)
     )
   }
+
