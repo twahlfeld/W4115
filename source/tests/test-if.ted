@@ -20,7 +20,7 @@ x = 42;
     if (x <= 41) {
         print(stdout, " fail");
     } else {
-        print(stdout, "ted");
+        print(stdout, " ted");
     }
 
     if (x >= 43) {

@@ -23,11 +23,12 @@ int main() {
         b = b + 1;
     }
     for (n = 1; n != 4; n = n + 1) {
-        for (o = 0; o != 10; o = o + n) {
+        for (o = 0; o < 12; o = o + n) {
           c = c + 1;    
         }
     }
     c = c * 2;
+    c = c + 2;
     print(stdout, "%d %d %d %d %d\n", x, y, a, b, c);
     return 0;
 }
