@@ -40,7 +40,8 @@ let _ =
       | hd::tl -> 
         (match hd with
         | Opcode.Str s | Opcode.Arg(_, Opcode.Str s)
-        | Opcode.Arg(_, (Opcode.Arg(_, Opcode.Str s))) -> 
+        | Opcode.Arg(_, (Opcode.Arg(_, Opcode.Str s))) 
+        | Opcode.Assign(_, Opcode.Str s) -> 
           add_string s n (filter_strings (n+1) tl)
         | _   -> filter_strings (n) tl
         )

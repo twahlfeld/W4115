@@ -85,7 +85,7 @@ let translate (globals, functions) =
         (match e with
         | Call(fn, a)    -> (expr e) @ [Opcode.Assign(unlist asn, Call fn)]
         | Binop(_, _, _) -> (expr e) @ [Opcode.Assign(unlist asn, Fakenop)]
-        | Stringlit(s)   -> (expr e) @ [Opcode.Assign(unlist asn, Str s)]
+        | Stringlit(s)   -> [Opcode.Assign(unlist asn, Str s)]
         | _              -> [Opcode.Assign(unlist asn, unlist (expr e))]
         )
       | Call (fname, actuals) -> 
