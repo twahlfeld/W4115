@@ -55,7 +55,7 @@ let translate (globals, functions) =
     let env = { env with local_index = string_map_pairs
       StringMap.empty (formal_offsets @ local_offsets) } in
     let unlist = function [x] -> x | _ -> Fakenop in
-    let int_to_var max = function
+    let int_to_var = function
       | 1 -> "rdi"
       | 2 -> "rsi"
       | 3 -> "rdx"

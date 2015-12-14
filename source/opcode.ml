@@ -93,7 +93,7 @@ let rec string_of_stmt strlit_map blist =
   | Bin(Ast.Add)      -> "\tadd\trax, rcx\n"
   | Bin(Ast.Sub)      -> "\tsub\trax, rcx\n"
   | Bin(Ast.Mult)     -> "\timul\trcx\n"
-  | Bin(Ast.Div)      -> "t\cdq\n\tidiv\trcx\n"
+  | Bin(Ast.Div)      -> "\tcdq\n\tidiv\trcx\n"
   | Bin(Ast.Equal)    -> "\txor\trax, rcx\n\tcmp\trax, 0\n"
   | Bin(Ast.Neq)      -> "\tcmp\trax, rcx\n\tsetne\tdl\n\tcmp\tdl, 1\n"
   | Bin(Ast.Less)     -> "\tcmp\trax, rcx\n\tsetl\tdl\n\tcmp\tdl, 1\n"
