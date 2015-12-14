@@ -85,11 +85,12 @@ let translate (globals, functions) =
         (match e with
         | Call(fn, a)    -> (expr e) @ [Opcode.Assign(unlist asn, Call fn)]
         | Binop(_, _, _) -> (expr e) @ [Opcode.Assign(unlist asn, Fakenop)]
+        | Stringlit(s)   -> (expr e) @ [Opcode.Assign(unlist asn, Str s)]
         | _              -> [Opcode.Assign(unlist asn, unlist (expr e))]
         )
-      | Call (fname, actuals) -> (try
-        (List.rev (List.mapi to_arg (List.concat (List.map expr actuals)))) @
-        [Opcode.Call (StringMap.find fname env.function_index)]
+      | Call (fname, actuals) -> 
+        (try (List.rev (List.mapi to_arg (List.concat (List.map expr actuals)))) @
+          [Opcode.Call (StringMap.find fname env.function_index)]
           with Not_found -> 
             StringMap.iter (fun k v -> Printf.printf "%s->%s\n" k v) env.function_index;
             Printf.printf "TESTING:%s\n" (StringMap.find fname env.function_index);
@@ -128,7 +129,8 @@ let translate (globals, functions) =
         )
     in
     let arg_to_var = 
-        List.mapi (fun x arg -> Arg_to_var(int_to_var (StringMap.find arg env.local_index), (int_to_var (x+1)))) formal_strings
+        (try List.mapi (fun x arg -> Arg_to_var(int_to_var (StringMap.find arg env.local_index), (int_to_var (x+1)))) formal_strings
+          with Not_found -> raise (Failure ("Undefined Problem")))
     in
     [Prologue(fdecl.fname, ((StringMap.cardinal env.local_index)*8))] @ 
       (stmt fdecl.fname 0 (Block (var_asn_list fdecl.locals))) @ (arg_to_var) @

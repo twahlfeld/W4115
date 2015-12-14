@@ -80,7 +80,8 @@ let rec string_of_stmt strlit_map blist =
   let to_string x = string_of_stmt strlit_map x in
   match blist with
   | Lit(x)            -> string_of_int x
-  | Str(s)            -> StringMap.find s strlit_map
+  | Str(s)            -> (try StringMap.find s strlit_map with Not_found ->
+                           raise (Failure ("Undeclared string " ^ s)))
   | Arg(lhs, rhs)     -> 
     (match rhs with 
     | Call s -> Printf.sprintf "\tmov\t%s, rax\nRHS:%s" lhs (to_string rhs)
