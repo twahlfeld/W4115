@@ -16,4 +16,5 @@ Element efun(Element e) {
 
 int main() {
     print(stdout, "42\n");
+    return 0;
 }
