@@ -12,7 +12,7 @@ type bstmt =
   | Glob_var of string        (* Global Variables, by absolute label *)
   | Get_gvar of string        (* Gets Global Variables *)
   | Set_gvar of string        (* Sets Global Variables  *)
-  | Call of string            (* Call function by name or address *)
+  | Call of string * int      (* Call function by name or address *)
   | Fdecl of string           (* Function Declaration *)
   | Imprt                     (* Import/Extern function *)
   | Prologue of string * int  (* Start of every stack frame *)
@@ -84,11 +84,14 @@ let rec string_of_stmt strlit_map blist =
                            raise (Failure ("Undeclared string " ^ s)))
   | Arg(lhs, rhs)     -> 
     (match rhs with 
-    | Call s -> Printf.sprintf "\tmov\t%s, rax\nRHS:%s" lhs (to_string rhs)
-    | Str  s -> Printf.sprintf "\tmov\t%s, %s\n" lhs (to_string rhs)
-    | _      -> if lhs.[0] = '[' then 
-                "\tpush\t" ^ (to_string rhs) ^ "\n"
-                else Printf.sprintf "\tmov\t%s, %s\n" lhs (to_string rhs)
+    | Call(s, n) -> let suffix =
+                      if n-6 > 0 then Printf.sprintf "sub rsp %XH\n" ((n-6)*8)
+                      else ""
+                    in
+                    "\tmov\t" ^ lhs ^ ", rax\nRHS:"^ (to_string rhs) ^ suffix
+    | Str  s     -> Printf.sprintf "\tmov\t%s, %s\n" lhs (to_string rhs)
+    | _          -> if lhs.[0] = '[' then "\tpush\t" ^ (to_string rhs) ^ "\n"
+                    else "\tmov\t" ^ lhs ^ ", " ^ to_string rhs ^ "\n"
     )
   | Reg s             -> s
   | Bin(Ast.Add)      -> "\tadd\trax, rcx\n"
@@ -112,7 +115,7 @@ let rec string_of_stmt strlit_map blist =
     (match b with
     | Lit _ | Str _ 
     | Glob_var _ | Local_var _ -> "\tmov\trax, " ^ (to_string b) ^ "\n"
-    | Call _                   -> (to_string b)
+    | Call(_, _)               -> (to_string b)
     | Bin _                    -> (to_string b)
     | _                        -> ""
     )
@@ -126,14 +129,18 @@ let rec string_of_stmt strlit_map blist =
   | Glob_var(s)          -> "["^s^"]"
   | Set_gvar(s)          -> "\tmov\t" ^ s ^ ", rax\n"
   | Get_gvar(s)          -> "\tmov\trax, " ^ s ^ "\n"
-  | Call(s)              -> "\tcall\t" ^ s ^ "\n"
+  | Call(s, n)           -> let suffix  =
+                              if n-6 > 0 then Printf.sprintf "sub rsp %XH\n" ((n-6)*8)
+                              else ""
+  in
+                            "\tcall\t" ^ s ^ "\n" ^ suffix
   | Fdecl(s)             -> "global " ^ s ^ "\n"
   | Imprt                -> "extern fprintf\nextern fopen\n"
   | Assign(dst, src)     -> 
     (match src with
-    | Call s  -> (to_string dst)
-    | Fakenop -> (to_string dst)
-    | _       -> "\tmov\trax, " ^ (to_string src)  ^ "\n" ^ (to_string dst)
+    | Call(s, n) -> (to_string dst)
+    | Fakenop    -> (to_string dst)
+    | _          -> "\tmov\trax, " ^ (to_string src)  ^ "\n" ^ (to_string dst)
     )
   | Jmp_true(lbl)     -> "\tjz " ^ lbl ^ "\n"
   | Jmp_false(lbl)    -> "\tjnz " ^ lbl ^ "\n"
