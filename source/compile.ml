@@ -62,7 +62,7 @@ let translate (globals, functions) =
       | 4 -> "rcx"
       | 5 -> "r8"
       | 6 -> "r9"
-      | x -> if x > 6 then Printf.sprintf "[rbp+%x]" ((x-6)) 
+      | x -> if x > 6 then Printf.sprintf "%d" ((x-7)) 
              else Printf.sprintf "[rbp-%xH]" (abs x)
     in
     let rec to_arg acc hd =
@@ -132,7 +132,7 @@ let translate (globals, functions) =
         (try List.mapi (fun x arg -> Arg_to_var(int_to_var (StringMap.find arg env.local_index), (int_to_var (x+1)))) formal_strings
           with Not_found -> raise (Failure ("Undefined Problem")))
     in
-    [Prologue(fdecl.fname, ((StringMap.cardinal env.local_index)*8))] @ 
+    [Prologue(fdecl.fname, (((StringMap.cardinal env.local_index)+(List.length fdecl.formals))*8))] @ 
       (stmt fdecl.fname 0 (Block (var_asn_list fdecl.locals))) @ (arg_to_var) @
       (stmt fdecl.fname 0 (Block fdecl.body)) @ [Epilogue]
   in

@@ -85,13 +85,15 @@ let rec string_of_stmt strlit_map blist =
   | Arg(lhs, rhs)     -> 
     (match rhs with 
     | Call(s, n) -> let suffix =
-                      if n-6 > 0 then Printf.sprintf "sub rsp %XH\n" ((n-6)*8)
+                      if n-6 > 0 then Printf.sprintf "\tadd rsp, %XH\n" ((n-6)*8)
                       else ""
                     in
                     "\tmov\t" ^ lhs ^ ", rax\nRHS:"^ (to_string rhs) ^ suffix
     | Str  s     -> Printf.sprintf "\tmov\t%s, %s\n" lhs (to_string rhs)
-    | _          -> if lhs.[0] = '[' then "\tpush\t" ^ (to_string rhs) ^ "\n"
-                    else "\tmov\t" ^ lhs ^ ", " ^ to_string rhs ^ "\n"
+    | _          -> (try Printf.sprintf "\tmov\trax, %s\n\tmov\t[rsp+%XH], rax\n" 
+                      (to_string rhs) (int_of_string lhs)
+                      with Failure "int_of_string" -> 
+                        "\tmov\t" ^ lhs ^ ", " ^ (to_string rhs) ^ "\n")
     )
   | Reg s             -> s
   | Bin(Ast.Add)      -> "\tadd\trax, rcx\n"
