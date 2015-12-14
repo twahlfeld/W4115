@@ -131,11 +131,7 @@ let rec string_of_stmt strlit_map blist =
   | Glob_var(s)          -> "["^s^"]"
   | Set_gvar(s)          -> "\tmov\t" ^ s ^ ", rax\n"
   | Get_gvar(s)          -> "\tmov\trax, " ^ s ^ "\n"
-  | Call(s, n)           -> let suffix  =
-                              if n-6 > 0 then Printf.sprintf "sub rsp %XH\n" ((n-6)*8)
-                              else ""
-  in
-                            "\tcall\t" ^ s ^ "\n" ^ suffix
+  | Call(s, n)           -> "\tcall\t" ^ s ^ "\n"
   | Fdecl(s)             -> "global " ^ s ^ "\n"
   | Imprt                -> "extern fprintf\nextern fopen\n"
   | Assign(dst, src)     -> 
