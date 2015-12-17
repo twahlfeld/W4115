@@ -1,0 +1,6 @@
+int main() {
+  Page p = get("https://haighr.com");
+  print(stdout, "%s\n%s\n%s\n%s\n", p.url, p.response, p.children.head.html);
+  return 0
+}
+

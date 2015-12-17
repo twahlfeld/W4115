@@ -1,0 +1,9 @@
+int main() {
+  Page p = get("http://haighr.com");
+  Element e = p.find("class", "boxContainer");
+  Element f = e.find("type", "h4");
+  Element g = p.find("id", "secondBox");
+  Element h = g.find("type", h2"); 
+  print(stdout, "%s\n%s\n", f.text, h.text);
+  return 0;
+}

@@ -1,0 +1,9 @@
+int main() {
+  List l = [1;4];
+  l.head.addafter(2);
+  int x = l.head.next.next;
+  x.addbefore(3);
+  print (stdout, "%d%d%d%d\n");
+  return 0;
+}
+  
