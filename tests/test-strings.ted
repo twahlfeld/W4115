@@ -1,0 +1,5 @@
+int main() {
+    string x = "Panic";
+    print(stdout, "%s %s\n", "Don't", x);
+    return 0;
+}
