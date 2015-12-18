@@ -8,6 +8,7 @@
 *.cmxs
 *.cmxa
 *.asm
+*.sublime*
 
 # Folders
 .idea/
