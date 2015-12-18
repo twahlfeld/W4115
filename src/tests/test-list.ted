@@ -3,6 +3,8 @@ int main() {
   l.head.addafter(2);
   int x = l.head.next.next;
   x.addbefore(3);
+  l.head.addbefore(0);
+  l.remove(l.head);
   print (stdout, "%d%d%d%d\n");
   return 0;
 }
