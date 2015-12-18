@@ -1,4 +1,3 @@
- nnot
  *.cmo
  *.cma
  *.cmi
@@ -8,14 +7,3 @@
  *.cmxs
  *.cmxa
  *.asm
-
- # ocamlbuild working directory
- _build/
-
- # ocamlbuild targets
- *.byte
- *.native
-
- # oasis generated files
- setup.data
- setup.log
