@@ -1,4 +1,0 @@
-# Dependencies
-
-#xml-light
-	ocamlfind ocamlc -package xml-light -linkpkg
