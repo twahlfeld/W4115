@@ -4,9 +4,9 @@
 ulimit -t 30
 
 SignalError() {
-    if [ $error -eq 0 ] ; then
-	echo "FAILED"
-	error=1
+    if [ $error -eq 0 ]; then
+	   echo "FAILED"
+	   error=1
     fi
     echo "  $1"
 }
@@ -19,23 +19,13 @@ Compare() {
     fi
 }
 
-# Run <args>
-Run() {
-    eval $* 
-}
-
 Check() {
     error=0
-    basename=`echo $1 | sed 's/.*\\///
-                             s/.ted//'`
-    reffile=`echo $1 | sed 's/.ted$//'`
+    echo "########## Testing $1 ##########"
 
-    echo "########## Testing $basename ##########"
-
-
-    Run "./ted_test.sh" $reffile ">" ${basename}.i.out
-    if [ -f ${basename}.i.out ]; then
-      Compare ${basename}.i.out ${reffile}.out $basename
+    $(../src/ted $1.ted && nasm -f elf64 $1.asm && gcc $1.o -o $1 && ./$1 > $1.rslt)
+    if [ -f $1.rslt ]; then
+      Compare $1.rslt $1.asrt $1
     else
       echo "########## TEST FAIL (COMPILATION ERROR) ##########"
     fi
@@ -44,17 +34,13 @@ Check() {
 #    rm -f $reffile
 }
 
-shift `expr $OPTIND - 1`
-
-if [ $# -ge 1 ]
-then
+if [ $# -ge 1 ]; then
     files=$@
 else
-    files="tests/test-*.ted"
+    files=$(find . -name "*.ted" -exec basename \{} .ted \;)
 fi
 
-for file in $files
-do
+for file in $files; do
     case $file in
 	*test-*)
 	    Check $file

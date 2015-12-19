@@ -33,6 +33,14 @@ scanner.ml: scanner.mll
 .PHONY: clean
 clean:
 	rm -f *.cmo *.cmi *.o *.asm ted scanner.ml parser.mli parser.ml
+	rm -f ../tests/*rslt ../tests/*.asm ../tests/*.o && rm -f `find ../tests/ -type f -executable ! -name "*.sh" -print`
+
+clean-tests:
+	rm -f ../tests/*rslt ../tests/*.asm ../tests/*.o && rm -f `find ../tests/ -type f -executable ! -name "*.sh" -print`
+
+tests: ted
+	echo -n "\n"
+	cd ../tests/ && ./run_tests.sh && cd -
 
 .PHONY: all
 all: clean default
