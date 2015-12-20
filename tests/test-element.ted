@@ -1,0 +1,7 @@
+int main() {
+  Page p = get("http://haighr.com");
+  Elememt e = p.children.head.next;
+  Element ee = e.children.head.next;
+  print(stdout, "%s\n%s\n%s\n%s\n", ee.id, ee.class, ee.type);
+  return 0;
+}

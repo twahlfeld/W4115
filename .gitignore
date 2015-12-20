@@ -1,0 +1,14 @@
+# Files
+*.cmo
+*.cma
+*.cmi
+*.a
+*.o
+*.cmx
+*.cmxs
+*.cmxa
+*.asm
+*.sublime*
+
+# Folders
+.idea/
