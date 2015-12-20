@@ -25,6 +25,8 @@ rule token = parse
 | "for"    { FOR }
 | "while"  { WHILE }
 | "return" { RETURN }
+| "any"    { ANY }
+| "file"   { FILE }
 | "int"    { INT }
 | "string" { STRING }
 | "List"   { LIST }

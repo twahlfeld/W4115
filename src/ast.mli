@@ -20,10 +20,12 @@ type stmt =
 type type_def =
     Int
     | String
+    | File
     | List
     | Page
     | Element
     | Nil
+    | Any
 
 type t_match = Td of type_def | Te of expr
 

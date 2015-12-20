@@ -23,6 +23,8 @@ Check() {
     error=0
     echo "########## Testing $1 ##########"
 
+    test $1 == "test-printfile" && echo "BUTTS"
+
     $(../src/ted $1.ted && nasm -f elf64 $1.asm && gcc $1.o -o $1 && ./$1 > $1.rslt)
     if [ -f $1.rslt ]; then
       Compare $1.rslt $1.asrt $1
