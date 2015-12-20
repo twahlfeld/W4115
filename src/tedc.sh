@@ -13,6 +13,6 @@ if [ -f $FILE.o ]; then
   rm $FILE.o
 fi
 
-$TED $INFILE
+$TED
 $ASSEMBLE
 $GCC
