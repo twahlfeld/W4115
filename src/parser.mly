@@ -7,7 +7,7 @@
 %token <int> LITERAL
 %token <string> ID STRING_LIT
 %token EOF 
-%token STRING LIST ELEMENT PAGE
+%token STRING LIST ELEMENT PAGE FILE ANY
 
 %nonassoc NOELSE
 %nonassoc ELSE
@@ -47,6 +47,8 @@ formal_list:
 
 type_decl:
     INT { Int }
+    | FILE { File }
+    | ANY { Any }
     | STRING { String }
     | LIST { List }
     | ELEMENT { Element }

@@ -27,6 +27,19 @@ let _ =
   let lexbuf = Lexing.from_channel file_in in
   (* AST Building *)
   let ast = Parser.program Scanner.token lexbuf in
+  let complete_ast (var, fdecl) =
+    let newvar = [Var(File, "stdout", Noexpr)] in
+    let newfdecl = 
+      [{ftype = Int;
+        fname="print"; 
+        formals=
+          (Arg(File, "stream")::Arg(String, "format")::Arg(Any, "vararg")::[]);
+        locals = [];
+        body = []}]@fdecl
+    in
+    (newvar@var, newfdecl)
+  in
+  let ast = complete_ast ast in
   (* SAST Building *)
   let sast (var, fdecl) = 
     let fnamemap = List.fold_left 
@@ -56,16 +69,20 @@ let _ =
                                if vtype != (sc_expr e) then raise (Failure ("Type Mismatch"))
                                else vtype
         | Call(s, e)        -> let rec matching lst1 lst2 =
-            let hd = function
+                                 let hd = function
                                    | [] -> Nil
                                    | (Td t)::_ -> t
                                    | (Te t)::_ -> sc_expr t
                                  in
-                                 if (hd lst1) != (hd lst2) then
-                                   raise (Failure ("Type Mismatch"))
-                                 else if lst1 = [] then StringMap.find s fnamemap
-                                 else matching (List.tl lst1) (List.tl lst2)
+                                 let hd1 = hd lst1 and hd2 = hd lst2 in
+                                 if hd2 != Any then (
+                                 if hd1 != hd2 then raise (Failure ("Type Mismatch"))
+                                 else if lst1 != [] then 
+                                   matching (List.tl lst1) (List.tl lst2)
+                                 else StringMap.find s fnamemap)
+                                 else StringMap.find s fnamemap
                                in
+                               
                                let rec flist = function
                                  | [] -> []
                                  | hd::tl -> if s = hd.fname then hd.formals else flist tl
@@ -101,7 +118,7 @@ let _ =
       in
       let sc_var = function 
         | Var(t, _, e) -> 
-          if t != (sc_expr e) then raise (Failure ("Variable type mismatch"))
+          if e != Noexpr && t != (sc_expr e) then raise (Failure ("Variable type mismatch"))
       in
       List.iter sc_var fd.locals;
       List.iter sc_stmt fd.body
