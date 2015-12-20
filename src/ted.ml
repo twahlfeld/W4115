@@ -51,9 +51,14 @@ let _ =
         List.fold_left (fun m x -> match x with Var(t, n, _) -> StringMap.add n t m) 
         StringMap.empty (fd.locals@var)
       in
+      let argmap = 
+        List.fold_left (fun m x -> match x with Arg(t, n) -> StringMap.add n t m)
+        StringMap.empty (fd.formals)
+      in
       let rec sc_expr = function
         | Literal s         -> Int
         | Id s              -> (try StringMap.find s varmap 
+                                 with Not_found -> try StringMap.find s argmap
                                  with Not_found -> try StringMap.find s fnamemap
                                  with Not_found -> raise (Failure ("Can't find ID")))
         | Stringlit s       -> String
