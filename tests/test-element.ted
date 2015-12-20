@@ -1,7 +1,15 @@
 int main() {
-  Page p = get("http://haighr.com");
-  Elememt e = p.children.head.next;
-  Element ee = e.children.head.next;
-  print(stdout, "%s\n%s\n%s\n%s\n", ee.id, ee.class, ee.type);
+
+  Page p = fetch("http://haighr.com");
+  Elememt e = pageroot(p);
+
+  List l = elementchildren(e);
+  Element f = listnext(l);
+
+  string s = elementattr(f, "id");
+  string t = elementtype(f);
+
+  print(stdout, "%s\n%s\n", s, t);
+
   return 0;
 }
