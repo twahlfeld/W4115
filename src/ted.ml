@@ -52,7 +52,7 @@ let _ =
         StringMap.empty (fd.locals@var)
       in
       let argmap = 
-        List.fold_left (fun m x -> match x with Arg(t, n) -> StringMap.add n t m)
+        List.fold_left (fun m x -> match x with Ast.Arg(t, n) -> StringMap.add n t m)
         StringMap.empty (fd.formals)
       in
       let rec sc_expr = function

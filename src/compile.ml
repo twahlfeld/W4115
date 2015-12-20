@@ -29,9 +29,11 @@ let string_map_pairs map pairs =
 let translate (globals, functions) =
 
   (* Allocate "addresses for each global variable" *)
-  let global_indexes = StringSet.empty in (*= string_map_pairs StringMap.empty (enum 1 0 globals) in*)
-  let global_indexes = StringSet.add "stdout" global_indexes in
-
+  let global_indexes =
+    List.fold_left
+      (fun m x -> match x with Ast.Var(_, n, _) -> StringSet.add n m) 
+      StringSet.empty globals
+  in
   (* Assign indexes to built-in functions is special *)
   let rec string_map_create = function
     | []     -> StringMap.empty
