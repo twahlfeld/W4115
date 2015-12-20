@@ -35,12 +35,85 @@ let _ =
   let complete_ast (var, fdecl) =
     let newvar = [Var(File, "stdout", Noexpr)] in
     let newfdecl = 
-      [{ftype = Int;
-        fname="print"; 
-        formals=
-          (Arg(File, "stream")::Arg(String, "format")::Arg(Any, "vararg")::[]);
-        locals = [];
-        body = []}]@fdecl
+      {ftype   = Int;
+       fname   = "print"; 
+       formals =
+         Arg(File, "stream")::Arg(String, "format")::Arg(Any, "vararg")::[];
+       locals  = [];
+       body    = [];
+      }::{
+       ftype   = File;
+       fname   = "open";
+       formals = Arg(String, "file")::Arg(String, "attr")::[];
+       locals  = [];
+       body    = []
+      }::{
+       ftype   = List;
+       fname   = "listnew";
+       formals = [];
+       locals  = [];
+       body    = []
+      }::{
+       ftype   = Any;
+       fname   = "listhead";
+       formals = Arg(List, "list")::[];
+       locals  = [];
+       body    = [];
+      }::{
+       ftype   = Any;
+       fname   = "listadd";
+       formals = Arg(List, "list")::Arg(Any, "data")::[];
+       locals  = [];
+       body    = [];
+      }::{
+       ftype   = Any;
+       fname   = "listrem";
+       formals = Arg(List, "list")::Arg(Int, "index")::[];
+       locals  = [];
+       body    = [];
+      }::{
+       ftype   = List;
+       fname   = "listtail";
+       formals = Arg(List, "list")::[];
+       locals  = [];
+       body    = [];
+      }::{
+       ftype   = Int;
+       fname   = "listsize"
+       formals = Arg(List, "list")::[];
+       locals  = [];
+       body    = []
+      }::{
+       ftype   = Page;
+       fname   = "fetch";
+       formals = Arg(String, url)::[]
+       locals  = [];
+       body    = []
+      }::{
+       ftype   = String;
+       fname   = "pageurl";
+       formals = Arg(Page, "page")::[]
+       locals  = [];
+       body    = []
+      }::{
+       ftype   = String;
+       fname   = "pagehtml"
+       formals = Arg(Page, "page")::[];
+       locals  = [];
+       body    = []
+      }::{
+       ftype   = Element;
+       fname   = "pageroot";
+       formals = Arg(Page, "page")::[];
+       locals  = [];
+       body    = []
+      }::{
+       ftype   = List;
+       fname   = "pagefind";
+       formals =
+       locals  =
+       body    =
+      }::fdecl
     in
     (newvar@var, newfdecl)
   in
