@@ -189,8 +189,9 @@ let _ =
                                ignore (isvalid rhs);
                                Int
         | Assign(v, e)      -> let vtype = StringMap.find v varmap in
-                               if vtype != (sc_expr e) then raise (Failure ("Type Mismatch"))
-                               else vtype
+                               let expr = sc_expr e in
+                               if vtype = expr || expr = Any then vtype
+                               else raise (Failure ("Type Mismatch"))
         | Call(s, e)        -> let rec matching lst1 lst2 =
                                  let hd = function
                                    | [] -> Nil
@@ -240,7 +241,8 @@ let _ =
       in
       let sc_var = function 
         | Var(t, _, e) -> 
-          if e != Noexpr && t != (sc_expr e) then raise (Failure ("Variable type mismatch"))
+          if e != Noexpr && t != (sc_expr e) && (sc_expr e) != Any then 
+            raise (Failure ("Variable type mismatch"))
       in
       List.iter sc_var fd.locals;
       List.iter sc_stmt fd.body
