@@ -3,7 +3,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq
 type expr =
     Literal of int
   | Id of string
-  | Stringlit of string  
+  | Stringlit of string
   | Binop of expr * op * expr
   | Assign of string * expr
   | Call of string * expr list
@@ -23,6 +23,9 @@ type type_def =
     | List
     | Page
     | Element
+    | Nil
+
+type t_match = Td of type_def | Te of expr
 
 (* type * ID * value *)
 type var = Var of type_def * string * expr
@@ -30,6 +33,7 @@ type var = Var of type_def * string * expr
 type arg = Arg of type_def * string
 
 type func_decl = {
+    ftype : type_def;
     fname : string;
     formals : arg list;
     locals : var list;
