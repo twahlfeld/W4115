@@ -1,33 +1,33 @@
 module StringMap = Map.Make(String)
 
 type bstmt =
-  | Lit of int                (* Integer Literal *)
-  | Str of string             (* String Literal *)
+  | Lit of int                  (* Integer Literal *)
+  | Str of string               (* String Literal *)
   | Arg of string * bstmt
   | Reg of string
-  | Bin of Ast.op             (* Binary Operators *)
-  (*| Unop of Ast.unop        (* Unary Operators *)*)
-  | Mov of string * bstmt     (* Mov instruction *)
-  | Local_var of int          (* Local Variables, Relative Frame Pointer offset *)
-  | Glob_var of string        (* Global Variables, by absolute label *)
-  | Get_gvar of string        (* Gets Global Variables *)
-  | Set_gvar of string        (* Sets Global Variables  *)
-  | Call of string * int      (* Call function by name or address *)
-  | Fdecl of string           (* Function Declaration *)
-  | Imprt                     (* Import/Extern function *)
-  | Prologue of string * int  (* Start of every stack frame *)
-  | Epilogue                  (* End of every stack frame *)
-  | Assign of bstmt * bstmt   (* Set variable *)
-  | Ld_var of string          (* Load variable *)
-  | Ld_reg of string          (* Load register into id *)
-  | Ld_lit of int             (* Load lit into register *)
-  | Str_var of string         (* Stores variable *)
-  | Jmp_true of string        (* Jump if equal to zero *)
-  | Jmp_false of string       (* Jump if not equal to zero*)
-  | Jmp of string             (* Unconditional Jump to label *)
-  | Label of string           (* Label for jumps *)
-  | Header of string          (* Creates standard header *)
-  | Tail of string            (* Creates a standard string *)
+  | Bin of Ast.op               (* Binary Operators *)
+  (*| Unop of Ast.unop          (* Unary Operators *)*)
+  | Mov of string * bstmt       (* Mov instruction *)
+  | Local_var of int            (* Local Variables, Relative Frame Pointer offset *)
+  | Glob_var of string          (* Global Variables, by absolute label *)
+  | Get_gvar of string          (* Gets Global Variables *)
+  | Set_gvar of string          (* Sets Global Variables  *)
+  | Call of string * int        (* Call function by name or address *)
+  | Fdecl of string             (* Function Declaration *)
+  | Imprt                       (* Import/Extern function *)
+  | Prologue of string * int    (* Start of every stack frame *)
+  | Epilogue                    (* End of every stack frame *)
+  | Assign of bstmt * bstmt     (* Set variable *)
+  | Ld_var of string            (* Load variable *)
+  | Ld_reg of string            (* Load register into id *)
+  | Ld_lit of int               (* Load lit into register *)
+  | Str_var of string           (* Stores variable *)
+  | Jmp_true of string          (* Jump if equal to zero *)
+  | Jmp_false of string         (* Jump if not equal to zero*)
+  | Jmp of string               (* Unconditional Jump to label *)
+  | Label of string             (* Label for jumps *)
+  | Header of string            (* Creates standard header *)
+  | Tail of string * string list(* Creates a standard string *)
   | Arg_to_var of string * string
   | Fakenop
   | Ret of bstmt
@@ -151,7 +151,10 @@ let rec string_of_stmt strlit_map blist =
   | Header(s)         -> s ^ "\nextern fprintf\nextern fopen\n" ^
                          "extern stdout\nextern get_title\n"^
                          "\nSECTION .text\n"
-  | Tail(s)           -> "\nSECTION .data\n" ^
+  | Tail(s, g)        -> "\nSECTION .data\n" ^
+                         (List.fold_left 
+                           (fun s n -> 
+                             Printf.sprintf "%s\n%s:\n\t\tdd 00000005H\n" s n) "" g) ^
                          "SECTION .bss\n" ^
                          "SECTION .rodata\n" ^
                          (build_str (StringMap.bindings strlit_map)) ^ "\n" ^ 

@@ -1,6 +1,7 @@
 open Opcode
 open Ast
 module StringMap = Map.Make(String)
+module StringSet = Set.Make(String)
 
 let _ =
   (* Reading File or stdin(put) *)
@@ -27,6 +28,10 @@ let _ =
   let lexbuf = Lexing.from_channel file_in in
   (* AST Building *)
   let ast = Parser.program Scanner.token lexbuf in
+  let prgglob (var, fdecl) = 
+    List.map (fun x -> match x with Var(_, n, _) -> n) var 
+  in
+  let globals = prgglob ast in
   let complete_ast (var, fdecl) =
     let newvar = [Var(File, "stdout", Noexpr)] in
     let newfdecl = 
@@ -39,6 +44,10 @@ let _ =
     in
     (newvar@var, newfdecl)
   in
+  let localfnameset (var, fdecl) =
+    List.fold_left (fun m fd -> StringSet.add fd.fname m) StringSet.empty fdecl
+  in
+  let fnameset = localfnameset ast in
   let ast = complete_ast ast in
   (* SAST Building *)
   let sast (var, fdecl) = 
@@ -48,7 +57,7 @@ let _ =
     in
     let sc_fdecl fd = 
       let varmap = 
-        List.fold_left (fun m x -> match x with Var(t, n, _) -> StringMap.add n t m) 
+        List.fold_left (fun m x -> match x with Ast.Var(t, n, _) -> StringMap.add n t m) 
         StringMap.empty (fd.locals@var)
       in
       let argmap = 
@@ -66,7 +75,7 @@ let _ =
                                  (match sc_expr e with
                                  | Int -> Int
                                  | _ -> raise (Failure ("Binop type mismatch")))
-        in
+                               in
                                ignore (isvalid lhs);
                                ignore (isvalid rhs);
                                Int
@@ -87,7 +96,6 @@ let _ =
                                  else StringMap.find s fnamemap)
                                  else StringMap.find s fnamemap
                                in
-                               
                                let rec flist = function
                                  | [] -> []
                                  | hd::tl -> if s = hd.fname then hd.formals else flist tl
@@ -133,7 +141,7 @@ let _ =
   sast ast;
   let program = ast in
   (* Creates an array of correlating bstmts(opcode.ml) *)
-  let prg = (Compile.translate program).text in
+  let prg = (Compile.translate program fnameset).text in
   (* Creates the stringmap for string literals *)
   let stringlit = 
     let add_string str n map =
@@ -169,7 +177,11 @@ let _ =
       )
   in
   let full_prg = 
-      [Opcode.Header (makeheader prg_ops)] @ prg_ops @ [Opcode.Tail ("")]
+      [Opcode.Header
+        (List.fold_left (fun s n -> Printf.sprintf "%sglobal %s\n" s n)
+          (makeheader prg_ops) globals)] @ prg_ops @ [Opcode.Tail ("", globals)]
   in
-  List.iter (fun x -> Printf.fprintf file_out "%s" x) (List.map (Opcode.string_of_stmt stringlit) full_prg)
+  List.iter 
+    (fun x -> Printf.fprintf file_out "%s" x) 
+    (List.map (Opcode.string_of_stmt stringlit) full_prg)
 

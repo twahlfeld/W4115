@@ -26,7 +26,7 @@ let string_map_pairs map pairs =
 (* Translate a program in AST form into a bytecode program.  Throw an
  * exception if something is wrong, e.g., a reference to an unknown
  * variable or function *)
-let translate (globals, functions) =
+let translate (globals, functions) localfnameset =
 
   (* Allocate "addresses for each global variable" *)
   let global_indexes =
@@ -53,6 +53,7 @@ let translate (globals, functions) =
 
   (* Translate a function in AST form into a list of bytecode statements *)
   let translate env fdecl =
+    if not (StringSet.mem fdecl.fname localfnameset) then [Fakenop] else
     (* Bookkeeping: frame pointer offsets for locals and arguments *)
     let formal_strings = (List.map (fun x -> match x with Ast.Arg(_, s) -> s) fdecl.formals) in
     let local_offsets = (* -8 because we are in 64bit system *)
@@ -69,7 +70,7 @@ let translate (globals, functions) =
       | 4 -> "rcx"
       | 5 -> "r8"
       | 6 -> "r9"
-      | x -> if x > 6 then Printf.sprintf "%d" ((x-7)) 
+      | x -> if x > 6 then Printf.sprintf "%d" ((x-7))
              else Printf.sprintf "[rbp-%xH]" (abs x)
     in
     let rec to_arg acc hd =
