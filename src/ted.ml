@@ -48,11 +48,11 @@ let _ =
     in
     let sc_fdecl fd = 
       let varmap = 
-        List.fold_left (fun m x -> match x with Var(t, n, _) -> StringMap.add n t m) 
+        List.fold_left (fun m x -> match x with Ast.Var(t, n, _) -> StringMap.add n t m) 
         StringMap.empty (fd.locals@var)
       in
       let argmap = 
-        List.fold_left (fun m x -> match x with Arg(t, n) -> StringMap.add n t m)
+        List.fold_left (fun m x -> match x with Ast.Arg(t, n) -> StringMap.add n t m)
         StringMap.empty (fd.formals)
       in
       let rec sc_expr = function
