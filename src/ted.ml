@@ -79,25 +79,31 @@ let _ =
        body    = [];
       }::{
        ftype   = Int;
-       fname   = "listsize"
+       fname   = "listsize";
        formals = Arg(List, "list")::[];
        locals  = [];
        body    = []
       }::{
+        ftype = List;
+        fname = "listconcat";
+        formals = Arg(List, "list")::Arg(List, "list")::[];
+        locals = [];
+        body = [];
+      }::{
        ftype   = Page;
        fname   = "fetch";
-       formals = Arg(String, url)::[]
+       formals = Arg(String, "url")::[];
        locals  = [];
        body    = []
       }::{
        ftype   = String;
        fname   = "pageurl";
-       formals = Arg(Page, "page")::[]
+       formals = Arg(Page, "page")::[];
        locals  = [];
        body    = []
       }::{
        ftype   = String;
-       fname   = "pagehtml"
+       fname   = "pagehtml";
        formals = Arg(Page, "page")::[];
        locals  = [];
        body    = []
@@ -110,9 +116,39 @@ let _ =
       }::{
        ftype   = List;
        fname   = "pagefind";
-       formals =
-       locals  =
-       body    =
+       formals = Arg(Page, "page")::Arg(String, "selector")::[];
+       locals  = [];
+       body    = []
+      }::{
+        ftype = String;
+        fname = "elementattr";
+        formals = Arg(Element, "element")::Arg(String, "selector")::[];
+        locals = [];
+        body = []
+      }::{
+        ftype = String;
+        fname = "elementhtml";
+        formals = Arg(Element, "element")::[];
+        locals = [];
+        body = []
+      }::{
+        ftype = String;
+        fname = "elementtext";
+        formals = Arg(Element, "element")::[];
+        locals = [];
+        body = []
+      }::{
+        ftype = String;
+        fname = "elementtype";
+        formals = Arg(Element, "element")::[];
+        locals = [];
+        body = []
+      }::{
+        ftype = List;
+        fname = "elementchildren";
+        formals = Arg(Element, "element")::[];
+        locals = [];
+        body = [];
       }::fdecl
     in
     (newvar@var, newfdecl)

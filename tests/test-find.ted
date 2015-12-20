@@ -2,12 +2,12 @@ int main() {
 
   Page p = fetch("http://haighr.com");
   
-  list l = pagefind(p, "#backToTop");
+  List l = pagefind(p, "#backToTop");
   Element e = listhead(l);
   string s = elementattr(e, "class");
   print(stdout, "%s\n", s); 
 
-  list l2 = pagefind(p, ".topImage");
+  List l2 = pagefind(p, ".topImage");
   Element e2 = listhead(l2);
   string s2 = elementattr(e2, "id");
   print(stdout, "%s\n", s2);

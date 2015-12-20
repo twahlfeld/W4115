@@ -8,7 +8,7 @@ int main() {
   listadd(l, 3);
   listadd(l, 4);
 
-  list l3 = listconcat(l, l2);
+  List l3 = listconcat(l, l2);
   int len = listsize(l3);
 
   int i;
