@@ -8,7 +8,7 @@ module StringSet = Set.Make(String)
 type env = {
   function_index : string StringMap.t; (* Index for each function *)
   global_index   : StringSet.t; (* "Address" for global variables *)
-  local_index    : int StringMap.t; (* FP offset for args, locals *)
+  local_index    : int StringMap.t; (* Frame pointer offset for args, locals *)
 }
 
 (* enum : int -> int -> ’a list -> (int * ’a) list
@@ -37,20 +37,25 @@ let translate (globals, functions) =
     | []     -> StringMap.empty
     | (fn, fp)::tl -> StringMap.add fn fp (string_map_create tl)
   in
-  let function_indexes = string_map_create ([("print", "fprintf"); 
-    ("open", "fopen"); ("get", "get_title"); ("find", "find"); ("head", "head"); 
-    ("addafter", "addafter"); ("addbefore", "addbefore"); ("remove", "remove");
-    ("getdata", "getdata")] @ 
-      List.map (fun x -> (x.fname, x.fname)) functions) 
+  let function_indexes = string_map_create ([
+    ("print", "fprintf"); 
+    ("open", "fopen");
+    ("get", "get_title"); 
+    ("find", "find"); 
+    ("head", "head"); 
+    ("addafter", "addafter"); 
+    ("addbefore", "addbefore"); 
+    ("remove", "remove");
+    ("getdata", "getdata")] @ List.map (fun x -> (x.fname, x.fname)) functions) 
   in
 
   (* Translate a function in AST form into a list of bytecode statements *)
   let translate env fdecl =
-    (* Bookkeeping: FP offsets for locals and arguments *)
+    (* Bookkeeping: frame pointer offsets for locals and arguments *)
     let formal_strings = (List.map (fun x -> match x with Ast.Arg(_, s) -> s) fdecl.formals) in
-    let local_offsets = 
+    let local_offsets = (* -8 because we are in 64bit system *)
       enum (-8) (-8) (List.map (fun x -> match x with Ast.Var(_, s, _) -> s) fdecl.locals)
-    and formal_offsets = 
+    and formal_offsets = (* +1 because of ret pointer *)
       enum (-8) (((List.length fdecl.locals)+1)*(-8)) formal_strings in
     let env = { env with local_index = string_map_pairs
       StringMap.empty (formal_offsets @ local_offsets) } in
