@@ -1,57 +1,21 @@
+#define _GNU_SOURCE
 #include <stdio.h>
-#include <string.h>
-#include <sys/time.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <string.h>
+#include "parse.h"
+#include "cJSON.h"
 
-#define FILENAME_SIZE 14
-#define BUFF_SIZE 4096
-
-void strrand(char *str, size_t len) {
-    static const char alphanum[] =
-        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    int i;
-    for (i = 0; i < len; ++i) {
-        str[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
-    }
-
-    str[len] = 0;
-}
-
-char *get_title(char *uri) {
+char *_scrape(char *script) {
     int pipefd[2];
     pid_t cpid;
     int status;
-    FILE *fp_in, *fp_out;
-    char js_file[FILENAME_SIZE];
-    char js_out[BUFF_SIZE];
-    char js_str[] = "var page = require('webpage').create(); var sys = require('system'); if (sys.args.length === 1) { phantom.exit(1); } var timeout = sys.args[1]; var url = sys.args[2]; page.viewportSize = { width: 1366, height: 768 }; page.settings.resourceTimeout = timeout; page.onResourceTimeout = function() { phantom.exit(2); }; page.open(url, function(status) { var title = page.evaluate(function() { return document.title; }); console.log(title); phantom.exit(0); });";
-    char timeout[] = "15000";
 
-    struct timeval time;
-    gettimeofday(&time, NULL);
-    srand((unsigned int) time.tv_usec);
+    FILE *file_ptr;
+    char *buffer = NULL, *temp = NULL;
 
-    memset(js_file, 0, sizeof(char) * strlen(js_file) + 1);
-    strrand(js_file, FILENAME_SIZE - 1);
-    strncpy(js_file + 10, ".js", 3);
-
-    do {
-        memset(js_file, 0, sizeof(char) * strlen(js_file) + 1);
-        strrand(js_file, FILENAME_SIZE - 1);
-        strncpy(js_file + 10, ".js", 3);
-    } while (access(js_file, F_OK) != -1);
-
-    fp_out = fopen(js_file, "w");
-    if (fp_out != NULL) {
-        fwrite(js_str, 1, strlen(js_str), fp_out);
-        fclose(fp_out);
-    }
-
-    if (pipe(pipefd) == -1) {
-        return NULL;
-    }
+    if (pipe(pipefd) == -1) return NULL;
 
     if ((cpid = fork()) == -1) {
         return NULL;
@@ -60,28 +24,80 @@ char *get_title(char *uri) {
         dup2(pipefd[1], STDOUT_FILENO);
         dup2(pipefd[1], STDERR_FILENO);
 
-        execl("/usr/bin/phantomjs", "phantomjs", "--ssl-protocol=tlsv1", "--ignore-ssl-errors=true", js_file, timeout, uri, NULL);
+        execl("/usr/bin/nodejs", "nodejs", "-e", script, NULL);
         return NULL;
     }
-
     close(pipefd[1]);
 
-    fp_in = fdopen(pipefd[0], "r");
-    if (fp_in != NULL) {
-        while (fgets(js_out, BUFF_SIZE, fp_in) != NULL) { }
-        fclose(fp_out);
+    size_t sz = 0, idx = 0;
+    int chr = EOF;
+
+    file_ptr = fdopen(pipefd[0], "r");
+    if (file_ptr != NULL) {
+        while (chr) {
+            chr = fgetc(file_ptr);
+            if (chr == EOF) chr = 0;
+
+            if (sz <= idx) {
+                sz++;
+                if ((temp = realloc(buffer, sz)) == NULL) {
+                    free(buffer);
+                    break;
+                }
+                buffer = temp;
+            }
+            buffer[idx++] = (char) chr;
+        }
     }
 
-    if (waitpid(cpid, &status, 0) == -1) {
-        return NULL;
-    }
+    if (waitpid(cpid, &status, 0) == -1) return NULL;
 
-    if (remove(js_file) != 0) {
-        return NULL;
-    }
-
-    char *title = malloc(sizeof(char) * strlen(js_out) + 1);
-    memset(title, 0, sizeof(char) * strlen(title) + 1);
-    strncpy(title, js_out, strlen(js_out));
-    return title;
+    return buffer;
 }
+
+Page *fetch(char *url) {
+    Page *page = malloc(sizeof(Page));
+    char *buffer = NULL;
+    asprintf(&buffer, "var phantom = require('phantom'); phantom.create(function (ph) { ph.createPage(function (page) { page.set('viewportSize', {width: 1366, height: 768}); page.open('%s', function () { page.includeJs('http://code.jquery.com/jquery-1.11.3.min.js', function () { page.evaluate(function () { return window.document.documentElement.outerHTML; }, function (result) { var str = JSON.stringify(result); console.log(str.substring(1, str.length - 1)); ph.exit(); }); }); }); }); });", url);
+    if (buffer == NULL) return NULL;
+
+    page->url = strdup(url);
+    char *str = _scrape(buffer);
+    str[strlen(str) - 1] = 0;
+    page->html = str;
+
+
+    free(buffer);
+    return page;
+}
+
+Element **find(Page *page, char *sel) {
+    char *buffer = NULL;
+    asprintf(&buffer, "var phantom = require('phantom'); phantom.create(function (ph) { ph.createPage(function (page) { page.set('viewportSize', {width: 1366, height: 768}); page.set('content', \"%s\"); page.includeJs('http://code.jquery.com/jquery-1.11.3.min.js', function () { page.evaluate(function () { var css_path = function(el) { if (!(el instanceof Element)) return; var path = []; while (el.nodeType === Node.ELEMENT_NODE) { var selector = el.nodeName.toLowerCase(); if (el.id) { selector += '#' + el.id; path.unshift(selector); break; } else { var sib = el, nth = 1; while (sib = sib.previousElementSibling) { if (sib.nodeName.toLowerCase() == selector) nth++; } if (nth != 1) selector += ':nth-of-type('+nth+')'; } path.unshift(selector); el = el.parentNode; } return path.join(' > '); }; return $.map($('%s'), function (elm) { return {html: elm.outerHTML, path: css_path(elm)} }); /*return $.find(blue[0]).length;*/ }, function (result) { console.log(JSON.stringify(result)); ph.exit(); }); }); }); });", page->html, sel);
+    if (buffer == NULL) return NULL;
+
+    cJSON *json;
+    char *str = _scrape(buffer);
+    json = cJSON_Parse(str);
+
+    int size = cJSON_GetArraySize(json);
+    Element **elm_list = malloc(sizeof(Element *) * size + 1);
+    elm_list[size] = NULL;
+    for (int i = 0; i < cJSON_GetArraySize(json); i++) {
+        elm_list[i] = malloc(sizeof(Element));
+        elm_list[i]->html = strdup(cJSON_GetObjectItem(cJSON_GetArrayItem(json, i), "html")->valuestring);
+        elm_list[i]->path = strdup(cJSON_GetObjectItem(cJSON_GetArrayItem(json, i), "path")->valuestring);
+    }
+
+    free(buffer);
+    cJSON_Delete(json);
+    return elm_list;
+}
+
+//Element *parent(Element *elm) {
+//    return NULL;
+//}
+//
+//Element *children(Element *elm) {
+//    return NULL;
+//}
