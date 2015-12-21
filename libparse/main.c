@@ -2,15 +2,12 @@
 #include "parse.h"
 
 int main(int argc, char *argv[]) {
-
-
-
-    Page *page = fetch("http://www.cs.columbia.edu/~sedwards/");
+    Page *page = pageFetch("http://www.cs.columbia.edu/~sedwards/");
 //    printf("%s\n", page->url);
 //    printf("%s\n", page->html);
 
-    Element **elm_list = find(page, "#titlebar");
-    printf("id:  %s\n",elementAttr(elm_list[0],"id"));
+    Element **elm_list = pageFind(page, "#titlebar");
+    printf("id:  %s\n",elementAttr(elm_list[0], "id"));
     printf("text:  %s\n",elementText(elm_list[0]));
     printf("type:  %s\n",elementType(elm_list[0]));
 

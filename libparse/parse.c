@@ -7,8 +7,8 @@
 #include "parse.h"
 #include "cJSON.h"
 #include <stdint.h>
-#include <string.h>
 #include <ctype.h>
+#include "list.h"
 
 char *_scrape(char *script) {
     int pipefd[2];
@@ -59,7 +59,7 @@ char *_scrape(char *script) {
 
     return buffer;
 }
-Page *fetch(char *url) {
+Page *pageFetch(char *url) {
     Page *page = malloc(sizeof(Page));
     char *buffer = NULL;
     asprintf(&buffer, "var phantom = require('phantom'); phantom.create(function (ph) { ph.createPage(function (page) { page.set('viewportSize', {width: 1366, height: 768}); page.open('%s', function () { page.includeJs('http://code.jquery.com/jquery-1.11.3.min.js', function () { page.evaluate(function () { return window.document.documentElement.outerHTML; }, function (result) { var str = JSON.stringify(result); console.log(str.substring(1, str.length - 1)); ph.exit(); }); }); }); }); });", url);
@@ -74,7 +74,7 @@ Page *fetch(char *url) {
     free(buffer);
     return page;
 }
-Element **find(Page *page, char *sel) {
+Element **pageFind(Page *page, char *sel) {
     char *buffer = NULL;
     asprintf(&buffer, "var phantom = require('phantom'); phantom.create(function (ph) { ph.createPage(function (page) { page.set('viewportSize', {width: 1366, height: 768}); page.set('content', \"%s\"); page.includeJs('http://code.jquery.com/jquery-1.11.3.min.js', function () { page.evaluate(function () { var css_path = function(el) { if (!(el instanceof Element)) return; var path = []; while (el.nodeType === Node.ELEMENT_NODE) { var selector = el.nodeName.toLowerCase(); if (el.id) { selector += '#' + el.id; path.unshift(selector); break; } else { var sib = el, nth = 1; while (sib = sib.previousElementSibling) { if (sib.nodeName.toLowerCase() == selector) nth++; } if (nth != 1) selector += ':nth-of-type('+nth+')'; } path.unshift(selector); el = el.parentNode; } return path.join(' > '); }; return $.map($('%s'), function (elm) { return {html: elm.outerHTML, path: css_path(elm)} }); /*return $.find(blue[0]).length;*/ }, function (result) { console.log(JSON.stringify(result)); ph.exit(); }); }); }); });", page->html, sel);
     if (buffer == NULL) return NULL;
@@ -102,8 +102,9 @@ Element **find(Page *page, char *sel) {
 
 /*Element*/
 char * _runOnElement(Element * element,char * code){
-    char * innerHtml = malloc(sizeof(char) * strlen(element->html)*2);
-    str_escape(innerHtml,element->html,strlen(innerHtml));
+    int size = sizeof(char) * strlen(element->html)*2;
+    char * innerHtml = malloc(size);
+    str_escape(innerHtml,element->html,size);
     char *buffer = NULL;
     asprintf(&buffer, "var phantom = require('phantom'); phantom.create(function (ph) { ph.createPage(function (page) { page.set('viewportSize', {width: 1366, height: 768}); page.set('content',\"\"); page.includeJs('http://code.jquery.com/jquery-1.11.3.min.js', function () { page.evaluate(function () { return obj = {text:$(\"%s\").%s}; }, function (result) { console.log(JSON.stringify(result)); ph.exit(); }); }); }); });", innerHtml,code);
     if (buffer == NULL) return NULL;
@@ -120,8 +121,10 @@ char * _runOnElement(Element * element,char * code){
     return json->valuestring;
 }
 char * elementAttr(Element * element, char * attr){
-    char * innerHtml = malloc(sizeof(char) * strlen(element->html)*2);
-    str_escape(innerHtml,element->html,strlen(innerHtml));
+    int size = sizeof(char) * strlen(element->html)*2;
+    char * innerHtml = malloc(size);
+    str_escape(innerHtml,element->html,size);
+    printf("innerHTML: %s",innerHtml);
 
     char *buffer = NULL;
     asprintf(&buffer, "var phantom = require('phantom'); phantom.create(function (ph) { ph.createPage(function (page) { page.set('viewportSize', {width: 1366, height: 768}); page.set('content',\"\"); page.includeJs('http://code.jquery.com/jquery-1.11.3.min.js', function () { page.evaluate(function () { return obj = {attr:$(\"%s\").attr('%s')}; }, function (result) { console.log(JSON.stringify(result)); ph.exit(); }); }); }); });", innerHtml, attr);
