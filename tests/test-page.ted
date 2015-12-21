@@ -4,13 +4,10 @@ int main() {
   string url;
   string html;
 
-  p = fetch("https://haighr.com");
+  p = pageFetch("http://example.com");
 
-  url = pageurl(p);
+  url = pageURL(p);
   print(stdout, "%s\n", url);
-
-  html = pagehtml(p);  
-  print(stdout, "%s\n", html);
 
   return 0;
 }

@@ -7,17 +7,27 @@ int main() {
   string s;
   string t;
 
-  p = fetch("http://haighr.com");
-  e = pageroot(p);
+  p = pageFetch("http://example.com");
+  e = pageRoot(p);
+  l = elementChildren(p, e);
+  l1 = listTail(l);
+  f = listHead(l1);
+  s = elementType(f);
+  print(stdout, "%s\n", s);
 
-  l = elementchildren(e);
-  l1 = listtail(l);
-  f = listhead(l1);
 
-  s = elementattr(f, "id");
-  t = elementtype(f);
+/*
+  p = pageFetch("http://haighr.com");
+  e = pageRoot(p);
+
+  l = elementChildren(e);
+  l1 = listTail(l);
+  f = listHead(l1);
+
+  s = elementAttr(f, "id");
+  t = elementType(f);
 
   print(stdout, "%s\n%s\n", s, t);
-
+*/
   return 0;
 }
