@@ -8,6 +8,7 @@
 #include "cJSON.h"
 #include <stdint.h>
 #include <ctype.h>
+#include "list.h"
 
 char *_scrape(char *script) {
     int pipefd[2];
