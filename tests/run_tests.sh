@@ -3,6 +3,8 @@
 # Set time limit for all operations
 ulimit -t 30
 
+rm -rf /tests/*.rslt
+
 SignalError() {
     if [ $error -eq 0 ]; then
 	   echo "FAILED"
@@ -23,8 +25,6 @@ Check() {
     error=0
     echo "########## Testing $1 ##########"
 
-    test $1 == "test-printfile" && echo "BUTTS"
-
     $(../src/ted $1.ted && nasm -f elf64 $1.asm && gcc $1.o -o $1 && ./$1 > $1.rslt)
     if [ -f $1.rslt ]; then
       Compare $1.rslt $1.asrt $1
@@ -35,6 +35,7 @@ Check() {
 #    rm -f ${reffile}.asm
 #    rm -f $reffile
 }
+
 
 if [ $# -ge 1 ]; then
     files=$@

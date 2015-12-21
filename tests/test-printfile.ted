@@ -1,6 +1,8 @@
 int main() {
 
-file out = open("test-printfile.rslt", "wb");
+file out;
+
+out = open("test-printfile.rslt", "wb");
 print(out, "%s\n", "panic");
 
 return 0;
