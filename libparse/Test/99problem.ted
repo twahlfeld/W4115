@@ -6,12 +6,12 @@ int main() {
 	file f;
 
 
-	page = pageFetch("http://www.99-bottles-of-beer.net/language-assembler-(intel-x86)-1144.html");
+	page = pageFetch("http://www.99-bottles-of-beer.net/language-bash-1815.html");
 	
 	first = pageFind(page, "#main > pre");
 	codeElement = listHead(first);
 	code = elementText(codeElement);
-	f = open("99problems.ocaml","r")
+	f = open("99problems.sh","w");
 	print(f, "%s\n", code);
 
 	return 0;
