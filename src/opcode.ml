@@ -43,14 +43,7 @@ let explode s =
     if i < 0 then l 
     else
       let ch = s.[i] in
-        (if i > 1 && ch = 'n' && s.[i-1] = '\\' then
-          let tl = function
-            | []     -> []
-            | hd::[] -> []
-            | hd::hd'::tl -> tl
-          in
-          exp (i - 2) (Char.code '\n' :: (tl l)) 
-        else exp (i - 1) (Char.code ch :: l))
+      exp (i - 1) (Char.code ch :: l)
   in
   exp (String.length s - 1) []
 ;;
@@ -69,12 +62,15 @@ let rec define_global acc = function
       (Printf.sprintf "%02XH, " hd) ^ define_global (acc+1) tl
 ;;
 
+
+let unescape s =
+    Scanf.sscanf ("\"" ^ s ^ "\"") "%S%!" (fun u -> u);;
+
 let rec build_str kv_list =
   match kv_list with
     | []     -> ""
-    | (k, v)::tl -> v ^ ":" ^ (define_global 0 (explode k))^(build_str tl)
+    | (k, v)::tl -> v ^ ":" ^ (define_global 0 (explode (unescape k)))^(build_str tl)
 ;;
-
 
 let rec string_of_stmt strlit_map blist =
   let to_string x = string_of_stmt strlit_map x in
