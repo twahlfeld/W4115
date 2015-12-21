@@ -8,7 +8,6 @@
 #include "cJSON.h"
 #include <stdint.h>
 #include <ctype.h>
-#include "list.h"
 
 char *_scrape(char *script) {
     int pipefd[2];
@@ -74,7 +73,7 @@ Page *pageFetch(char *url) {
     free(buffer);
     return page;
 }
-Element **pageFind(Page *page, char *sel) {
+NODE *pageFind(Page *page, char *sel) {
     char *buffer = NULL;
     asprintf(&buffer, "var phantom = require('phantom'); phantom.create(function (ph) { ph.createPage(function (page) { page.set('viewportSize', {width: 1366, height: 768}); page.set('content', \"%s\"); page.includeJs('http://code.jquery.com/jquery-1.11.3.min.js', function () { page.evaluate(function () { var css_path = function(el) { if (!(el instanceof Element)) return; var path = []; while (el.nodeType === Node.ELEMENT_NODE) { var selector = el.nodeName.toLowerCase(); if (el.id) { selector += '#' + el.id; path.unshift(selector); break; } else { var sib = el, nth = 1; while (sib = sib.previousElementSibling) { if (sib.nodeName.toLowerCase() == selector) nth++; } if (nth != 1) selector += ':nth-of-type('+nth+')'; } path.unshift(selector); el = el.parentNode; } return path.join(' > '); }; return $.map($('%s'), function (elm) { return {html: elm.outerHTML, path: css_path(elm)} }); /*return $.find(blue[0]).length;*/ }, function (result) { console.log(JSON.stringify(result)); ph.exit(); }); }); }); });", page->html, sel);
     if (buffer == NULL) return NULL;
@@ -85,18 +84,18 @@ Element **pageFind(Page *page, char *sel) {
     if (json == NULL)
         return NULL;
 
-    int size = cJSON_GetArraySize(json);
-    Element **elm_list = malloc(sizeof(Element *) * size + 1);
-    elm_list[size] = NULL;
+    NODE * head = listNew();
+
     for (int i = 0; i < cJSON_GetArraySize(json); i++) {
-        elm_list[i] = malloc(sizeof(Element));
-        elm_list[i]->html = strdup(cJSON_GetObjectItem(cJSON_GetArrayItem(json, i), "html")->valuestring);
-        elm_list[i]->path = strdup(cJSON_GetObjectItem(cJSON_GetArrayItem(json, i), "path")->valuestring);
+        Element * e = malloc(sizeof(Element));
+        e->html = strdup(cJSON_GetObjectItem(cJSON_GetArrayItem(json, i), "html")->valuestring);
+        e->path = strdup(cJSON_GetObjectItem(cJSON_GetArrayItem(json, i), "path")->valuestring);
+        listAddLast(head,e);
     }
 
     free(buffer);
     cJSON_Delete(json);
-    return elm_list;
+    return head;
 }
 
 
@@ -111,6 +110,7 @@ char * _runOnElement(Element * element,char * code){
 
     cJSON *json;
     char *str = _scrape(buffer);
+    //printf("str: %s",str);
     json = cJSON_Parse(str);
     if (json == NULL)
         return NULL;
@@ -124,8 +124,6 @@ char * elementAttr(Element * element, char * attr){
     int size = sizeof(char) * strlen(element->html)*2;
     char * innerHtml = malloc(size);
     str_escape(innerHtml,element->html,size);
-    printf("innerHTML: %s",innerHtml);
-
     char *buffer = NULL;
     asprintf(&buffer, "var phantom = require('phantom'); phantom.create(function (ph) { ph.createPage(function (page) { page.set('viewportSize', {width: 1366, height: 768}); page.set('content',\"\"); page.includeJs('http://code.jquery.com/jquery-1.11.3.min.js', function () { page.evaluate(function () { return obj = {attr:$(\"%s\").attr('%s')}; }, function (result) { console.log(JSON.stringify(result)); ph.exit(); }); }); }); });", innerHtml, attr);
     if (buffer == NULL) return NULL;
@@ -147,7 +145,7 @@ char * elementText(Element * element){
 char * elementType(Element * element){
     return _runOnElement(element,"get(0).tagName");
 }
-Element **elementChildren(Page * page, Element * element) {
+NODE * elementChildren(Page * page, Element * element) {
     char *buffer = NULL;
     asprintf(&buffer, "var phantom = require('phantom'); phantom.create(function (ph) { ph.createPage(function (page) { page.set('viewportSize', {width: 1366, height: 768}); page.set('content', '%s'); page.includeJs('http://code.jquery.com/jquery-1.11.3.min.js', function () { page.evaluate(function () { var css_path = function(el) { if (!(el instanceof Element)) return; var path = []; while (el.nodeType === Node.ELEMENT_NODE) { var selector = el.nodeName.toLowerCase(); if (el.id) { selector += '#' + el.id; path.unshift(selector); break; } else { var sib = el, nth = 1; while (sib = sib.previousElementSibling) { if (sib.nodeName.toLowerCase() == selector) nth++; } if (nth != 1) selector += \":nth-of-type(\"+nth+\")\"; } path.unshift(selector); el = el.parentNode; } return path.join(\" > \"); }; return $.map($('%s').children(), function (elm) { return {html: elm.outerHTML, path: css_path(elm)} }); /*return $.find(blue[0]).length;*/ }, function (result) { console.log(JSON.stringify(result)); ph.exit(); }); }); }); });", page->html,element->path);
     if (buffer == NULL) return NULL;
@@ -156,17 +154,19 @@ Element **elementChildren(Page * page, Element * element) {
     json = cJSON_Parse(str);
     if (json == NULL)
         return NULL;
-    int size = cJSON_GetArraySize(json);
-    Element **elm_list = malloc(sizeof(Element *) * size + 1);
-    elm_list[size] = NULL;
+
+    NODE * head = listNew();
+
     for (int i = 0; i < cJSON_GetArraySize(json); i++) {
-        elm_list[i] = malloc(sizeof(Element));
-        elm_list[i]->html = strdup(cJSON_GetObjectItem(cJSON_GetArrayItem(json, i), "html")->valuestring);
-        elm_list[i]->path = strdup(cJSON_GetObjectItem(cJSON_GetArrayItem(json, i), "path")->valuestring);
+        Element * e = malloc(sizeof(Element));
+        e->html = strdup(cJSON_GetObjectItem(cJSON_GetArrayItem(json, i), "html")->valuestring);
+        e->path = strdup(cJSON_GetObjectItem(cJSON_GetArrayItem(json, i), "path")->valuestring);
+        listAddLast(head,e);
     }
+
     free(buffer);
     cJSON_Delete(json);
-    return elm_list;
+    return head;
 }
 
 /* Page */

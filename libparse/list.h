@@ -12,3 +12,4 @@ NODE *listAddAfter(NODE *node, void *data);
 void list_remove(NODE *list, int index);
 NODE * listConcate (NODE *head1, NODE *head2);
 NODE * listAddLast(NODE * first, void * data);
+void listPrint(NODE *start);

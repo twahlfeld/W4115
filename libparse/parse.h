@@ -1,5 +1,6 @@
 #ifndef PARSE_PARSE_H
 #define PARSE_PARSE_H
+#include "list.h"
 
 #define mu_assert(message, test) do { if (!(test)) return message; } while (0)
 #define mu_run_test(test) do { char *message = test(); tests_run++; if (message) return message; } while (0)
@@ -22,7 +23,7 @@ size_t str_escape(char *dst, const char *src, size_t dstLen);
 
 /*Page*/
 Page *pageFetch(char *url);
-Element **pageFind(Page *page, char *sel);
+NODE *pageFind(Page *page, char *sel);
 char *pageURL(Page *p);
 char *pageHTML(Page *p);
 Element *pageRoot(Page *p);
@@ -33,7 +34,7 @@ char *_runOnElement(Element *element, char *code);
 char *elementText(Element *element);
 char *elementType(Element *element);
 char *elementAttr(Element *element, char *attr);
-Element **elementChildren(Page *page, Element *element);
+NODE * elementChildren(Page *page, Element *element);
 
 
 #endif
