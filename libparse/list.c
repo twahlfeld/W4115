@@ -3,7 +3,6 @@
 #include "list.h"
 
 
-
 NODE *listNew()
 {
 
@@ -106,12 +105,12 @@ NODE * listConcate (NODE *head1, NODE *head2)
     return (head1);
 }
 
-void listPrint(NODE *start) {
-    NODE *temp;  //Declare temp
-    temp = start;       //Assign Starting Address to temp
-    while(temp!=NULL)
-    {
-        printf("%s\n",temp->data);
-        temp=temp->next;
-    }
-}
+//void listPrint(NODE *start) {
+//    NODE *temp;  //Declare temp
+//    temp = start;       //Assign Starting Address to temp
+//    while(temp!=NULL)
+//    {
+//        printf("%s\n",((Element *)(temp->data))->html);
+//        temp=temp->next;
+//    }
+//}
