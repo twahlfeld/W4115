@@ -3,21 +3,44 @@ int main() {
   Element e;
   List l;
   List l1;
+  List l2;
   Element f;
   string s;
   string t;
+  Element g;
 
-  p = fetch("http://haighr.com");
-  e = pageroot(p);
+  p = pageFetch("http://www.example.com");
+  e = pageRoot(p);
+  l = elementChildren(p, e);
+  e = listHead(l);
+  l1 = listTail(l);
+  f = listHead(l1);
+  s = elementText(f);
 
-  l = elementchildren(e);
-  l1 = listtail(l);
-  f = listhead(l1);
+  print(stdout, "%s\n", s);
 
-  s = elementattr(f, "id");
-  t = elementtype(f);
+
+
+
+/*
+  l1 = listTail(l);      
+  f = listHead(l1);
+  l2 = elementChildren(f);
+  g = listHead(l2);
+  s = elementText(g);
+  print(stdout, "%s\n", s);
+
+  p = pageFetch("http://haighr.com");
+  e = pageRoot(p);
+
+  l = elementChildren(e);
+  l1 = listTail(l);
+  f = listHead(l1);
+
+  s = elementAttr(f, "id");
+  t = elementType(f);
 
   print(stdout, "%s\n%s\n", s, t);
-
+*/
   return 0;
 }

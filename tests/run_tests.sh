@@ -25,7 +25,7 @@ Check() {
     error=0
     echo "########## Testing $1 ##########"
 
-    $(../src/ted $1.ted && nasm -f elf64 $1.asm && gcc $1.o -o $1 && ./$1 > $1.rslt)
+    $(../src/ted $1.ted && nasm -f elf64 $1.asm && gcc $1.o -I../libparse -L../libparse -lm -lparse -o $1 && ./$1 > $1.rslt)
     if [ -f $1.rslt ]; then
       Compare $1.rslt $1.asrt $1
     else

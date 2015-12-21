@@ -76,7 +76,7 @@ let _ =
        body    = [];
       }::{
        ftype   = Any;
-       fname   = "list_remove";
+       fname   = "listRemove";
        formals = Arg(List, "list")::Arg(Int, "index")::[];
        locals  = [];
        body    = [];
@@ -88,7 +88,7 @@ let _ =
        body    = [];
       }::{
        ftype   = List;
-       fname   = "listConcate";
+       fname   = "listConcat";
        formals = Arg(List, "list1")::Arg(List, "list2")::[];
        locals  = [];
        body    = []
@@ -296,9 +296,12 @@ let _ =
         ((List.fold_left (fun s n -> Printf.sprintf "%sglobal %s\n" s n)
           (makeheader prg_ops) globals),
         (List.fold_left (fun s n ->
-          let fn =
-            if n = "print" then "fprintf" 
-            else if n = "open" then "fopen" else n
+          let fn = match n with
+            | "print"      -> "fprintf" 
+            | "open"       -> "fopen"
+            | "listRemove" -> "list_remove"
+            | "listConcat" -> "listConcate"
+            | n            -> n
           in
           Printf.sprintf "%sextern %s\n" s fn) "\n" externfset))] 
       @ prg_ops @ [Opcode.Tail ("", globals)]
