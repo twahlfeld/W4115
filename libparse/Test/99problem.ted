@@ -11,7 +11,7 @@ int main() {
 	first = pageFind(page, "#main > pre");
 	codeElement = listHead(first);
 	code = elementText(codeElement);
-	f = open("99problems.sh","w");
+	f = open("99problem.sh","w");
 	print(f, "%s\n", code);
 
 	return 0;
