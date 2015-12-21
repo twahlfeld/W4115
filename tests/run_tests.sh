@@ -3,6 +3,8 @@
 # Set time limit for all operations
 ulimit -t 30
 
+rm -rf /tests/*.rslt
+
 SignalError() {
     if [ $error -eq 0 ]; then
 	   echo "FAILED"
@@ -33,6 +35,7 @@ Check() {
 #    rm -f ${reffile}.asm
 #    rm -f $reffile
 }
+
 
 if [ $# -ge 1 ]; then
     files=$@

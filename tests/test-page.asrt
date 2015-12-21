@@ -1,14 +1,294 @@
 https://haighr.com/
-HTTP/1.1 200 OK
+<html lang="en"><head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Columbia University Association for Computing Machinery</title>
-    <link href="css/reset.css" rel="stylesheet">
+    <title>Matthew Haigh</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/reset.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=PT+Mono">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <link href="css/custom.css" rel="stylesheet">
+    <!--<script src="script/validate-form.js"></script>-->
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+<style type="text/css"></style></head>
+
+<body>
+    <div class="container-fluid">
+        <p id="backToTop">
+            <a href="#top" class="myGray">Back to Top</a>
+        </p>
+        <div class="row">
+            <div class="col-xs-12 topImage" id="top">
+                <div class="top-text center">
+                    A MODERN DEVELOPER
+                </div>
+            </div>
+        </div>
+        <div class="menuContainer myGreen row" id="about">
+            <div class="menuWrapper myGreen row">
+<!--                <div class="hidden-xs col-lg-7 col-md-5 col-sm-4 matthew myGreen">MATTHEW HAIGH</div>-->
+<!--                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 menuWrap myGreen">-->
+                    <div class="col-xs-7 matthew myGreen">MATTHEW HAIGH</div>
+                    <div class="col-xs-5 menuWrap myGreen">
+                    <div class="menuBar">
+                        <a class="menuItem myGreen" href="#portfolio">PORTFOLIO
+                            <div class="slider myGreen2">PORTFOLIO</div>
+                        </a>
+                        <a class="menuItem myGreen" href="#resume">RÉSUMÉ
+                            <div class="slider myGreen2">RÉSUMÉ</div>
+                        </a>
+                        <a class="menuItem myGreen" href="#contact">CONTACT
+                            <div class="slider myGreen2">CONTACT</div>
+                        </a>
+                        <a class="menuItem myGreen" href="#about">ABOUT ME
+                            <div class="slider myGreen2">ABOUT ME</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row aboutWrapper">
+            <div class="aboutContainer">
+                <div class="row">
+                    <p class="p1 lightGrayText col-xs-6">“Here, for whatever reason, is the world. And here it stays. With me on it.”<br> ― Douglas Adams, So Long, and Thanks for all the Fish
+                    </p>
+                    <p class="p2 col-xs-6">I am a non-traditional computer science professional. I gained experience in business, sales, and management before returning to school at age 30. I am passionate about programming, video games, exercise, and family. I have been fortunate to return to college and receive a second opportunity at a fulfilling career in the field I love. My hard work reflects this gratitude.</p>
+                </div>
+            </div>
+        </div>
+        <div class="mediaBar myBlue3 mediaWrapper">
+            <div class="mediaButtonWrapper center">
+            <span class="mediaButton">
+                <i class="fa fa-github center myBlue2Text">
+                    <a href="https://github.com/mlhaigh" class="buttonLink"></a>
+                </i>
+            </span>
+            <span class="mediaButton">
+                <i class="fa fa-linkedin-square center myBlue2Text">
+                    <a href="https://www.linkedin.com/profile/view?id=315481601" class="buttonLink"></a>
+                </i>
+            </span>
+            <span class="mediaButton">
+                <i class="fa fa-facebook-square center myBlue2Text">
+                    <a href="https://www.facebook.com/mlhaigh" class="buttonLink"></a>
+                </i>
+            </span>
+            <span class="mediaButton">
+                <i class="fa fa-twitter center myBlue2Text">
+                    <a href="https://twitter.com/iAmThePr0blem" class="buttonLink"></a>
+                </i>
+            </span>
+            <span class="mediaButton">
+                <i class="fa fa-envelope-square center myBlue2Text">
+                    <a href="mailto:matt@haighr.com" class="buttonLink"></a>
+                </i>
+            </span>
+            </div>
+        </div>
+        <form method="post" name="contact_me" id="contact" action="script/mailModule.php">
+            <div class="row">
+                <div>
+                    <p class="contact lightGrayText">CONTACT</p>
+                </div>
+                <div class="col-sm-6">
+                    <div id="nameWrapper">
+                        <label for="name" id="email_label" class="greenText">NAME</label>
+                        <label class="error" for="name" id="name_error" style="display: none;">this field is required</label>
+                        <br>
+                        <input type="text" name="name" id="name">
+                    </div>
+                    <div id="emailWrapper">
+                        <label for="email" id="email_label" class="greenText">EMAIL
+                            ADDRESS</label>
+                        <label class="error" for="email" id="email_error" style="display: none;">this field is required</label>
+                        <br>
+                        <input type="email" name="email" id="email">
+                    </div>
+                    <div class="col-sm-12 buttonWrapper">
+                        <button type="submit" id="submit" class="myGreen subbutton">
+                            SEND
+                        </button>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <label for="message" class="greenText">MESSAGE</label>
+                    <label class="error" for="message" id="message_error" style="display: none;">this field is required</label>
+                    <br>
+                    <textarea id="message" name="user_message"></textarea>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="resumeSectionWrapper" id="resume">
+        <div class="resumeSection">
+            <div class="sectionDiv"></div>
+            <div class="resumeTitle">
+                <p class="lightGrayText">RÉSUMÉ</p>
+            </div>
+            <div class="row resumeWrapper">
+                <div id="boxContainer" class="col-sm-6">
+                    <div class="box grow myBlue2" id="firstBox">
+                        <h2>Software Development Intern</h2>
+                        <h4>Mishki, Inc.</h4>
+                        <h4>New York, NY</h4>
+                        <h4>Summer 2015</h4>
+                        <ul>
+                            <li>Learned HTML, CSS, Javascript, Jquery, PHP, Python, MySQL, Bootstrap, Flask</li>
+                            <li>Improved internal management web interface, allowing employees to search database entries</li>
+                            <li>Updated consumer web interface, combining two disparate websites into one with cohesive aesthetic</li>
+                            <li>Developed integrated web application mock-up for retail client</li>
+                        </ul>
+                    </div>
+                    <div class="box grow myRed" id="secondBox">
+                        <h2>Partner/Co-Founder</h2>
+                        <h4>Haigh Properties</h4>
+                        <h4>Bristol, PA</h4>
+                        <h4>2005 - 2011</h4>
+                        <ul>
+                            <li>Purchased and renovated homes for resale or
+                                rental
+                            </li>
+                            <li>Managed financial accounts and handled legal
+                                proceedings such as eviction and inspections
+                            </li>
+                            <li>Handled tenants by collecting rent and
+                                mitigating
+                                delinquencies and problems
+                            </li>
+                            <li>Maintained property and performed repairs as
+                                needed
+                            </li>
+                            <li>Searched for new investments and researched
+                                accordingly
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="box grow myRed" id="thirdBox">
+                        <h2>Sales and Leasing Consultant</h2>
+                        <h4>Lawrence Toyota</h4>
+                        <h4>Lawrenceville, NJ</h4>
+                        <h4>2009 - 2010</h4>
+                        <ul>
+                            <li>Closed sales and ensured smooth administration
+                                and
+                                delivery process
+                            </li>
+                            <li>Met or exceeded sales targets of 12-15 cars per
+                                month
+                            </li>
+                            <li>Top performer for warranty and aftermarket sales
+                            </li>
+                            <li>Maintained relationships with customers to
+                                cultivate
+                                new business and ensure satisfaction
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="box grow myBlue2" id="fourthBox">
+                        <h2>Finance and Insurance Manager</h2>
+                        <h4>Fun Center Motorsports</h4>
+                        <h4>Bensalem, PA</h4>
+                        <h4>2006 - 2009</h4>
+                        <ul>
+                            <li>Created relationships with finance companies,
+                                such
+                                as Merrick Bank, Help Me Ride and credit unions
+                            </li>
+                            <li>Maintained profits and financing sources through
+                                recession
+                            </li>
+                            <li>Among best individual in industry in per unit
+                                add-on
+                                sales
+                            </li>
+                            <li>Assisted sales department by closing sales,
+                                serving
+                                customers, and handling problems
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="portfolioSectionWrapper" id="portfolio">
+        <div class="portfolioSection">
+            <div class="sectionDiv"></div>
+            <div class="portfolioTitle">
+                <p class="lightGrayText">PORTFOLIO</p>
+            </div>
+            <div class="buttonContainer">
+                <div class="filterTitle">FILTER BY</div>
+                <div class="filterBy">
+                    <div class="selector myBlue" id="web" onclick="webClick()">
+                        <p class="radioButton">Web</p></div>
+                    <div class="selector myYellow" id="c" onclick="cClick()">
+                        <p class="radioButton">C/C++</p></div>
+                    <div class="selector long myBlue2" id="data" onclick="dataClick()">
+                        <p class="radioButton">Data Structures</p></div>
+                    <div class="selector myRed allClicked" id="all" onclick="allClick()">
+                        <p class="radioButton">all</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- javascript -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <!--     <script src="js/bootstrap.min.js"></script> -->
+    <script src="script/script.js"></script>
+    <script type="text/javascript">
+        var parsed = [{"project_id":"60","title":"Personal Website","date":"2015","description":"This website!  Created database using MYSQL and server with PHP.  Designed algorithm so boxes in Portfolio section draw randomly and display relevant data.  Designed slider buttons and menu bar as well as form and content. ","category":"1","priority":"1"},{"project_id":"62","title":"Menu Bar","date":"2015","description":"Designed menu bar with slider buttons and dynamic sizing using bootstrap.","category":"1","priority":"5"},{"project_id":"64","title":"Media Bar","date":"2015","description":"Designed Media Bar with links to Github, Facebook, Twitter, LinkedIn, and Email.  Includes shadow and raising effect on hover.","category":"1","priority":"5"},{"project_id":"66","title":"Web Server","date":"2014","description":"Created web server using C to serve dynamic content to client.  Created back end-server and connected client to server\/client to server using sockets API.","category":"2","priority":"1"},{"project_id":"67","title":"Linked List","date":"2014","description":"Implemented a singly linked list in C that can hold any data type.  All allocated memory is freed.  Created library for easy utilizatio.n","category":"2","priority":"2"},{"project_id":"68","title":"Database","date":"2014","description":"Created database using C that can be queried on command line and stored in linked list.","category":"2","priority":"3"},{"project_id":"69","title":"Dijkstra w\/GUI","date":"2014","description":"Implemented Dijkstra'a algorithm to find shortest path in Java on US cities input with graphical interface. ","category":"3","priority":"2"},{"project_id":"70","title":"Heapsort\/Huffman","date":"2014","description":"Implemented heapsort using huffman encoding and printed results in tree form in Java.","category":"3","priority":"5"},{"project_id":"71","title":"AVL Tree","date":"2014","description":"Implemented spell checker using AVL tree with balancing.","category":"3","priority":"3"}];
+        var numOfProjects = parsed.length;
+        var container;
+        var remainingData = numOfProjects;
+        var boxes = $('.box');
+        var hoverBox;
+        makeContainer();
+        drawBoxes();
+        fillboxes();
+        $(".portfolioBox").fadeIn(1000);
+
+        function webClick() {
+            document.getElementById("web").className += " webClicked";
+            document.getElementById("c").className = "selector myYellow";
+            document.getElementById("data").className = "selector myBlue2 long";
+            document.getElementById("all").className = "selector myRed";
+            parsed = [{"project_id":"60","title":"Personal Website","date":"2015","description":"This website!  Created database using MYSQL and server with PHP.  Designed algorithm so boxes in Portfolio section draw randomly and display relevant data.  Designed slider buttons and menu bar as well as form and content. ","category":"1","priority":"1"},{"project_id":"62","title":"Menu Bar","date":"2015","description":"Designed menu bar with slider buttons and dynamic sizing using bootstrap.","category":"1","priority":"5"},{"project_id":"64","title":"Media Bar","date":"2015","description":"Designed Media Bar with links to Github, Facebook, Twitter, LinkedIn, and Email.  Includes shadow and raising effect on hover.","category":"1","priority":"5"}];
+            redraw();
+        }
+        function cClick() {
+            document.getElementById("c").className += " cClicked";
+            document.getElementById("web").className = "selector myBlue";
+            document.getElementById("data").className = "selector myBlue2 long";
+            document.getElementById("all").className = "selector myRed";
+            parsed = [{"project_id":"66","title":"Web Server","date":"2014","description":"Created web server using C to serve dynamic content to client.  Created back end-server and connected client to server\/client to server using sockets API.","category":"2","priority":"1"},{"project_id":"67","title":"Linked List","date":"2014","description":"Implemented a singly linked list in C that can hold any data type.  All allocated memory is freed.  Created library for easy utilizatio.n","category":"2","priority":"2"},{"project_id":"68","title":"Database","date":"2014","description":"Created database using C that can be queried on command line and stored in linked list.","category":"2","priority":"3"}];
+            redraw();
+        }
+        function dataClick() {
+            document.getElementById("data").className += " dataClicked";
+            document.getElementById("web").className = "selector myBlue";
+            document.getElementById("c").className = "selector myYellow";
+            document.getElementById("all").className = "selector myRed";
+            parsed = [{"project_id":"69","title":"Dijkstra w\/GUI","date":"2014","description":"Implemented Dijkstra'a algorithm to find shortest path in Java on US cities input with graphical interface. ","category":"3","priority":"2"},{"project_id":"70","title":"Heapsort\/Huffman","date":"2014","description":"Implemented heapsort using huffman encoding and printed results in tree form in Java.","category":"3","priority":"5"},{"project_id":"71","title":"AVL Tree","date":"2014","description":"Implemented spell checker using AVL tree with balancing.","category":"3","priority":"3"}];
+            redraw();
+        }
+        function allClick() {
+            document.getElementById("all").className += " allClicked";
+            document.getElementById("web").className = "selector myBlue";
+            document.getElementById("c").className = "selector myYellow";
+            document.getElementById("data").className = "selector myBlue2 long";
+            parsed = [{"project_id":"60","title":"Personal Website","date":"2015","description":"This website!  Created database using MYSQL and server with PHP.  Designed algorithm so boxes in Portfolio section draw randomly and display relevant data.  Designed slider buttons and menu bar as well as form and content. ","category":"1","priority":"1"},{"project_id":"62","title":"Menu Bar","date":"2015","description":"Designed menu bar with slider buttons and dynamic sizing using bootstrap.","category":"1","priority":"5"},{"project_id":"64","title":"Media Bar","date":"2015","description":"Designed Media Bar with links to Github, Facebook, Twitter, LinkedIn, and Email.  Includes shadow and raising effect on hover.","category":"1","priority":"5"},{"project_id":"66","title":"Web Server","date":"2014","description":"Created web server using C to serve dynamic content to client.  Created back end-server and connected client to server\/client to server using sockets API.","category":"2","priority":"1"},{"project_id":"67","title":"Linked List","date":"2014","description":"Implemented a singly linked list in C that can hold any data type.  All allocated memory is freed.  Created library for easy utilizatio.n","category":"2","priority":"2"},{"project_id":"68","title":"Database","date":"2014","description":"Created database using C that can be queried on command line and stored in linked list.","category":"2","priority":"3"},{"project_id":"69","title":"Dijkstra w\/GUI","date":"2014","description":"Implemented Dijkstra'a algorithm to find shortest path in Java on US cities input with graphical interface. ","category":"3","priority":"2"},{"project_id":"70","title":"Heapsort\/Huffman","date":"2014","description":"Implemented heapsort using huffman encoding and printed results in tree form in Java.","category":"3","priority":"5"},{"project_id":"71","title":"AVL Tree","date":"2014","description":"Implemented spell checker using AVL tree with balancing.","category":"3","priority":"3"}];
+            redraw();
+        }
+
+    </script><div class="portfolioBoxContainer" id="mainContainer"><div class="portfolioBox grow myBlue" style="height: 292.964px; width: 365px; top: 0px; left: 0px; display: block;"><h2>Personal Website</h2><h4>2015</h4><p>This website!  Created database using MYSQL and server with PHP.  Designed algorithm so boxes in Portfolio section draw randomly and display relevant data.  Designed slider buttons and menu bar as well as form and content. </p></div><div class="portfolioBox grow myYellow" style="height: 210.498px; width: 365px; top: 0px; left: 395px; display: block;"><h2>Menu Bar</h2><h4>2015</h4><p>Designed menu bar with slider buttons and dynamic sizing using bootstrap.</p></div><div class="portfolioBox grow myBlue" style="height: 169.116px; width: 365px; top: 0px; left: 790px; display: block;"><h2>Media Bar</h2><h4>2015</h4><p>Designed Media Bar with links to Github, Facebook, Twitter, LinkedIn, and Email.  Includes shadow and raising effect on hover.</p></div><div class="portfolioBox grow myYellow" style="height: 307.909px; width: 365px; top: 280px; left: 395px; display: block;"><h2>Web Server</h2><h4>2014</h4><p>Created web server using C to serve dynamic content to client.  Created back end-server and connected client to server/client to server using sockets API.</p></div><div class="portfolioBox grow myBlue" style="height: 237.632px; width: 365px; top: 280px; left: 790px; display: block;"><h2>Linked List</h2><h4>2014</h4><p>Implemented a singly linked list in C that can hold any data type.  All allocated memory is freed.  Created library for easy utilizatio.n</p></div><div class="portfolioBox grow myYellow" style="height: 184.442px; width: 365px; top: 530px; left: 0px; display: block;"><h2>Database</h2><h4>2014</h4><p>Created database using C that can be queried on command line and stored in linked list.</p></div><div class="portfolioBox grow myBlue" style="height: 310.848px; width: 365px; top: 530px; left: 790px; display: block;"><h2>Dijkstra w/GUI</h2><h4>2014</h4><p>Implemented Dijkstra'a algorithm to find shortest path in Java on US cities input with graphical interface. </p></div><div class="portfolioBox grow myYellow" style="height: 284.708px; width: 365px; top: 810px; left: 0px; display: block;"><h2>Heapsort/Huffman</h2><h4>2014</h4><p>Implemented heapsort using huffman encoding and printed results in tree form in Java.</p></div><div class="portfolioBox grow myBlue" style="height: 290.787px; width: 365px; top: 810px; left: 395px; display: block;"><h2>AVL Tree</h2><h4>2014</h4><p>Implemented spell checker using AVL tree with balancing.</p></div></div>
+
+
+
+
+</body></html>

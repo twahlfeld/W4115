@@ -1,11 +1,30 @@
 int main() {
-  List l = [1;4];
-  l.head.addafter(2);
-  int x = l.head.next.next;
-  x.addbefore(3);
-  l.head.addbefore(0);
-  l.remove(l.head);
-  print (stdout, "%d%d%d%d\n");
+  List l;
+  List l2;
+  List l3;
+  List l4;
+  int i;
+  int j;
+  int len;
+
+  l = listnew();
+  listaddafter(l, 1);
+  listaddafter(l, 2);
+
+  l2 = listnew();
+  listaddafter(l2, 3);
+  listaddafter(l2, 4);
+  l4 = listtail(l2);
+  listaddafter(l4, 5);
+
+  l3 = listconcat(l, l2);
+
+  for (i = 0; i < 5; i = i + 1) {
+    j = listhead(l3);
+    print(stdout, "%d\n", j);
+    l3 = listtail(l3);
+  }
+
   return 0;
 }
   

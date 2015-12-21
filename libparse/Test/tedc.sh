@@ -1,8 +1,18 @@
-FILE=$1
-COMPILE="ted $FILE.ted"
-ASSEMBLE="nasm -f elf64 $FILE.asm"
-GCC="gcc -static $FILE.o -L. -lparse -o $FILE"
+#!/bin/sh
 
-$COMPILE
+FILE=$1
+TED="./ted $FILE.ted"
+ASSEMBLE="nasm -f elf64 $FILE.asm"
+GCC="gcc $FILE.o -I../ -L../ -lm -lparse -o $FILE"
+
+if [ -f $FILE.asm ]; then
+  rm $FILE.asm
+fi
+
+if [ -f $FILE.o ]; then
+  rm $FILE.o
+fi
+
+$TED
 $ASSEMBLE
 $GCC
