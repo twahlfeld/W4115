@@ -26,7 +26,7 @@ type bstmt =
   | Jmp_false of string         (* Jump if not equal to zero*)
   | Jmp of string               (* Unconditional Jump to label *)
   | Label of string             (* Label for jumps *)
-  | Header of string            (* Creates standard header *)
+  | Header of string * string   (* Creates standard header *)
   | Tail of string * string list(* Creates a standard string *)
   | Arg_to_var of string * string
   | Fakenop
@@ -148,8 +148,8 @@ let rec string_of_stmt strlit_map blist =
   | Ld_reg(reg)       -> "\tmov\trax, " ^ reg ^ "\n"
   | Ld_lit(lit)       -> "\tmov\trax, " ^ (string_of_int lit) ^ "\n" 
   | Str_var(var)      -> "\tmov\tqword " ^ var ^", rax\n"
-  | Header(s)         -> s ^ "\nextern fprintf\nextern fopen\n" ^
-                         "extern stdout\nextern get_title\n"^
+  | Header(s, extn)   -> s ^ "\nextern fprintf\nextern fopen\n" ^
+                         "extern stdout\n" ^
                          "\nSECTION .text\n"
   | Tail(s, g)        -> "\nSECTION .data\n" ^
                          (List.fold_left 

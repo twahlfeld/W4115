@@ -31,10 +31,7 @@ let _ =
   let prgglob (var, fdecl) = 
     List.map (fun x -> match x with Var(_, n, _) -> n) var 
   in
-  let globals = prgglob ast in
-  let complete_ast (var, fdecl) =
-    let newvar = [Var(File, "stdout", Noexpr)] in
-    let newfdecl = 
+  let externfunc = 
       {ftype   = Int;
        fname   = "print"; 
        formals =
@@ -149,9 +146,16 @@ let _ =
         formals = Arg(Element, "element")::[];
         locals = [];
         body = [];
-      }::fdecl
-    in
-    (newvar@var, newfdecl)
+      }::[]
+  in
+  let externfset = 
+      List.fold_left 
+        (fun set x -> x.fname::set) [] externfunc
+  in
+  let globals = prgglob ast in
+  let complete_ast (var, fdecl) =
+    let newvar = [Var(File, "stdout", Noexpr)] in
+    (newvar@var, externfunc@fdecl)
   in
   let localfnameset (var, fdecl) =
     List.fold_left (fun m fd -> StringSet.add fd.fname m) StringSet.empty fdecl
@@ -289,9 +293,16 @@ let _ =
   in
   let full_prg = 
       [Opcode.Header
-        (List.fold_left (fun s n -> Printf.sprintf "%sglobal %s\n" s n)
-          (makeheader prg_ops) globals)] @ prg_ops @ [Opcode.Tail ("", globals)]
-  in
+        ((List.fold_left (fun s n -> Printf.sprintf "%sglobal %s\n" s n)
+          (makeheader prg_ops) globals),
+        (List.fold_left (fun s n ->
+          let fn =
+            if n = "print" then "printf" 
+            else if n = "open" then "open" else n
+          in
+          Printf.sprintf "%sextern %s\n" s fn) "\n" externfset))] 
+      @ prg_ops @ [Opcode.Tail ("", globals)]
+        in
   List.iter 
     (fun x -> Printf.fprintf file_out "%s" x) 
     (List.map (Opcode.string_of_stmt stringlit) full_prg)
