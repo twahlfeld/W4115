@@ -1,121 +1,117 @@
-/*
- * ============================================================================
- *
- *       Filename:  list.c
- *
- *    Description:  A simple IRC chat program
- *      Functions:
- *          void traverseList(struct List *list, void(*f)(void *))   ->
- *              Traverse through all nodes in *list perform function (*f)
- *          void removeAllNodes(struct List *list) ->
- *              Removes every node in *list
- *          void *remove_node(List *lst, Node *node) -> Removes node from lst
- *          Node *add_end(List *list, void *data) ->
- *              add a node at the end of list containing data
- *          Node *addFront(struct List *list, void *data)  ->
- *              Adds a new node in front of *list with *data
- *          Node *findNode(struct List *list, const void *dataSought,
- *           int(*compar)(const void *, const void *)) ->
- *              Find node in *list with *dataSought evaluated by *compar
- *
- *        Version:  1.0
- *        Created:  09/19/2015 14:53:11
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Theodore Ahlfeld (), twahlfeld@gmail.com
- *   Organization:
- *
- * ============================================================================
- */
-
 #include <stdlib.h>
-#include <string.h>
+#include <stdio.h>
 #include "list.h"
 
-/*
- * Traverses *list performing function (*f) on each node's data
- * struct List *list -> The list of nodes
- * void (*f)(void *) -> The function to perform on each node
- */
-void traverse_list(List *list, void (*f)(void *))
+
+
+NODE *listNew()
 {
-    Node *node = list->head;
-    while(node) {
-        f(node->data);
-        node = node->next;
-    }
+
+    NODE *node;
+    if(!(node=malloc(sizeof(NODE)))) return NULL;
+    node->data=NULL;
+    node->next=NULL;
+    return node;
 }
 
-/*
- * Removes all nodes in *list
- * struct List *list -> List of nodes
- */
-void remove_all_nodes(Node *list)
+NODE *_list_create(void *data)
 {
-    Node *node = list;
-    while(node) {
-        Node *tmpNode = node;
-        node = node->next;
-        free(tmpNode);
-    }
-    listnew(list);
-
+    NODE *node;
+    if(!(node=malloc(sizeof(NODE)))) return NULL;
+    node->data=data;
+    node->next=NULL;
+    return node;
 }
 
-/*
- * Removes node from for list and returns the data
- * List *lst    -> The List to remove the node from
- * Node *node   -> The node to remove
- * returns the data from the removed node otherwise NULL
- */
-void remove_node(Node *node)
-{
-    if(node) {
-        Node *tmp = node->next;
-        void *data = node->data;
-        if(node) {
-            memcpy(node, tmp, sizeof(Node));
-        }
-    free(tmp);
-    }
+void * listHead(NODE * n){
+    return n->data;
 }
 
-/*
- * Adds a node at the end of *list containing *data
- * struct List *list -> The list of nodes to add the node in
- * void *data        -> The data for the new node to have
- * returns the new node if created otherwise NULL
- */
-Node *listadd(Node *list, void *data)
+NODE * listTail(NODE * n){
+    return n->next;
+}
+
+
+void listSet(NODE * n, void * data){
+    n->data = data;
+}
+
+
+NODE *listAddAfter(NODE *node, void *data)
 {
-    Node *node = list;
-    while(node->next) {
-        node = node->next;
-    }
-    Node *newnode = malloc(sizeof(Node));
-    newnode->next = NULL;
-    newnode->data = data;
+    NODE *newnode;
+    newnode= _list_create(data);
+    newnode->next = node->next;
     node->next = newnode;
-    return list;
+    return newnode;
 }
 
-/*
- * Finds the node in *list with *dataSought using the *compar function
- * struct List *list       -> The list of nodes to search through
- * const void *dataSought  -> The data to find in the node
- * int (*compar)(const void *, const void)   ->
- *                The function to compare *dataSought and each node's data
- * return   -> returns NULL if node is not found otherwise returns the found node
- */
-Node *find_node(List *list, const void *dataSought,
-                      int (*compar)(const void *, const void *))
-{
-    struct Node *tmpNode = list->head;
-    while(tmpNode) {
-        if(compar(dataSought, tmpNode->data) == 0)
-            return tmpNode;
-        tmpNode = tmpNode->next;
+NODE * listAddLast(NODE * first, void * data){
+
+    if(first->next == NULL && first->data == NULL){
+        first->data = data;
+        return first;
     }
-    return NULL;
+
+    NODE *newnode;
+    newnode= _list_create(data);
+
+    NODE *current = first;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+    current->next = newnode;
+    return newnode;
+
+}
+
+//list remove
+
+void list_remove(NODE *list, int index) {//todo:test!
+    int i = 0;
+
+    while (list->next && i < index-1) {
+        list = list->next;
+        i++;
+    }
+
+    if(!list->next)//last one,can't delete
+        return;
+
+    NODE * tmp = list->next;
+    if(!list->next->next)//this is one before the last one
+        list->next = NULL;
+    else
+        list->next = list->next->next;
+
+    free(tmp);
+}
+
+
+
+//list concat
+NODE * listConcate (NODE *head1, NODE *head2)
+{
+    NODE  *p;
+    if (head1==NULL)                            //if the first linked
+        return (head2);
+    if (head2==NULL)                            //if second linked
+        return (head1);
+
+    p=head1;                             //place p on the first
+    while (p->next!=NULL)                 //move p to the last node
+        p=p->next;
+    p->next=head2;                           //address
+
+    return (head1);
+}
+
+void listPrint(NODE *start) {
+    NODE *temp;  //Declare temp
+    temp = start;       //Assign Starting Address to temp
+    while(temp!=NULL)
+    {
+        printf("%s\n",temp->data);
+        temp=temp->next;
+    }
 }
