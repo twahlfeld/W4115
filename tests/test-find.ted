@@ -9,15 +9,15 @@ int main() {
   string s2;
 
 
-  p = fetch("http://haighr.com");
-  l = pagefind(p, "#backToTop");
-  e = listhead(l);
-  s = elementattr(e, "class");
+  p = pageFetch("http://haighr.com");
+  l = pageFind(p, "#backToTop");
+  e = listHead(l);
+  s = elementAttr(e, "class");
   print(stdout, "%s\n", s); 
 
-  l2 = pagefind(p, ".topImage");
-  e2 = listhead(l2);
-  s2 = elementattr(e2, "id");
+  l2 = pageFind(p, ".topImage");
+  e2 = listHead(l2);
+  s2 = elementAttr(e2, "id");
   print(stdout, "%s\n", s2);
 
   return 0;
