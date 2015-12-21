@@ -1,16 +1,26 @@
 int main() {
 
-  Page p = fetch("http://haighr.com");
-  
-  List l = pagefind(p, "#backToTop");
-  Element e = listhead(l);
-  string s = elementattr(e, "class");
+  Page p;
+  List l;
+  Element e;
+  string s;
+  List l2;
+  Element e2;
+  string s2;
+
+
+  p = fetch("http://haighr.com");
+  l = pagefind(p, "#backToTop");
+  e = listhead(l);
+  s = elementattr(e, "class");
   print(stdout, "%s\n", s); 
 
-  List l2 = pagefind(p, ".topImage");
-  Element e2 = listhead(l2);
-  string s2 = elementattr(e2, "id");
+  l2 = pagefind(p, ".topImage");
+  e2 = listhead(l2);
+  s2 = elementattr(e2, "id");
   print(stdout, "%s\n", s2);
 
   return 0;
 }
+
+

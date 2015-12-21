@@ -1,0 +1,12 @@
+/* comment */
+int main() {
+  int i;
+  i = /* comment */ 42;
+
+  /* comment
+  comment 
+  comment */
+
+  print(stdout, "%s\n", i);
+  return 0;
+}

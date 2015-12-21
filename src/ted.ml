@@ -297,7 +297,7 @@ let _ =
           (makeheader prg_ops) globals),
         (List.fold_left (fun s n ->
           let fn =
-            if n = "print" then "printf" 
+            if n = "print" then "fprintf" 
             else if n = "open" then "open" else n
           in
           Printf.sprintf "%sextern %s\n" s fn) "\n" externfset))] 
