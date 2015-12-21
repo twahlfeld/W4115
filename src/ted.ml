@@ -46,103 +46,103 @@ let _ =
        body    = []
       }::{
        ftype   = List;
-       fname   = "listNew";
+       fname   = "listnew";
        formals = [];
        locals  = [];
        body    = []
       }::{
        ftype   = Any;
-       fname   = "listHead";
+       fname   = "listhead";
        formals = Arg(List, "list")::[];
        locals  = [];
        body    = [];
       }::{
        ftype   = Any;
-       fname   = "listAddLast";
+       fname   = "listaddlast";
        formals = Arg(List, "list")::Arg(Any, "data")::[];
        locals  = [];
        body    = [];
       }::{
        ftype   = Any;
-       fname   = "listAddAfter";
+       fname   = "listaddafter";
        formals = Arg(List, "list")::Arg(Any, "data")::[];
        locals  = [];
        body    = [];
       }::{
        ftype   = Any;
-       fname   = "listSet";
+       fname   = "listset";
        formals = Arg(List, "list")::Arg(Any, "data")::[];
        locals  = [];
        body    = [];
       }::{
        ftype   = Any;
-       fname   = "list_remove";
+       fname   = "listrem";
        formals = Arg(List, "list")::Arg(Int, "index")::[];
        locals  = [];
        body    = [];
       }::{
        ftype   = List;
-       fname   = "listTail";
+       fname   = "listtail";
        formals = Arg(List, "list")::[];
        locals  = [];
        body    = [];
       }::{
        ftype   = List;
-       fname   = "listConcate";
+       fname   = "listconcat";
        formals = Arg(List, "list1")::Arg(List, "list2")::[];
        locals  = [];
        body    = []
       }::{
        ftype   = Page;
-       fname   = "pageFetch";
+       fname   = "pagefetch";
        formals = Arg(String, "url")::[];
        locals  = [];
        body    = []
       }::{
        ftype   = String;
-       fname   = "pageURL";
+       fname   = "pageurl";
        formals = Arg(Page, "page")::[];
        locals  = [];
        body    = []
       }::{
        ftype   = String;
-       fname   = "pageHTML";
+       fname   = "pagehtml";
        formals = Arg(Page, "page")::[];
        locals  = [];
        body    = []
       }::{
        ftype   = Element;
-       fname   = "pageRoot";
+       fname   = "pageroot";
        formals = Arg(Page, "page")::[];
        locals  = [];
        body    = []
       }::{
        ftype   = List;
-       fname   = "pageFind";
+       fname   = "pagefind";
        formals = Arg(Page, "page")::Arg(String, "selector")::[];
        locals  = [];
        body    = []
       }::{
         ftype = String;
-        fname = "elementAttr";
+        fname = "elementattr";
         formals = Arg(Element, "element")::Arg(String, "selector")::[];
         locals = [];
         body = []
       }::{
         ftype = String;
-        fname = "elementText";
+        fname = "elementtext";
         formals = Arg(Element, "element")::[];
         locals = [];
         body = []
       }::{
         ftype = String;
-        fname = "elementType";
+        fname = "elementtype";
         formals = Arg(Element, "element")::[];
         locals = [];
         body = []
       }::{
         ftype = List;
-        fname = "elementChildren";
+        fname = "elementchildren";
         formals = Arg(Page, "page")::Arg(Element, "element")::[];
         locals = [];
         body = [];
@@ -298,7 +298,25 @@ let _ =
         (List.fold_left (fun s n ->
           let fn =
             if n = "print" then "fprintf" 
-            else if n = "open" then "fopen" else n
+            else if n = "open" then "fopen"
+            else if n = "listnew" then "listNew" 
+            else if n = "listhead" then "listHead"
+            else if n = "listaddlast" then "listAddLast"
+            else if n = "listaddafter" then "listAddAfter"
+            else if n = "listset" then "listSet"
+            else if n = "listrem" then "list_remove"
+            else if n = "listtail" then "listTail"
+            else if n = "listconcat" then "listConcate"
+            else if n = "pagefetch" then "pageFetch"
+            else if n = "pageurl" then "pageURL"
+            else if n = "pagehtml" then "pageHTML"
+            else if n = "pageroot" then "pageRoot"
+            else if n = "pagefind" then "pageFind"
+            else if n = "elementattr" then "elementAttr"
+            else if n = "elementtext" then "elementText"
+            else if n = "elementtype" then "elementType"
+            else if n = "elementchildren" then "elementChildren"
+            else n
           in
           Printf.sprintf "%sextern %s\n" s fn) "\n" externfset))] 
       @ prg_ops @ [Opcode.Tail ("", globals)]

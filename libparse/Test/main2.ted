@@ -1,0 +1,26 @@
+int main() {
+    Page page = pagefetch("http://www.cs.columbia.edu/~sedwards/");
+    List child_list;
+    List first = pagefind(page, "#titlebar");
+    Element e = listhead(first);
+    string s = elementattr(e, "id");
+    print(stdout, "id:  %s\n", s);
+    s = elementtext(e);
+    print(stdout, "text:  %s\n", s);
+    s = elementtype(e);
+    print(stdout, "type:  %s\n\n\n", s);
+
+    child_list = elementchildren(page, e);
+    child_list = listtail(child_list);
+    e = listhead(child_list);
+
+    s = elementtext(e);
+    print(stdout, "text first child:  %s\n", s);
+    s = elementtype(e);
+    print(stdout, "type first child:  %s\n", s);
+    s = elementattr(e, "id");
+    print(stdout,"id first child:  %s\n", s); 
+
+    return 0;
+}
+

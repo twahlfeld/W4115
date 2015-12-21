@@ -13,3 +13,4 @@
 # Folders
 .idea/
 bin/
+node_modules/

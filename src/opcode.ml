@@ -128,7 +128,27 @@ let rec string_of_stmt strlit_map blist =
   | Glob_var(s)          -> "["^s^"]"
   | Set_gvar(s)          -> "\tmov\t" ^ s ^ ", rax\n"
   | Get_gvar(s)          -> "\tmov\trax, " ^ s ^ "\n"
-  | Call(s, n)           -> "\tcall\t" ^ s ^ "\n"
+  | Call(s, n)           -> let name = match s with 
+                              | "listhead"        -> "listHead"
+                              | "listnew"         -> "listNew"
+                              | "listaddlast"     -> "listAddLast"
+                              | "listaddafter"    -> "listaddafter"
+                              | "listset"         -> "listSet"
+                              | "listrem"         -> "list_remove"
+                              | "listtail"        -> "listTail"
+                              | "listconat"       -> "listConcate"
+                              | "pagefetch"       -> "pageFetch"
+                              | "pageurl"         -> "pageURL"
+                              | "pagehtml"        -> "pageHTML"
+                              | "pageroot"        -> "pageRoot"
+                              | "pagefind"        -> "pageFind"
+                              | "elementattr"     -> "elementAttr"
+                              | "elementtext"     -> "elementText"
+                              | "elementtype"     -> "elementType"
+                              | "elementchildren" -> "elementChildren"
+                              | _                 -> s
+                            in 
+                            "\tcall\t" ^ name ^ "\n"
   | Fdecl(s)             -> "global " ^ s ^ "\n"
   | Imprt                -> "extern fprintf\nextern fopen\n"
   | Assign(dst, src)     -> 

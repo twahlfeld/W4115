@@ -122,6 +122,8 @@ char * _runOnElement(Element * element,char * code){
     return json->valuestring;
 }
 char * elementAttr(Element * element, char * attr){
+    if (element->html == NULL)
+        return NULL;
     int size = sizeof(char) * strlen(element->html)*2;
     char * innerHtml = malloc(size);
     str_escape(innerHtml,element->html,size);
