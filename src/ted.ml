@@ -46,116 +46,104 @@ let _ =
        body    = []
       }::{
        ftype   = List;
-       fname   = "listnew";
+       fname   = "listNew";
        formals = [];
        locals  = [];
        body    = []
       }::{
        ftype   = Any;
-       fname   = "listhead";
+       fname   = "listHead";
        formals = Arg(List, "list")::[];
        locals  = [];
        body    = [];
       }::{
        ftype   = Any;
-       fname   = "listaddlast";
+       fname   = "listAddLast";
        formals = Arg(List, "list")::Arg(Any, "data")::[];
        locals  = [];
        body    = [];
       }::{
        ftype   = Any;
-       fname   = "listaddafter";
+       fname   = "listAddAfter";
        formals = Arg(List, "list")::Arg(Any, "data")::[];
        locals  = [];
        body    = [];
       }::{
        ftype   = Any;
-       fname   = "listset";
+       fname   = "listSet";
        formals = Arg(List, "list")::Arg(Any, "data")::[];
        locals  = [];
        body    = [];
       }::{
        ftype   = Any;
-       fname   = "listrem";
+       fname   = "list_remove";
        formals = Arg(List, "list")::Arg(Int, "index")::[];
        locals  = [];
        body    = [];
       }::{
        ftype   = List;
-       fname   = "listtail";
+       fname   = "listTail";
        formals = Arg(List, "list")::[];
        locals  = [];
        body    = [];
       }::{
        ftype   = List;
-       fname   = "listconcat";
+       fname   = "listConcate";
        formals = Arg(List, "list1")::Arg(List, "list2")::[];
        locals  = [];
        body    = []
       }::{
-        ftype = List;
-        fname = "listconcat";
-        formals = Arg(List, "list")::Arg(List, "list")::[];
-        locals = [];
-        body = [];
-      }::{
        ftype   = Page;
-       fname   = "fetch";
+       fname   = "pageFetch";
        formals = Arg(String, "url")::[];
        locals  = [];
        body    = []
       }::{
        ftype   = String;
-       fname   = "pageurl";
+       fname   = "pageURL";
        formals = Arg(Page, "page")::[];
        locals  = [];
        body    = []
       }::{
        ftype   = String;
-       fname   = "pagehtml";
+       fname   = "pageHTML";
        formals = Arg(Page, "page")::[];
        locals  = [];
        body    = []
       }::{
        ftype   = Element;
-       fname   = "pageroot";
+       fname   = "pageRoot";
        formals = Arg(Page, "page")::[];
        locals  = [];
        body    = []
       }::{
        ftype   = List;
-       fname   = "pagefind";
+       fname   = "pageFind";
        formals = Arg(Page, "page")::Arg(String, "selector")::[];
        locals  = [];
        body    = []
       }::{
         ftype = String;
-        fname = "elementattr";
+        fname = "elementAttr";
         formals = Arg(Element, "element")::Arg(String, "selector")::[];
         locals = [];
         body = []
       }::{
         ftype = String;
-        fname = "elementhtml";
+        fname = "elementText";
         formals = Arg(Element, "element")::[];
         locals = [];
         body = []
       }::{
         ftype = String;
-        fname = "elementtext";
-        formals = Arg(Element, "element")::[];
-        locals = [];
-        body = []
-      }::{
-        ftype = String;
-        fname = "elementtype";
+        fname = "elementType";
         formals = Arg(Element, "element")::[];
         locals = [];
         body = []
       }::{
         ftype = List;
-        fname = "elementchildren";
-        formals = Arg(Element, "element")::[];
+        fname = "elementChildren";
+        formals = Arg(Page, "page")::Arg(Element, "element")::[];
         locals = [];
         body = [];
       }::[]
