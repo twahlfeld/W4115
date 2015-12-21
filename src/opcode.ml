@@ -69,7 +69,7 @@ let unescape s =
 let rec build_str kv_list =
   match kv_list with
     | []     -> ""
-    | (k, v)::tl -> v ^ ":\t\t;" ^ k ^ 
+    | (k, v)::tl -> v ^ ":\t\t;\"" ^ k ^ "\"" ^
       (define_global 0 (explode (unescape k))) ^ (build_str tl)
 ;;
 
