@@ -4,10 +4,10 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <string.h>
-#include "parse.h"
 #include "cJSON.h"
 #include <stdint.h>
 #include <ctype.h>
+#include "parse.h"
 
 char *_scrape(char *script) {
     int pipefd[2];
@@ -86,7 +86,8 @@ NODE *pageFind(Page *page, char *sel) {
 
     NODE * head = listNew();
 
-    for (int i = 0; i < cJSON_GetArraySize(json); i++) {
+    int i;
+    for (i = 0; i < cJSON_GetArraySize(json); i++) {
         Element * e = malloc(sizeof(Element));
         e->html = strdup(cJSON_GetObjectItem(cJSON_GetArrayItem(json, i), "html")->valuestring);
         e->path = strdup(cJSON_GetObjectItem(cJSON_GetArrayItem(json, i), "path")->valuestring);
@@ -157,7 +158,8 @@ NODE * elementChildren(Page * page, Element * element) {
 
     NODE * head = listNew();
 
-    for (int i = 0; i < cJSON_GetArraySize(json); i++) {
+    int i;
+    for (i = 0; i < cJSON_GetArraySize(json); i++) {
         Element * e = malloc(sizeof(Element));
         e->html = strdup(cJSON_GetObjectItem(cJSON_GetArrayItem(json, i), "html")->valuestring);
         e->path = strdup(cJSON_GetObjectItem(cJSON_GetArrayItem(json, i), "path")->valuestring);
