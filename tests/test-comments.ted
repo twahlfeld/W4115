@@ -7,6 +7,6 @@ int main() {
   comment 
   comment */
 
-  print(stdout, "%s\n", i);
+  print(stdout, "%d\n", i);
   return 0;
 }
