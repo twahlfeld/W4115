@@ -148,7 +148,7 @@ let rec string_of_stmt strlit_map blist =
   | Ld_reg(reg)       -> "\tmov\trax, " ^ reg ^ "\n"
   | Ld_lit(lit)       -> "\tmov\trax, " ^ (string_of_int lit) ^ "\n" 
   | Str_var(var)      -> "\tmov\tqword " ^ var ^", rax\n"
-  | Header(s, extn)   -> s ^ "\nextern fprintf\nextern fopen\n" ^
+  | Header(s, extn)   -> s ^ extn ^
                          "extern stdout\n" ^
                          "\nSECTION .text\n"
   | Tail(s, g)        -> "\nSECTION .data\n" ^
