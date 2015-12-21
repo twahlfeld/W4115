@@ -88,7 +88,7 @@ let _ =
        body    = [];
       }::{
        ftype   = List;
-       fname   = "listConcate";
+       fname   = "listConcat";
        formals = Arg(List, "list1")::Arg(List, "list2")::[];
        locals  = [];
        body    = []

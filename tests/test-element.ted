@@ -3,20 +3,33 @@ int main() {
   Element e;
   List l;
   List l1;
+  List l2;
   Element f;
   string s;
   string t;
+  Element g;
 
-  p = pageFetch("http://example.com");
+  p = pageFetch("http://www.example.com");
   e = pageRoot(p);
   l = elementChildren(p, e);
+  e = listHead(l);
   l1 = listTail(l);
   f = listHead(l1);
-  s = elementType(f);
+  s = elementText(f);
+
   print(stdout, "%s\n", s);
 
 
+
+
 /*
+  l1 = listTail(l);      
+  f = listHead(l1);
+  l2 = elementChildren(f);
+  g = listHead(l2);
+  s = elementText(g);
+  print(stdout, "%s\n", s);
+
   p = pageFetch("http://haighr.com");
   e = pageRoot(p);
 
