@@ -1,7 +1,9 @@
+#!/bin/sh
+
 FILE=$1
 TED="./ted $FILE.ted"
 ASSEMBLE="nasm -f elf64 $FILE.asm"
-GCC="gcc $FILE.o -o $FILE"
+GCC="gcc -I../libparse -L../libparse $FILE.o -lm -lparse -o $FILE"
 
 if [ -f $FILE.asm ]; then
   rm $FILE.asm
@@ -11,6 +13,6 @@ if [ -f $FILE.o ]; then
   rm $FILE.o
 fi
 
-$TED $INFILE
+$TED
 $ASSEMBLE
 $GCC

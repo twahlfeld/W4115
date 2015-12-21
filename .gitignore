@@ -8,6 +8,9 @@
 *.cmxs
 *.cmxa
 *.asm
+*.sublime*
 
 # Folders
 .idea/
+bin/
+node_modules/

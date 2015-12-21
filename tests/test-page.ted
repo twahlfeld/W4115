@@ -1,6 +1,14 @@
 int main() {
-  Page p = get("https://haighr.com");
-  print(stdout, "%s\n%s\n%s\n%s\n", p.url, p.response, p.children.head.html);
-  return 0
+
+  Page p;
+  string url;
+  string html;
+
+  p = pageFetch("http://example.com");
+
+  url = pageURL(p);
+  print(stdout, "%s\n", url);
+
+  return 0;
 }
 

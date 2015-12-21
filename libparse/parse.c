@@ -1,57 +1,23 @@
+#define _GNU_SOURCE
 #include <stdio.h>
-#include <string.h>
-#include <sys/time.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <string.h>
+#include "cJSON.h"
+#include <stdint.h>
+#include <ctype.h>
+#include "parse.h"
 
-#define FILENAME_SIZE 14
-#define BUFF_SIZE 4096
-
-void strrand(char *str, size_t len) {
-    static const char alphanum[] =
-        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    int i;
-    for (i = 0; i < len; ++i) {
-        str[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
-    }
-
-    str[len] = 0;
-}
-
-char *get_title(char *uri) {
+char *_scrape(char *script) {
     int pipefd[2];
     pid_t cpid;
     int status;
-    FILE *fp_in, *fp_out;
-    char js_file[FILENAME_SIZE];
-    char js_out[BUFF_SIZE];
-    char js_str[] = "var page = require('webpage').create(); var sys = require('system'); if (sys.args.length === 1) { phantom.exit(1); } var timeout = sys.args[1]; var url = sys.args[2]; page.viewportSize = { width: 1366, height: 768 }; page.settings.resourceTimeout = timeout; page.onResourceTimeout = function() { phantom.exit(2); }; page.open(url, function(status) { var title = page.evaluate(function() { return document.title; }); console.log(title); phantom.exit(0); });";
-    char timeout[] = "15000";
 
-    struct timeval time;
-    gettimeofday(&time, NULL);
-    srand((unsigned int) time.tv_usec);
+    FILE *file_ptr;
+    char *buffer = NULL, *temp = NULL;
 
-    memset(js_file, 0, sizeof(char) * strlen(js_file) + 1);
-    strrand(js_file, FILENAME_SIZE - 1);
-    strncpy(js_file + 10, ".js", 3);
-
-    do {
-        memset(js_file, 0, sizeof(char) * strlen(js_file) + 1);
-        strrand(js_file, FILENAME_SIZE - 1);
-        strncpy(js_file + 10, ".js", 3);
-    } while (access(js_file, F_OK) != -1);
-
-    fp_out = fopen(js_file, "w");
-    if (fp_out != NULL) {
-        fwrite(js_str, 1, strlen(js_str), fp_out);
-        fclose(fp_out);
-    }
-
-    if (pipe(pipefd) == -1) {
-        return NULL;
-    }
+    if (pipe(pipefd) == -1) return NULL;
 
     if ((cpid = fork()) == -1) {
         return NULL;
@@ -60,28 +26,256 @@ char *get_title(char *uri) {
         dup2(pipefd[1], STDOUT_FILENO);
         dup2(pipefd[1], STDERR_FILENO);
 
-        execl("/usr/bin/phantomjs", "phantomjs", "--ssl-protocol=tlsv1", "--ignore-ssl-errors=true", js_file, timeout, uri, NULL);
+        execl("/usr/bin/nodejs", "nodejs", "-e", script, NULL);
         return NULL;
     }
+
 
     close(pipefd[1]);
 
-    fp_in = fdopen(pipefd[0], "r");
-    if (fp_in != NULL) {
-        while (fgets(js_out, BUFF_SIZE, fp_in) != NULL) { }
-        fclose(fp_out);
+    size_t sz = 0, idx = 0;
+    int chr = EOF;
+
+    file_ptr = fdopen(pipefd[0], "r");
+    if (file_ptr != NULL) {
+        while (chr) {
+            chr = fgetc(file_ptr);
+            if (chr == EOF) chr = 0;
+
+            if (sz <= idx) {
+                sz++;
+                if ((temp = realloc(buffer, sz)) == NULL) {
+                    free(buffer);
+                    break;
+                }
+                buffer = temp;
+            }
+            buffer[idx++] = (char) chr;
+        }
     }
 
-    if (waitpid(cpid, &status, 0) == -1) {
-        return NULL;
-    }
+    if (waitpid(cpid, &status, 0) == -1) return NULL;
 
-    if (remove(js_file) != 0) {
-        return NULL;
-    }
-
-    char *title = malloc(sizeof(char) * strlen(js_out) + 1);
-    memset(title, 0, sizeof(char) * strlen(title) + 1);
-    strncpy(title, js_out, strlen(js_out));
-    return title;
+    return buffer;
 }
+Page *pageFetch(char *url) {
+    Page *page = malloc(sizeof(Page));
+    char *buffer = NULL;
+    asprintf(&buffer, "var phantom = require('phantom'); phantom.create(function (ph) { ph.createPage(function (page) { page.set('viewportSize', {width: 1366, height: 768}); page.open('%s', function () { page.includeJs('http://code.jquery.com/jquery-1.11.3.min.js', function () { page.evaluate(function () { return window.document.documentElement.outerHTML; }, function (result) { var str = JSON.stringify(result); console.log(str.substring(1, str.length - 1)); ph.exit(); }); }); }); }); });", url);
+    if (buffer == NULL) return NULL;
+
+    page->url = strdup(url);
+    char *str = _scrape(buffer);
+    str[strlen(str) - 1] = 0;
+    page->html = str;
+
+
+    free(buffer);
+    return page;
+}
+NODE *pageFind(Page *page, char *sel) {
+    char *buffer = NULL;
+    asprintf(&buffer, "var phantom = require('phantom'); phantom.create(function (ph) { ph.createPage(function (page) { page.set('viewportSize', {width: 1366, height: 768}); page.set('content', \"%s\"); page.includeJs('http://code.jquery.com/jquery-1.11.3.min.js', function () { page.evaluate(function () { var css_path = function(el) { if (!(el instanceof Element)) return; var path = []; while (el.nodeType === Node.ELEMENT_NODE) { var selector = el.nodeName.toLowerCase(); if (el.id) { selector += '#' + el.id; path.unshift(selector); break; } else { var sib = el, nth = 1; while (sib = sib.previousElementSibling) { if (sib.nodeName.toLowerCase() == selector) nth++; } if (nth != 1) selector += ':nth-of-type('+nth+')'; } path.unshift(selector); el = el.parentNode; } return path.join(' > '); }; return $.map($('%s'), function (elm) { return {html: elm.outerHTML, path: css_path(elm)} }); /*return $.find(blue[0]).length;*/ }, function (result) { console.log(JSON.stringify(result)); ph.exit(); }); }); }); });", page->html, sel);
+    if (buffer == NULL) return NULL;
+
+    cJSON *json;
+    char *str = _scrape(buffer);
+    json = cJSON_Parse(str);
+    if (json == NULL)
+        return NULL;
+
+    NODE * head = listNew();
+
+    int i;
+    for (i = 0; i < cJSON_GetArraySize(json); i++) {
+        Element * e = malloc(sizeof(Element));
+        e->html = strdup(cJSON_GetObjectItem(cJSON_GetArrayItem(json, i), "html")->valuestring);
+        e->path = strdup(cJSON_GetObjectItem(cJSON_GetArrayItem(json, i), "path")->valuestring);
+        listAddLast(head,e);
+    }
+
+    free(buffer);
+    cJSON_Delete(json);
+    return head;
+}
+
+
+/*Element*/
+char * _runOnElement(Element * element,char * code){
+    int size = sizeof(char) * strlen(element->html)*2;
+    char * innerHtml = malloc(size);
+    str_escape(innerHtml,element->html,size);
+    char *buffer = NULL;
+    asprintf(&buffer, "var phantom = require('phantom'); phantom.create(function (ph) { ph.createPage(function (page) { page.set('viewportSize', {width: 1366, height: 768}); page.set('content',\"\"); page.includeJs('http://code.jquery.com/jquery-1.11.3.min.js', function () { page.evaluate(function () { return obj = {text:$(\"%s\").%s}; }, function (result) { console.log(JSON.stringify(result)); ph.exit(); }); }); }); });", innerHtml,code);
+    if (buffer == NULL) return NULL;
+
+    cJSON *json;
+    char *str = _scrape(buffer);
+    //printf("str: %s",str);
+    json = cJSON_Parse(str);
+    if (json == NULL)
+        return NULL;
+    json = cJSON_GetObjectItem(json,"text");
+    if (json == NULL)
+        return NULL;
+    free(innerHtml);
+    return json->valuestring;
+}
+char * elementAttr(Element * element, char * attr){
+    if (element->html == NULL)
+        return NULL;
+    int size = sizeof(char) * strlen(element->html)*2;
+    char * innerHtml = malloc(size);
+    str_escape(innerHtml,element->html,size);
+    char *buffer = NULL;
+    asprintf(&buffer, "var phantom = require('phantom'); phantom.create(function (ph) { ph.createPage(function (page) { page.set('viewportSize', {width: 1366, height: 768}); page.set('content',\"\"); page.includeJs('http://code.jquery.com/jquery-1.11.3.min.js', function () { page.evaluate(function () { return obj = {attr:$(\"%s\").attr('%s')}; }, function (result) { console.log(JSON.stringify(result)); ph.exit(); }); }); }); });", innerHtml, attr);
+    if (buffer == NULL) return NULL;
+
+    cJSON *json;
+    char *str = _scrape(buffer);
+    json = cJSON_Parse(str);
+    if (json == NULL)
+        return NULL;
+    json = cJSON_GetObjectItem(json,"attr");
+    if (json == NULL)
+        return NULL;
+    free(innerHtml);
+    return json->valuestring;
+}
+char * elementText(Element * element){
+    return _runOnElement(element,"text()");
+}
+char * elementType(Element * element){
+    return _runOnElement(element,"get(0).tagName");
+}
+NODE * elementChildren(Page * page, Element * element) {
+    char *buffer = NULL;
+    asprintf(&buffer, "var phantom = require('phantom'); phantom.create(function (ph) { ph.createPage(function (page) { page.set('viewportSize', {width: 1366, height: 768}); page.set('content', '%s'); page.includeJs('http://code.jquery.com/jquery-1.11.3.min.js', function () { page.evaluate(function () { var css_path = function(el) { if (!(el instanceof Element)) return; var path = []; while (el.nodeType === Node.ELEMENT_NODE) { var selector = el.nodeName.toLowerCase(); if (el.id) { selector += '#' + el.id; path.unshift(selector); break; } else { var sib = el, nth = 1; while (sib = sib.previousElementSibling) { if (sib.nodeName.toLowerCase() == selector) nth++; } if (nth != 1) selector += \":nth-of-type(\"+nth+\")\"; } path.unshift(selector); el = el.parentNode; } return path.join(\" > \"); }; return $.map($('%s').children(), function (elm) { return {html: elm.outerHTML, path: css_path(elm)} }); /*return $.find(blue[0]).length;*/ }, function (result) { console.log(JSON.stringify(result)); ph.exit(); }); }); }); });", page->html,element->path);
+    if (buffer == NULL) return NULL;
+    cJSON *json;
+    char *str = _scrape(buffer);
+    json = cJSON_Parse(str);
+    if (json == NULL)
+        return NULL;
+
+    NODE * head = listNew();
+
+    int i;
+    for (i = 0; i < cJSON_GetArraySize(json); i++) {
+        Element * e = malloc(sizeof(Element));
+        e->html = strdup(cJSON_GetObjectItem(cJSON_GetArrayItem(json, i), "html")->valuestring);
+        e->path = strdup(cJSON_GetObjectItem(cJSON_GetArrayItem(json, i), "path")->valuestring);
+        listAddLast(head,e);
+    }
+
+    free(buffer);
+    cJSON_Delete(json);
+    return head;
+}
+
+/* Page */
+char * pageURL(Page * p){
+    return p->url;
+}
+char * pageHTML(Page * p){
+    return p->html;
+}
+Element * pageRoot(Page * p){
+    Element * element = malloc(sizeof(element));
+    element->path = "html";
+    element->html = p->html;
+    return element;
+}
+
+
+char * elementHTML(Element * element){
+    return element->html;
+}
+
+size_t str_escape(char *dst, const char *src, size_t dstLen)
+{
+    const char complexCharMap[] = "abtnvfr";
+
+    size_t i;
+    size_t srcLen = strlen(src);
+    size_t dstIdx = 0;
+
+    // If caller wants to determine required length (supplying NULL for dst)
+    // then we set dstLen to SIZE_MAX and pretend the buffer is the largest
+    // possible, but we never write to it. Caller can also provide dstLen
+    // as 0 if no limit is wanted.
+    if (dst == NULL || dstLen == 0) dstLen = SIZE_MAX;
+
+    for (i = 0; i < srcLen && dstIdx < dstLen; i++)
+    {
+        size_t complexIdx = 0;
+
+        switch (src[i])
+        {
+            case '\'':
+            case '\"':
+            case '\\':
+                if (dst && dstIdx <= dstLen - 2)
+                {
+                    dst[dstIdx++] = '\\';
+                    dst[dstIdx++] = src[i];
+                }
+                else dstIdx += 2;
+                break;
+
+            case '\r': complexIdx++;
+            case '\f': complexIdx++;
+            case '\v': complexIdx++;
+            case '\n': complexIdx++;
+            case '\t': complexIdx++;
+            case '\b': complexIdx++;
+            case '\a':
+                if (dst && dstIdx <= dstLen - 2)
+                {
+                    dst[dstIdx++] = '\\';
+                    dst[dstIdx++] = complexCharMap[complexIdx];
+                }
+                else dstIdx += 2;
+                break;
+
+            default:
+                if (isprint(src[i]))
+                {
+                    // simply copy the character
+                    if (dst)
+                        dst[dstIdx++] = src[i];
+                    else
+                        dstIdx++;
+                }
+                else
+                {
+                    // produce octal escape sequence
+                    if (dst && dstIdx <= dstLen - 4)
+                    {
+                        dst[dstIdx++] = '\\';
+                        dst[dstIdx++] = ((src[i] & 0300) >> 6) + '0';
+                        dst[dstIdx++] = ((src[i] & 0070) >> 3) + '0';
+                        dst[dstIdx++] = ((src[i] & 0007) >> 0) + '0';
+                    }
+                    else
+                    {
+                        dstIdx += 4;
+                    }
+                }
+        }
+    }
+
+    if (dst && dstIdx <= dstLen)
+        dst[dstIdx] = '\0';
+
+    return dstIdx;
+}
+
+
+//Element *parent(Element *elm) {
+//    return NULL;
+//}
+//
+//Element *children(Element *elm) {
+//    return NULL;
+//}

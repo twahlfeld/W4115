@@ -1,33 +1,33 @@
 module StringMap = Map.Make(String)
 
 type bstmt =
-  | Lit of int                (* Integer Literal *)
-  | Str of string             (* String Literal *)
+  | Lit of int                  (* Integer Literal *)
+  | Str of string               (* String Literal *)
   | Arg of string * bstmt
   | Reg of string
-  | Bin of Ast.op             (* Binary Operators *)
-  (*| Unop of Ast.unop        (* Unary Operators *)*)
-  | Mov of string * bstmt     (* Mov instruction *)
-  | Local_var of int          (* Local Variables, Relative Frame Pointer offset *)
-  | Glob_var of string        (* Global Variables, by absolute label *)
-  | Get_gvar of string        (* Gets Global Variables *)
-  | Set_gvar of string        (* Sets Global Variables  *)
-  | Call of string * int      (* Call function by name or address *)
-  | Fdecl of string           (* Function Declaration *)
-  | Imprt                     (* Import/Extern function *)
-  | Prologue of string * int  (* Start of every stack frame *)
-  | Epilogue                  (* End of every stack frame *)
-  | Assign of bstmt * bstmt   (* Set variable *)
-  | Ld_var of string          (* Load variable *)
-  | Ld_reg of string          (* Load register into id *)
-  | Ld_lit of int             (* Load lit into register *)
-  | Str_var of string         (* Stores variable *)
-  | Jmp_true of string        (* Jump if equal to zero *)
-  | Jmp_false of string       (* Jump if not equal to zero*)
-  | Jmp of string             (* Unconditional Jump to label *)
-  | Label of string           (* Label for jumps *)
-  | Header of string          (* Creates standard header *)
-  | Tail of string            (* Creates a standard string *)
+  | Bin of Ast.op               (* Binary Operators *)
+  (*| Unop of Ast.unop          (* Unary Operators *)*)
+  | Mov of string * bstmt       (* Mov instruction *)
+  | Local_var of int            (* Local Variables, Relative Frame Pointer offset *)
+  | Glob_var of string          (* Global Variables, by absolute label *)
+  | Get_gvar of string          (* Gets Global Variables *)
+  | Set_gvar of string          (* Sets Global Variables  *)
+  | Call of string * int        (* Call function by name or address *)
+  | Fdecl of string             (* Function Declaration *)
+  | Imprt                       (* Import/Extern function *)
+  | Prologue of string * int    (* Start of every stack frame *)
+  | Epilogue                    (* End of every stack frame *)
+  | Assign of bstmt * bstmt     (* Set variable *)
+  | Ld_var of string            (* Load variable *)
+  | Ld_reg of string            (* Load register into id *)
+  | Ld_lit of int               (* Load lit into register *)
+  | Str_var of string           (* Stores variable *)
+  | Jmp_true of string          (* Jump if equal to zero *)
+  | Jmp_false of string         (* Jump if not equal to zero*)
+  | Jmp of string               (* Unconditional Jump to label *)
+  | Label of string             (* Label for jumps *)
+  | Header of string * string   (* Creates standard header *)
+  | Tail of string * string list(* Creates a standard string *)
   | Arg_to_var of string * string
   | Fakenop
   | Ret of bstmt
@@ -43,14 +43,7 @@ let explode s =
     if i < 0 then l 
     else
       let ch = s.[i] in
-        (if i > 1 && ch = 'n' && s.[i-1] = '\\' then
-          let tl = function
-            | []     -> []
-            | hd::[] -> []
-            | hd::hd'::tl -> tl
-          in
-          exp (i - 2) (Char.code '\n' :: (tl l)) 
-        else exp (i - 1) (Char.code ch :: l))
+      exp (i - 1) (Char.code ch :: l)
   in
   exp (String.length s - 1) []
 ;;
@@ -69,12 +62,16 @@ let rec define_global acc = function
       (Printf.sprintf "%02XH, " hd) ^ define_global (acc+1) tl
 ;;
 
+
+let unescape s =
+    Scanf.sscanf ("\"" ^ s ^ "\"") "%S%!" (fun u -> u);;
+
 let rec build_str kv_list =
   match kv_list with
     | []     -> ""
-    | (k, v)::tl -> v ^ ":" ^ (define_global 0 (explode k))^(build_str tl)
+    | (k, v)::tl -> v ^ ":\t\t;\"" ^ k ^ "\"" ^
+      (define_global 0 (explode (unescape k))) ^ (build_str tl)
 ;;
-
 
 let rec string_of_stmt strlit_map blist =
   let to_string x = string_of_stmt strlit_map x in
@@ -131,7 +128,12 @@ let rec string_of_stmt strlit_map blist =
   | Glob_var(s)          -> "["^s^"]"
   | Set_gvar(s)          -> "\tmov\t" ^ s ^ ", rax\n"
   | Get_gvar(s)          -> "\tmov\trax, " ^ s ^ "\n"
-  | Call(s, n)           -> "\tcall\t" ^ s ^ "\n"
+  | Call(s, n)           -> let name = match s with 
+                              | "listRemove"     -> "list_remove"
+                              | "listConcat" -> "listConcate"
+                              | _                 -> s
+                            in 
+                            "\tcall\t" ^ name ^ "\n"
   | Fdecl(s)             -> "global " ^ s ^ "\n"
   | Imprt                -> "extern fprintf\nextern fopen\n"
   | Assign(dst, src)     -> 
@@ -148,10 +150,13 @@ let rec string_of_stmt strlit_map blist =
   | Ld_reg(reg)       -> "\tmov\trax, " ^ reg ^ "\n"
   | Ld_lit(lit)       -> "\tmov\trax, " ^ (string_of_int lit) ^ "\n" 
   | Str_var(var)      -> "\tmov\tqword " ^ var ^", rax\n"
-  | Header(s)         -> s ^ "\nextern fprintf\nextern fopen\n" ^
-                         "extern stdout\nextern get_title\n"^
+  | Header(s, extn)   -> s ^ extn ^
+                         "extern stdout\n" ^
                          "\nSECTION .text\n"
-  | Tail(s)           -> "\nSECTION .data\n" ^
+  | Tail(s, g)        -> "\nSECTION .data\n" ^
+                         (List.fold_left 
+                           (fun s n -> 
+                             Printf.sprintf "%s\n%s:\n\t\tdd 00000005H\n" s n) "" g) ^
                          "SECTION .bss\n" ^
                          "SECTION .rodata\n" ^
                          (build_str (StringMap.bindings strlit_map)) ^ "\n" ^ 
