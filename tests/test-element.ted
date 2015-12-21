@@ -2,6 +2,7 @@ int main() {
   Page p;
   Element e;
   List l;
+  List l1;
   Element f;
   string s;
   string t;
@@ -10,7 +11,8 @@ int main() {
   e = pageroot(p);
 
   l = elementchildren(e);
-  f = listnext(l);
+  l1 = listtail(l);
+  f = listhead(l1);
 
   s = elementattr(f, "id");
   t = elementtype(f);

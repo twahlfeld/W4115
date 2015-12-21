@@ -2,22 +2,24 @@ int main() {
   List l;
   List l2;
   List l3;
+  List l4;
   int i;
   int j;
   int len;
 
   l = listnew();
-  listadd(l, 1);
-  listadd(l, 2);
+  listaddafter(l, 1);
+  listaddafter(l, 2);
 
   l2 = listnew();
-  listadd(l, 3);
-  listadd(l, 4);
+  listaddafter(l2, 3);
+  listaddafter(l2, 4);
+  l4 = listtail(l2);
+  listaddafter(l4, 5);
 
   l3 = listconcat(l, l2);
-  len = listsize(l3);
 
-  for (i = 0; i < len; i = i + 1) {
+  for (i = 0; i < 5; i = i + 1) {
     j = listhead(l3);
     print(stdout, "%d\n", j);
     l3 = listtail(l3);
