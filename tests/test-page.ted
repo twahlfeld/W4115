@@ -1,13 +1,17 @@
 int main() {
 
-  Page p = fetch("https://haighr.com");
+  Page p;
+  string url;
+  string html;
 
-  string url = pageurl(p);
+  p = fetch("https://haighr.com");
+
+  url = pageurl(p);
   print(stdout, "%s\n", url);
 
-  string html = pagehtml(p);  
+  html = pagehtml(p);  
   print(stdout, "%s\n", html);
 
-  return 0
+  return 0;
 }
 

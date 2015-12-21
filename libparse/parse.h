@@ -21,19 +21,19 @@ size_t str_escape(char *dst, const char *src, size_t dstLen);
 
 
 /*Page*/
-Page *fetch(char *url);
-Element **find(Page *page, char *sel);
-char * pageURL(Page * p);
-char * pageHTML(Page * p);
-Element * pageRoot(Page * p);
+Page *pageFetch(char *url);
+Element **pageFind(Page *page, char *sel);
+char *pageURL(Page *p);
+char *pageHTML(Page *p);
+Element *pageRoot(Page *p);
 
 
 /*Element*/
-char * _runOnElement(Element * element,char * code);
-char * elementText(Element * element);
-char * elementType(Element * element);
-char * elementAttr(Element * element, char * attr);
-Element ** elementChildren(Page * page, Element * element);
+char *_runOnElement(Element *element, char *code);
+char *elementText(Element *element);
+char *elementType(Element *element);
+char *elementAttr(Element *element, char *attr);
+Element **elementChildren(Page *page, Element *element);
 
 
 #endif

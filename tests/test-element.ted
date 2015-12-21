@@ -1,13 +1,19 @@
 int main() {
+  Page p;
+  Element e;
+  List l;
+  Element f;
+  string s;
+  string t;
 
-  Page p = fetch("http://haighr.com");
-  Elememt e = pageroot(p);
+  p = fetch("http://haighr.com");
+  e = pageroot(p);
 
-  List l = elementchildren(e);
-  Element f = listnext(l);
+  l = elementchildren(e);
+  f = listnext(l);
 
-  string s = elementattr(f, "id");
-  string t = elementtype(f);
+  s = elementattr(f, "id");
+  t = elementtype(f);
 
   print(stdout, "%s\n%s\n", s, t);
 
