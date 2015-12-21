@@ -8,7 +8,6 @@ int main() {
   string s;
   string t;
   Element g;
-
   p = pageFetch("http://www.example.com");
   e = pageRoot(p);
   l = elementChildren(p, e);
@@ -16,31 +15,6 @@ int main() {
   l1 = listTail(l);
   f = listHead(l1);
   s = elementText(f);
-
   print(stdout, "%s\n", s);
-
-
-
-
-/*
-  l1 = listTail(l);      
-  f = listHead(l1);
-  l2 = elementChildren(f);
-  g = listHead(l2);
-  s = elementText(g);
-  print(stdout, "%s\n", s);
-
-  p = pageFetch("http://haighr.com");
-  e = pageRoot(p);
-
-  l = elementChildren(e);
-  l1 = listTail(l);
-  f = listHead(l1);
-
-  s = elementAttr(f, "id");
-  t = elementType(f);
-
-  print(stdout, "%s\n%s\n", s, t);
-*/
   return 0;
 }
