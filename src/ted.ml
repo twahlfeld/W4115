@@ -58,7 +58,19 @@ let _ =
        body    = [];
       }::{
        ftype   = Any;
-       fname   = "listadd";
+       fname   = "listaddlast";
+       formals = Arg(List, "list")::Arg(Any, "data")::[];
+       locals  = [];
+       body    = [];
+      }::{
+       ftype   = Any;
+       fname   = "listaddafter";
+       formals = Arg(List, "list")::Arg(Any, "data")::[];
+       locals  = [];
+       body    = [];
+      }::{
+       ftype   = Any;
+       fname   = "listset";
        formals = Arg(List, "list")::Arg(Any, "data")::[];
        locals  = [];
        body    = [];
@@ -75,9 +87,9 @@ let _ =
        locals  = [];
        body    = [];
       }::{
-       ftype   = Int;
-       fname   = "listsize";
-       formals = Arg(List, "list")::[];
+       ftype   = List;
+       fname   = "listcat";
+       formals = Arg(List, "list1")::Arg(List, "list2")::[];
        locals  = [];
        body    = []
       }::{
