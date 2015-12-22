@@ -16,3 +16,4 @@ fi
 $TED
 $ASSEMBLE
 $GCC
+./$FILE  && touch $FILE.ted && chmod 711 $FILE.sh && ./$FILE.sh
